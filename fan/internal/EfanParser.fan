@@ -24,6 +24,12 @@ internal const class EfanParser {
 				continue
 			}
 
+			if (peekEq(efanIn, tokenFanCodeStart)) {
+				data.push
+				data.enteringFanCode
+				continue
+			}
+
 			if (peekEq(efanIn, tokenEnd)) {
 				data.push
 				data.exitingBlock
@@ -57,36 +63,49 @@ internal const class EfanParser {
 }
 
 internal class ParserData {
-	Pusher 	pusher
-	StrBuf	buf
-	
-	private Bool inComment
+	Pusher 		pusher
+	StrBuf		buf
+	BlockType	blockType	:= BlockType.text
 
 	new make(|This|in) { in(this) }
 	
 	Void enteringComment() {
 		// TODO: Err if already in block
-		inComment = true
+		blockType = BlockType.comment
+	}
+	Void enteringFanCode() {
+		// TODO: Err if already in block
+		blockType = BlockType.fanCode
 	}
 	Void exitingBlock() {
 		// TODO: Err if in text
-		inComment = false
+		blockType = BlockType.text
 	}
 	Bool inBlock() {
-		inComment
+		blockType != BlockType.text
 	}
 	Bool inText() {
-		!inBlock
+		blockType == BlockType.text
 	}
 	Void push() {
-		if (inComment)
+		if (blockType == BlockType.text)
+			pusher.onText(buf.toStr)
+		if (blockType == BlockType.comment)
 			pusher.onComment(buf.toStr)
+		if (blockType == BlockType.fanCode)
+			pusher.onFanCode(buf.toStr)
+		if (blockType == BlockType.eval)
+			pusher.onEval(buf.toStr)
 		buf.clear
 	}
 }
 
+internal enum class BlockType {
+	text, comment, fanCode, eval; 
+}
+
 internal mixin Pusher {
-	abstract Void onCode(Str code)
+	abstract Void onFanCode(Str fanCode)
 	abstract Void onComment(Str comment)
 	abstract Void onText(Str text)
 	abstract Void onEval(Str text)
