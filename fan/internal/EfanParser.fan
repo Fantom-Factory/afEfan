@@ -1,9 +1,10 @@
 
 internal const class EfanParser {
 
+	// TODO: maybe have these contributed?
 	private static const Str tokenFanCodeStart	:= "<%"
 	private static const Str tokenCommentStart	:= "<%#"
-	private static const Str tokenEqualStart	:= "<%="
+	private static const Str tokenEvalStart		:= "<%="
 	private static const Str tokenEnd			:= "%>"
 	
 	new make(|This|in) { in(this) }
@@ -13,14 +14,19 @@ internal const class EfanParser {
 	Void parse(Pusher pusher, Str efan) {
 		efanIn	:= efan.toBuf
 		
-		buf			:= StrBuf(100)
+		buf			:= StrBuf(100)	// 100 being an average line length
 		data		:= ParserData() { it.buf = buf; it.pusher = pusher }
 		
 		while (efanIn.more) {
-			
 			if (peekEq(efanIn, tokenCommentStart)) {
 				data.push
 				data.enteringComment
+				continue
+			}
+
+			if (peekEq(efanIn, tokenEvalStart)) {
+				data.push
+				data.enteringEval
 				continue
 			}
 
@@ -43,6 +49,7 @@ internal const class EfanParser {
 		if (data.inText) {
 			data.push
 		} else {
+			// FIXME: text
 			throw Err()
 		}
 	}
@@ -72,6 +79,10 @@ internal class ParserData {
 	Void enteringComment() {
 		// TODO: Err if already in block
 		blockType = BlockType.comment
+	}
+	Void enteringEval() {
+		// TODO: Err if already in block
+		blockType = BlockType.eval
 	}
 	Void enteringFanCode() {
 		// TODO: Err if already in block
