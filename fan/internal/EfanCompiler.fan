@@ -19,6 +19,8 @@ internal const class EfanCompiler {
 
 		model.overrideMethod(EfanRenderer#render, data.toFantomCode)
 
+		Env.cur.err.printLine(model.toFantomCode)
+		
 		pod		:= podCompiler.compile(model.toFantomCode)
 		type	:= pod.type("EfanRenderer")
 
@@ -34,10 +36,10 @@ internal class EfanModel : Pusher {
 	
 	new make(Int bufSize) {
 		code = StrBuf(bufSize)
-		code.add("\t\tcode := StrBuf(${bufSize})\n")
+		code.add("code := StrBuf(${bufSize})\n")
 	}
 	
-	override Void onCode(Str code) {
+	override Void onFanCode(Str code) {
 		
 	}
 	
@@ -47,6 +49,7 @@ internal class EfanModel : Pusher {
 	}
 
 	override Void onText(Str text) {
+		// FIXME: escape "'s
 		add("""code.add("${text}")""")
 	}
 
