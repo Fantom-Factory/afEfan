@@ -1,0 +1,10 @@
+
+General webSockets server
+ - maybe a WebMod ?
+ - Then a BedSheet Route
+ - Then a Draft Route
+ 
+ 
+To consider - what if Wisp closes and there're web sockets open still?
+
+ Need a WebSocksets client, with a JS native - a diff pod perhaps?
