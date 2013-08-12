@@ -12,9 +12,9 @@ internal const class EfanParser {
 	Void parse(Pusher pusher, Str efan) {
 		efanIn	:= efan.toBuf
 		
-		buf			:= StrBuf(100)	// 100 being an average line length
-		data		:= ParserData() { it.buf = buf; it.pusher = pusher }
-		
+		buf		:= StrBuf(100)	// 100 being an average line length
+		data	:= ParserData() { it.buf = buf; it.pusher = pusher }
+		line	:= 1
 		while (efanIn.more) {
 			if (peekEq(efanIn, tokenCommentStart)) {
 				data.push
@@ -41,6 +41,14 @@ internal const class EfanParser {
 			}
 
 			char := efanIn.readChar
+			
+			// normalise new lines in blocks (leave template text as is) 
+			if (data.inBlock && char == '\r') {
+				char = '\n'
+				// consume \r\n
+				if (peekEq(efanIn, "\n")) { }
+			}
+			
 			buf.addChar(char)
 		}
 		
