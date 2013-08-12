@@ -36,7 +36,7 @@ internal class EfanModel : Pusher {
 	
 	new make(Int bufSize) {
 		code = StrBuf(bufSize)
-		code.add("code := StrBuf(${bufSize})\n")
+		code.add("_afCode := StrBuf(${bufSize})\n")
 	}
 	
 	override Void onFanCode(Str code) {
@@ -45,23 +45,21 @@ internal class EfanModel : Pusher {
 	
 	override Void onComment(Str comment) {
 		// FIXME: handle multiline comments
-		// FIXME: escape "'s
 		add("""// ${comment}""")
 	}
 
 	override Void onText(Str text) {
 		// FIXME: handle multiline text
-		// FIXME: escape "'s
-		// FIXME: escape """'s
-		add("""code.add("${text}")""")
+		escaped := text.replace("\"", "\\\"")
+		add("""_afCode.add("${escaped}")""")
 	}
 
-	override Void onEval(Str text) {
-		
+	override Void onEval(Str code) {
+		add("""_afCode.add( ${code} )""")
 	}
 
 	Str toFantomCode() {
-		add("return code.toStr")
+		add("return _afCode.toStr")
 		return code.toStr
 	}
 

@@ -25,6 +25,11 @@ internal class TestEfanBasics : EfanTest {
 		verifyEq(text, "Hello!")
 	}
 
+	Void testOneLineEvalBlock() {
+		text := efan.renderStr("Hel<%= \" BIGBOY \" %>lo!")
+		verifyEq(text, "Hel BIGBOY lo!")
+	}
+
 	Void testFanCodeInBlockNotAllowedBlock() {
 		verifyEfanErrMsg(ErrMsgs.parserBlockInBlockNotAllowed(BlockType.fanCode, BlockType.fanCode)) {
 			text := efan.renderStr("Hel<% wot<%ever%> %>lo!")
@@ -73,4 +78,18 @@ internal class TestEfanBasics : EfanTest {
 		}		
 	}
 
+	Void testCommentWithTrippleQuotes() {
+		text := efan.renderStr("Hel<%# \"\"\" %>lo!")
+		verifyEq(text, "Hello!")
+	}
+
+	Void testTextWithQuotes() {
+		text := efan.renderStr("Hel\"lo!")
+		verifyEq(text, "Hel\"lo!")
+	}
+
+	Void testTextWithTrippleQuotes() {
+		text := efan.renderStr("Hel\"\"\"lo!")
+		verifyEq(text, "Hel\"\"\"lo!")
+	}
 }
