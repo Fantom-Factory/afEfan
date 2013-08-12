@@ -1,15 +1,13 @@
 
 internal const class EfanParser {
 
-	// TODO: maybe have these contributed?
+	// don't contribute these, as currently, there are a lot of assumptions around <%# starting with <%
 	private static const Str tokenFanCodeStart	:= "<%"
 	private static const Str tokenCommentStart	:= "<%#"
 	private static const Str tokenEvalStart		:= "<%="
 	private static const Str tokenEnd			:= "%>"
 	
 	new make(|This|in) { in(this) }
-	
-	// TODO: test that <% <% is illegal
 	
 	Void parse(Pusher pusher, Str efan) {
 		efanIn	:= efan.toBuf
@@ -46,12 +44,10 @@ internal const class EfanParser {
 			buf.addChar(char)
 		}
 		
-		if (data.inText) {
-			data.push
-		} else {
-			// FIXME: text
-			throw Err()
-		}
+		if (data.inBlock)
+			throw EfanParserErr(ErrMsgs.parserBlockNotClosed(data.blockType))
+
+		data.push
 	}
 	
 	Bool peekEq(Buf buf, Str tag) {
@@ -76,20 +72,22 @@ internal class ParserData {
 
 	new make(|This|in) { in(this) }
 	
-	Void enteringComment() {
-		// TODO: Err if already in block
-		blockType = BlockType.comment
-	}
-	Void enteringEval() {
-		// TODO: Err if already in block
-		blockType = BlockType.eval
-	}
 	Void enteringFanCode() {
-		// TODO: Err if already in block
+		if (inBlock)
+			throw EfanParserErr(ErrMsgs.parserBlockInBlockNotAllowed(blockType, BlockType.fanCode))
 		blockType = BlockType.fanCode
 	}
+	Void enteringEval() {
+		if (inBlock)
+			throw EfanParserErr(ErrMsgs.parserBlockInBlockNotAllowed(blockType, BlockType.eval))
+		blockType = BlockType.eval
+	}
+	Void enteringComment() {
+		if (inBlock)
+			throw EfanParserErr(ErrMsgs.parserBlockInBlockNotAllowed(blockType, BlockType.comment))
+		blockType = BlockType.comment
+	}
 	Void exitingBlock() {
-		// TODO: Err if in text
 		blockType = BlockType.text
 	}
 	Bool inBlock() {
