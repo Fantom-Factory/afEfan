@@ -2,12 +2,12 @@ using afIoc
 
 internal class TestEfanBasics : EfanTest {
 	
-	Registry? 	reg
-	Efan?		efan
+	Registry? 		reg
+	EfanService?	efan
 	
 	override Void setup() {
 		reg 	= RegistryBuilder(["suppressLogging":true]).addModule(EfanModule#).build(["suppressStartupMsg":true]).startup
-		efan	= reg.dependencyByType(Efan#)
+		efan	= reg.dependencyByType(EfanService#)
 	}
 	
 	Void testOneLineText() {
