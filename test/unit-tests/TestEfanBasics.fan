@@ -92,4 +92,14 @@ internal class TestEfanBasics : EfanTest {
 		text := efan.renderStr("Hel\"\"\"lo!")
 		verifyEq(text, "Hel\"\"\"lo!")
 	}
+
+	Void testEvalWithQuotes() {
+		text := efan.renderStr("""Hel<%= " \\\" " %>lo!""")
+		verifyEq(text, "Hel \" lo!")
+	}
+
+	Void testEvalWithTrippleQuotes() {
+		text := efan.renderStr("Hel<%= \" \\\"\\\"\\\" \" %>lo!")
+		verifyEq(text, "Hel \"\"\" lo!")
+	}
 }
