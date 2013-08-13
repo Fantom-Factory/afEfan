@@ -4,12 +4,12 @@ using afIoc::RegistryBuilder
 internal class TestMultiLines : EfanTest {
 	
 	Registry? 		reg
-	Efan?			efan
+	EfanService?	efan
 	EfanCompiler?	compiler
 	
 	override Void setup() {
 		reg 		= RegistryBuilder(["suppressLogging":true]).addModule(EfanModule#).build(["suppressStartupMsg":true]).startup
-		efan		= reg.dependencyByType(Efan#)
+		efan		= reg.dependencyByType(EfanService#)
 		compiler	= reg.dependencyByType(EfanCompiler#)
 	}
 

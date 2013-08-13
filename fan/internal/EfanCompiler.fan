@@ -9,17 +9,18 @@ internal const class EfanCompiler {
 	
 	new make(|This|in) { in(this) }
 
-	EfanRenderer compile(Str efan) {
+	Type compile(Str efan, Type? ctxType) {
 		model := PlasticClassModel("EfanRenderer", true)
-		model.extendMixin(EfanRenderer#)
+//		model.extendMixin(EfanRenderer#)
 
 		code := parseIntoCode(efan)
-		model.overrideMethod(EfanRenderer#render, code)
+		sig	 := (ctxType == null) ? "" : "${ctxType.qname} ctx"
+		model.addMethod(Str#, "render", sig, code)
 
 		pod		:= podCompiler.compile(model.toFantomCode)
 		type	:= pod.type("EfanRenderer")
 
-		return type.make([null])	// TODO: remove [null] when afIoc 1.4.2 released		
+		return type		
 	}
 	
 	internal Str parseIntoCode(Str efan) {
