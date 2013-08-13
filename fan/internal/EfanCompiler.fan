@@ -10,29 +10,30 @@ internal const class EfanCompiler {
 	new make(|This|in) { in(this) }
 
 	EfanRenderer compile(Str efan) {
-
 		model := PlasticClassModel("EfanRenderer", true)
 		model.extendMixin(EfanRenderer#)
 
-		data	:= EfanModel(efan.size)
-		parser.parse(data, efan)
+		code := parseIntoCode(efan)
+		model.overrideMethod(EfanRenderer#render, code)
 
-		model.overrideMethod(EfanRenderer#render, data.toFantomCode)
-
-//		Env.cur.err.printLine(model.toFantomCode)
-		
 		pod		:= podCompiler.compile(model.toFantomCode)
 		type	:= pod.type("EfanRenderer")
 
 		return type.make([null])	// TODO: remove [null] when afIoc 1.4.2 released		
 	}
 	
+	internal Str parseIntoCode(Str efan) {
+		data := EfanModel(efan.size)
+		parser.parse(data, efan)
+		return data.toFantomCode
+	}
 }
 
 
 internal class EfanModel : Pusher {
 
-	StrBuf code
+	StrBuf 	code
+	Int		indentSize	:= 2
 	
 	new make(Int bufSize) {
 		code = StrBuf(bufSize)
@@ -40,32 +41,86 @@ internal class EfanModel : Pusher {
 	}
 	
 	override Void onFanCode(Str code) {
-		add(code)		
+		if (code.contains("\n"))
+			addMultiline(code)
+		else
+			indent.add(code)		
 	}
 	
 	override Void onComment(Str comment) {
-		// FIXME: handle multiline comments
-		add("""// ${comment}""")
-	}
-
-	override Void onText(Str text) {
-		// FIXME: handle multiline text
-		escaped := text.replace("\"", "\\\"")
-		add("""_afCode.add("${escaped}")""")
+		comment.split('\n').each |line| {
+			if (line.isEmpty) return
+			indent.add("""// ${line}""")
+		}
 	}
 
 	override Void onEval(Str code) {
-		add("""_afCode.add( ${code} )""")
+		if (code.contains("\n")) {
+			indent.add("_afCode.add(")
+			addMultiline(code)
+			indent.add(")")
+		} else
+			indent.add("""_afCode.add( ${code} )""")
+	}
+
+	override Void onText(Str text) {
+		if (text.contains("\n")) {
+			first := true
+			text.split('\n', false).each |line| {
+				if (first) {
+					indent
+					code.add("_afCode.add(\"\"\"").add(escapeTripleQuotes(line)).addChar('\n')
+					first = false
+				} else
+					indent(15).add(escapeTripleQuotes(line))
+			}
+			code.remove(-1).add("\"\"\")\n")
+		} else {
+			escaped := text.replace("\"", "\\\"")
+			indent.add("""_afCode.add("${escaped}")""")
+		}
 	}
 
 	Str toFantomCode() {
-		add("return _afCode.toStr")
+		indent.add("return _afCode.toStr")
 		return code.toStr
 	}
 
-	@Operator
 	private This add(Str txt) {
-		code.addChar('\t').addChar('\t').add(txt).addChar('\n')
+		code.add(txt).addChar('\n')
 		return this
+	}
+
+	private This addMultiline(Str code) {
+		indentSize++
+		code.split('\n').each |line| {
+			if (line.isEmpty) return
+			indent.add(line) 
+		}
+		indentSize--
+		return this
+	}
+	
+	private This indent(Int spaces := 0) {
+		indentSize.times |i| { code.addChar('\t') }
+		spaces.times { code.addChar(' ') }
+		return this
+	}
+
+	private This indentStr(Int spaces := 0) {
+		indentSize.times |i| { code.addChar('\t') }
+		spaces.times { code.addChar(' ') }
+		return this
+	}
+	
+	private Str escapeTripleQuotes(Str text) {
+		if (!text.contains("\"\"\""))
+			return text
+		// I know this is ugly - but, heck, it's what you get for putting triple quotes in your templates!
+		in := "\"\"\" + Str<|\"\"\"|> +\n"
+		indentSize.times { in = in + "\t" }
+		12.times { in = in + " " }
+		in += "\"\"\""
+		return text.replace("\"\"\"", in)
 	}
 }
