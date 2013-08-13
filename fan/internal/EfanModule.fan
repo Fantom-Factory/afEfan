@@ -6,6 +6,7 @@ internal const class EfanModule {
 		binder.bindImpl(EfanService#)
 		binder.bindImpl(EfanCompiler#)
 		binder.bindImpl(EfanParser#)
+		binder.bindImpl(EfanHelpers#)
 	}
 
 }

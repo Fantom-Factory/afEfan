@@ -9,8 +9,9 @@ internal const class EfanCompiler {
 	
 	new make(|This|in) { in(this) }
 
-	Type compile(Str efan, Type? ctxType) {
+	Type compile(Str efan, Type? ctxType, Type[] mixins) {
 		model	:= PlasticClassModel("EfanRenderer", true)
+		mixins.each { model.extendMixin(it) }
 		code	:= parseIntoCode(efan)
 		sig		:= (ctxType == null) ? "" : "${ctxType.qname} ctx"
 		model.addMethod(Str#, "render", sig, code)

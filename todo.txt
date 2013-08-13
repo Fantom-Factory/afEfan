@@ -1,1 +1,26 @@
 
+For Preview Release
+-------------------
+write pod doc
+
+Add a couple more methods to ConcurrentCache.
+
+
+
+For v1.0
+--------
+<%! using webmod %>
+
+Add line numbers for efan src compilation errs (keep a map of fantom src line nos => efan line nos) for converting src l-nos to efan l-nos
+
+Raise proper compilation errs.
+
+Do BedSheet pretty Err src handling, with ErrPage contributions.
+
+Add Ruby h(), x(), j(), etc... view helpers
+
+
+
+Future:
+-------
+Multiple ctx args
