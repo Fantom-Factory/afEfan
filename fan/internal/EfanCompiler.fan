@@ -10,11 +10,9 @@ internal const class EfanCompiler {
 	new make(|This|in) { in(this) }
 
 	Type compile(Str efan, Type? ctxType) {
-		model := PlasticClassModel("EfanRenderer", true)
-//		model.extendMixin(EfanRenderer#)
-
-		code := parseIntoCode(efan)
-		sig	 := (ctxType == null) ? "" : "${ctxType.qname} ctx"
+		model	:= PlasticClassModel("EfanRenderer", true)
+		code	:= parseIntoCode(efan)
+		sig		:= (ctxType == null) ? "" : "${ctxType.qname} ctx"
 		model.addMethod(Str#, "render", sig, code)
 
 		pod		:= podCompiler.compile(model.toFantomCode)
@@ -22,7 +20,7 @@ internal const class EfanCompiler {
 
 		return type		
 	}
-	
+
 	internal Str parseIntoCode(Str efan) {
 		data := EfanModel(efan.size)
 		parser.parse(data, efan)
