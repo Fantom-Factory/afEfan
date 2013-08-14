@@ -11,7 +11,7 @@ const class EfanService {
 	internal new make(|This|in) { in(this) }
 
 	** Renders the given template with the a ctx. 
-	Str renderStr(Str efan, Obj? ctx := null) {
+	Str renderFromStr(Str efan, Obj? ctx := null) {
 		renderType	:= compiler.compile(efan, ctx?.typeof, helpers.helpers)
 		renderer 	:= renderType.make 
 		return renderer->render(ctx)
@@ -19,7 +19,7 @@ const class EfanService {
 
 	** Renders an '.efan' template file with the given ctx. 
 	** The compiled '.efan' template is cached for re-use.   
-	Str renderFile(File efanFile, Obj? ctx := null) {
+	Str renderFromFile(File efanFile, Obj? ctx := null) {
 		key := key(efanFile, ctx)
 		if (!rendererCache.containsKey(key)) {
 			template 	:= efanFile.readAllStr
