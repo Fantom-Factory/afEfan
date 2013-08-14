@@ -3,7 +3,9 @@ For Preview Release
 -------------------
 write pod doc
 
-Add a couple more methods to ConcurrentCache.
+cache files - check for updates - see MoustacheTemplates
+
+EFanService -> EfanTemplates ??? Use common FileCache class, add isModified() method, use in AppDestroyer?
 
 
 

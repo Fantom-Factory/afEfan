@@ -3,7 +3,7 @@ using afIoc::ConcurrentCache
 
 // TODO: hide behind a mixin
 ** Renders Embedded Fantom (efan) templates against a given context.
-const class EfanService {
+const class EfanTemplates {
 			private const ConcurrentCache	rendererCache	:= ConcurrentCache()
 	@Inject	private const EfanCompiler 		compiler
 	@Inject	private const EfanHelpers 		helpers

@@ -2,10 +2,9 @@ using afIoc::Inject
 
 internal class TestDocExample : EfanTest {
 
-	@Inject EfanService? efan
+	@Inject EfanTemplates? efan
 
 	Void testExample() {
-		
 		template := "<% ctx.times |i| { %>Ho! <% } %>Merry Christmas!"
 		output   := efan.renderFromStr(template, 3)
 		

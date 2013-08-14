@@ -2,7 +2,7 @@ using afIoc::Inject
 
 internal class TestSimpleCtx : EfanTest {
 	
-	@Inject EfanService?	service
+	@Inject EfanTemplates?	service
 	
 	Void testSimpleCtx1() {
 		efan := Str<|<% for (i := 0; i < ctx; ++i) { %> ><%= i + 1 %>< <% } %>|>

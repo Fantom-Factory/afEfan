@@ -2,7 +2,7 @@ using afIoc::Inject
 
 internal class TestMultiLines : EfanTest {
 
-	@Inject	EfanService?	efan
+	@Inject	EfanTemplates?	efan
 	@Inject EfanCompiler?	compiler
 	
 	Void testCommentWithMultiLines() {
