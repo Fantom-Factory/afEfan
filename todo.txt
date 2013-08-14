@@ -3,10 +3,6 @@ For Preview Release
 -------------------
 write pod doc
 
-cache files - check for updates - see MoustacheTemplates
-
-EFanService -> EfanTemplates ??? Use common FileCache class, add isModified() method, use in AppDestroyer?
-
 
 
 For v1.0
@@ -25,4 +21,6 @@ Add Ruby h(), x(), j(), etc... view helpers
 
 Future:
 -------
-Multiple ctx args
+Multiple ctx args (optionally give mixin render mixin method?)
+extend class
+

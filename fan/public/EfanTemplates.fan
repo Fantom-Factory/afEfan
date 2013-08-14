@@ -1,9 +1,22 @@
 using afIoc::Inject
 using afIoc::ConcurrentCache
 
-// TODO: hide behind a mixin
 ** Renders Embedded Fantom (efan) templates against a given context.
-const class EfanTemplates {
+const mixin EfanTemplates {
+
+	** Renders the given template with the ctx.
+	** 
+	** WARN: Overuse of this method could cause a memory leak! A new Fantom Type is created on 
+	** every call. 
+	abstract Str renderFromStr(Str efan, Obj? ctx)
+	
+	** Renders an '.efan' template file with the given ctx. 
+	** The compiled '.efan' template is cached for re-use.   
+	abstract Str renderFromFile(File efanFile, Obj? ctx)
+	
+}
+
+const class EfanTemplatesImpl : EfanTemplates {
 	private const static Log log := Utils.getLog(EfanTemplates#)
 	private const FileCache fileCache
 	
@@ -12,22 +25,15 @@ const class EfanTemplates {
 
 	internal new make(|This|in) {
 		in(this) 
-		fileCache = FileCache(10sec)
+		fileCache = FileCache(10sec)	// TODO: make config
 	}
 
-	** Renders the given template with the ctx.
-	** 
-	** WARN: Overuse of this method could cause a memory leak! A new Fantom Type is created on 
-	** every call. 
-	Str renderFromStr(Str efan, Obj? ctx) {
+	override Str renderFromStr(Str efan, Obj? ctx) {
 		renderer	:= compiler.compile(efan, ctx?.typeof, viewHelpers.mixins)
 		return renderer->render(ctx)
 	}
 
-	** Renders an '.efan' template file with the given ctx. 
-	** The compiled '.efan' template is cached for re-use.   
-	Str renderFromFile(File efanFile, Obj? ctx) {
-		
+	override Str renderFromFile(File efanFile, Obj? ctx) {
 		if (!efanFile.exists)
 			throw IOErr(ErrMsgs.templatesFileNotFound(efanFile))
 		
