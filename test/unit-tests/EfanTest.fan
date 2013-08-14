@@ -1,5 +1,18 @@
+using afIoc::Registry
+using afIoc::RegistryBuilder
 
 abstract internal class EfanTest : Test {
+	
+	Registry? reg
+	
+	override Void setup() {
+		reg = (Registry) RegistryBuilder(["suppressLogging":true]).addModule(EfanModule#).build(["suppressStartupMsg":true]).startup
+		reg.injectIntoFields(this)
+	}
+	
+	override Void teardown() {
+		reg.shutdown
+	}
 	
 	Void verifyEfanErrMsg(Str errMsg, |Obj| func) {
 		verifyErrTypeMsg(EfanErr#, errMsg, func)

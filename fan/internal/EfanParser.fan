@@ -7,7 +7,7 @@ internal const class EfanParser {
 	private static const Str tokenEvalStart		:= "<%="
 	private static const Str tokenEnd			:= "%>"
 	
-	new make(|This|in) { in(this) }
+	new make(|This|? in := null) { in?.call(this) }
 	
 	Void parse(Pusher pusher, Str efan) {
 		efanIn	:= efan.toBuf

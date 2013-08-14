@@ -1,3 +1,59 @@
 Overview [#overview]
 ********************
+afEfan is an [Fantom]`http://fantom.org/` [afIoc]`http://repo.status302.com/doc/afIoc/#overview` library for rendering
+Embedded Fantom (efan) templates.
+
+Much like EJS for Javascript, ERB for Ruby and JSP for Java, EFAN allows you to embed snippets of Fantom code inside textual
+templates.
+
+Efan templates hope to hit the middle ground between programatically rendering markup with `web::WebOutStream` and using
+logicless templates with [Mustache]`https://bitbucket.org/xored/mustache/`.
+
+
+
+Quick Start [#quickStart]
+*************************
+
+pre>
+  @Inject EfanService? efan
+
+  ...
+
+  template := "<% ctx.times |i| { %>Ho! <% } %>Merry Christmas!"
+  output   := efan.renderFromStr(template, 3)
+
+  verifyEq("Ho! Ho! Ho! Merry Christmas!", output)
+<pre
+
+Usage
+*****
+
+Talk about ctx
+
+
+View Helpers
+************
+
+Fair Usage Policy!
+******************
+
+Str vs Files
+
+Updating .efan files has same effect
+
+
+
+Non afIoc Applications
+**********************
+Normal efan usage is for in [afIoc]`http://repo.status302.com/doc/afIoc/#overview` applications for `the EfanService` provides
+type caching
+
+Whereas Efan was predominantly created for
+
+Release Notes [#releaseNotes]
+*****************************
+
+v0.0.2 [#v0.0.2]
+----------------
+ - New: Preview release.
 
