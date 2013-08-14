@@ -36,7 +36,7 @@ internal const class EfanTemplatesImpl : EfanTemplates {
 	override Str renderFromFile(File efanFile, Obj? ctx) {
 		if (!efanFile.exists)
 			throw IOErr(ErrMsgs.templatesFileNotFound(efanFile))
-		
+
 		renderer := fileCache.getOrAddOrUpdate(efanFile) |->Obj| {
 			template 	:= efanFile.readAllStr
 			renderer	:= compiler.compile(template, ctx?.typeof, viewHelpers.mixins)
