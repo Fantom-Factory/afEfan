@@ -10,7 +10,7 @@ internal class TestMultiLines : EfanTest {
 		       Line 1 
 		           	Line 2 
 		       %> lo!""" 
-		text := efan.renderFromStr(c)
+		text := efan.renderFromStr(c, null)
 		verifyEq(text, "Hel  lo!")
 
 		// test the code looks pretty
@@ -24,7 +24,7 @@ internal class TestMultiLines : EfanTest {
 		c :="""Hel <%= 60 + 
 		       9 
 		       %> lo!""" 
-		text := efan.renderFromStr(c)
+		text := efan.renderFromStr(c, null)
 		verifyEq(text, "Hel 69 lo!")
 
 		// test the code looks pretty
@@ -38,7 +38,7 @@ internal class TestMultiLines : EfanTest {
 		       6
 		       9
 		       lo!""" 
-		text := efan.renderFromStr(c)		
+		text := efan.renderFromStr(c, null)
 		verifyEq(text, "Hel\n6\n9\nlo!")
 		
 		// test the code looks pretty
@@ -49,7 +49,7 @@ internal class TestMultiLines : EfanTest {
 
 	Void testTextWithMulilines2() {
 		c :="""Hel\r6\r9\rlo!""" 
-		text := efan.renderFromStr(c)
+		text := efan.renderFromStr(c, null)
 		verifyEq(text, "Hel\r6\r9\rlo!")
 
 		// test the code looks pretty - \r's make for ugly code - not a lot I can do about it
@@ -63,7 +63,7 @@ internal class TestMultiLines : EfanTest {
 		       6
 		       "9"
 		       lo!""" 
-		text := efan.renderFromStr(c)		
+		text := efan.renderFromStr(c, null)
 		verifyEq(text, "Hel\n6\n\"9\"\nlo!")
 		
 		// test the code looks pretty
@@ -77,7 +77,7 @@ internal class TestMultiLines : EfanTest {
 		          6
 		          """9"""
 		          lo!|>
-		text := efan.renderFromStr(c)
+		text := efan.renderFromStr(c, null)
 		verifyEq(text, "Hel\n6\n\"\"\"9\"\"\"\nlo!")
 		// the code is ugly - no need to test it!
 	}

@@ -1,37 +1,5 @@
-using afIoc::Inject
-using afIoc::PlasticPodCompiler
-using afIoc::PlasticClassModel
-
-internal const class EfanCompiler {
-
-	@Inject	private const PlasticPodCompiler podCompiler
-	@Inject	private const EfanParser parser
-	
-	new make(|This|in) { in(this) }
-
-	Type compile(Str efan, Type? ctxType, Type[] mixins) {
-		model	:= PlasticClassModel("EfanRenderer", true)
-		mixins.each { model.extendMixin(it) }
-		code	:= parseIntoCode(efan)
-		sig		:= (ctxType == null) ? "" : "${ctxType.qname} ctx"
-		model.addMethod(Str#, "render", sig, code)
-
-		pod		:= podCompiler.compile(model.toFantomCode)
-		type	:= pod.type("EfanRenderer")
-
-		return type		
-	}
-
-	internal Str parseIntoCode(Str efan) {
-		data := EfanModel(efan.size)
-		parser.parse(data, efan)
-		return data.toFantomCode
-	}
-}
-
 
 internal class EfanModel : Pusher {
-
 	StrBuf 	code
 	Int		indentSize	:= 2
 	

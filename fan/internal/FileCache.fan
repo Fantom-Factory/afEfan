@@ -1,12 +1,13 @@
 using afIoc::ConcurrentCache
 using afIoc::Inject
 
-const class FileCache {
+internal const class FileCache {
 	private const ConcurrentCache 	cache	:= ConcurrentCache()
 	private const Duration 			timeout
 
-	new make(|This|in) { in(this) }
-	
+	new make(Duration timeout) { 
+		this.timeout = timeout
+	}
 	
 	@Operator
 	Obj? get(File file) {
@@ -34,14 +35,15 @@ const class FileCache {
 				payload 		= bob(file)
 			}
 			
-			cache[file]	= FileCacheState(lastModified, payload)
+			state = FileCacheState(lastModified, payload)
+			cache[file]	= state
 		}
 
-		return state.payload
+		return state?.payload
 	}
 }
 
-internal class FileCacheState {
+internal const class FileCacheState {
 	const DateTime	lastChecked
 	const DateTime	lastModified	// pod files have last modified info
 	const Obj?		payload

@@ -1,0 +1,1 @@
+<% ctx.val.times |i| { %>Ho! <% } %>Merry Christmas!
