@@ -17,10 +17,12 @@ internal class TestTemplates : EfanTest {
 	}
 }
 
+@NoDoc
 class T_Val1 {
 	virtual Int val
 }
 
+@NoDoc
 class T_Val2 : T_Val1 {
 	override Int val
 }

@@ -1,8 +1,11 @@
 
 ** Contribute to 'EfanViewHelpers' to add view helper methods to your efan templates.
-const class EfanViewHelpers {
-	
-	internal const Type[]	mixins
+const mixin EfanViewHelpers { 
+	abstract internal Type[] mixins()
+}
+
+internal const class EfanViewHelpersImpl : EfanViewHelpers {
+	override internal const Type[]	mixins
 	
 	internal new make(Type[] mixins, |This|in) { 
 		in(this)
