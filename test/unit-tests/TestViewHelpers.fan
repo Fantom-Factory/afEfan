@@ -11,19 +11,19 @@ internal class TestViewHelpers : EfanTest {
 	
 	Void testMixinsAreMixins() {
 		verifyEfanErrMsg(ErrMsgs.viewHelperMixinIsNotMixin(Int#)) {
-			vh := EfanViewHelpers([Int#]) { }
+			vh := EfanViewHelpersImpl([Int#]) { }
 		}		
 	}
 	
 	Void testMixinsAreConst() {
 		verifyEfanErrMsg(ErrMsgs.viewHelperMixinIsNotConst(T_Vh1#)) {
-			vh := EfanViewHelpers([T_Vh1#]) { }
+			vh := EfanViewHelpersImpl([T_Vh1#]) { }
 		}		
 	}
 
 	Void testMixinsArePublic() {
 		verifyEfanErrMsg(ErrMsgs.viewHelperMixinIsNotPublic(T_Vh2#)) {
-			vh := EfanViewHelpers([T_Vh2#]) { }
+			vh := EfanViewHelpersImpl([T_Vh2#]) { }
 		}		
 	}
 	
@@ -34,13 +34,18 @@ internal class TestViewHelpers : EfanTest {
 	}
 }
 
+@NoDoc
 mixin T_Vh1 {}
+
+@NoDoc
 internal const mixin T_Vh2 {}
 
+@NoDoc
 const mixin T_Vh3 {
 	Str a() { "Judge" }
 }
 
+@NoDoc
 const mixin T_Vh4 {
 	Str b() { "Dredd" }
 }

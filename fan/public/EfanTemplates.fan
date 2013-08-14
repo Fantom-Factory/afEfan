@@ -16,7 +16,7 @@ const mixin EfanTemplates {
 	
 }
 
-const class EfanTemplatesImpl : EfanTemplates {
+internal const class EfanTemplatesImpl : EfanTemplates {
 	private const static Log log := Utils.getLog(EfanTemplates#)
 	private const FileCache fileCache
 	

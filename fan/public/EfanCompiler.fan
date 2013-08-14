@@ -2,6 +2,7 @@ using afIoc::Inject
 using afIoc::PlasticClassModel
 using afIoc::PlasticPodCompiler
 
+** Compiles efan templates into Fantom code; maybe used outside of [afIoc]`http://repo.status302.com/doc/afIoc/#overview`.
 const class EfanCompiler {
 	@Inject	private const PlasticPodCompiler podCompiler
 	@Inject	private const EfanParser parser
