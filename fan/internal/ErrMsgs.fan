@@ -9,4 +9,8 @@ internal class ErrMsgs {
 		"${blockType.name.toDisplayName} block not closed."
 	}
 	
+	static Str templatesFileNotFound(File file) {
+		"File not found: ${file.normalize.osPath}"
+	}
+	
 }
