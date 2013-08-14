@@ -4,10 +4,18 @@ const class EfanViewHelpers {
 	
 	internal const Type[]	mixins
 	
-	// FIXME: test mixin helpers! (test multiple!)
 	internal new make(Type[] mixins, |This|in) { 
 		in(this)
-		// TODO: check mixins are const
+		
+		mixins.each { 
+			if (!it.isMixin)
+				throw EfanErr(ErrMsgs.viewHelperMixinIsNotMixin(it))
+			if (!it.isConst)
+				throw EfanErr(ErrMsgs.viewHelperMixinIsNotConst(it))
+			if (!it.isPublic)
+				throw EfanErr(ErrMsgs.viewHelperMixinIsNotPublic(it))
+		}
+		
 		this.mixins = mixins.toImmutable
 	}
 }
