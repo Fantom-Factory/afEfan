@@ -1,12 +1,12 @@
 Overview [#overview]
 ********************
-afEfan is an [Fantom]`http://fantom.org/` [afIoc]`http://repo.status302.com/doc/afIoc/#overview` library for rendering
+afEfan is a [Fantom]`http://fantom.org/` [afIoc]`http://repo.status302.com/doc/afIoc/#overview` library for rendering
 Embedded Fantom (efan) templates.
 
 Much like EJS for Javascript, ERB for Ruby and JSP for Java, EFAN allows you to embed snippets of Fantom code inside textual
 templates.
 
-Efan templates hope to hit the middle ground between programmatically rendering markup with `web::WebOutStream` and using
+Efan hopes to hit the middle ground between programmatically rendering markup with `web::WebOutStream` and using
 logicless templates with [Mustache]`https://bitbucket.org/xored/mustache/`.
 
 

@@ -9,19 +9,19 @@ internal class TestViewHelpers : EfanTest {
 		super.setup
 	}
 	
-	Void testMixinsAreMixins() {
+	Void testHelpersAreMixins() {
 		verifyEfanErrMsg(ErrMsgs.viewHelperMixinIsNotMixin(Int#)) {
 			vh := EfanViewHelpersImpl([Int#]) { }
 		}		
 	}
 	
-	Void testMixinsAreConst() {
+	Void testHelpersAreConst() {
 		verifyEfanErrMsg(ErrMsgs.viewHelperMixinIsNotConst(T_Vh1#)) {
 			vh := EfanViewHelpersImpl([T_Vh1#]) { }
 		}		
 	}
 
-	Void testMixinsArePublic() {
+	Void testHelpersArePublic() {
 		verifyEfanErrMsg(ErrMsgs.viewHelperMixinIsNotPublic(T_Vh2#)) {
 			vh := EfanViewHelpersImpl([T_Vh2#]) { }
 		}		
