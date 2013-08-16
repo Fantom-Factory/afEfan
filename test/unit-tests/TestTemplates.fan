@@ -4,7 +4,7 @@ internal class TestTemplates : EfanTest {
 
 	@Inject private EfanTemplates? efan
 	
-	Void testWarning() {
+	Void testWarningIfCtxChanges() {
 		// okay, so I can't 'test' the warning, but I can test stuff doesn't break
 		
 		file := `test/unit-tests/hohoho.efan`.toFile

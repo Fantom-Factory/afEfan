@@ -1,10 +1,4 @@
 
-For Preview Release
--------------------
-write pod doc
-
-
-
 For v1.0
 --------
 <%! using webmod %>
@@ -19,6 +13,7 @@ Add Ruby h(), x(), j(), etc... view helpers
 
 make 'ctx' configurable
 
+readme.md
 
 Future:
 -------

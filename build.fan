@@ -4,7 +4,7 @@ class Build : BuildPod {
 
 	new make() {
 		podName = "afEfan"
-		summary = "A afIoc library for rendering Embedded Fantom (efan) templates"
+		summary = "A library for rendering Embedded Fantom (efan) templates"
 		version = Version([0,0,3])
 
 		meta	= [	"org.name"		: "Alien-Factory",
@@ -21,7 +21,7 @@ class Build : BuildPod {
 				]
 
 		depends = ["sys 1.0",  
-					"afIoc 1.3+", "afBedSheet 1.0+"]
+					"afIoc 1.4.2+"]
 		srcDirs = [`test/unit-tests/`, `fan/`, `fan/public/`, `fan/internal/`, `fan/internal/utils/`]
 		resDirs = [`doc/`]
 
