@@ -1,11 +1,13 @@
 
 For v1.0
 --------
+use afIoc to make() the renderers - Can Helpers define afIoc services?
+
 <%! using webmod %>
 
 Add line numbers for efan src compilation errs (keep a map of fantom src line nos => efan line nos) for converting src l-nos to efan l-nos
 
-Raise proper compilation errs.
+Raise proper compilation errs AND runtime errs.
 
 Do BedSheet pretty Err src handling, with ErrPage contributions.
 
