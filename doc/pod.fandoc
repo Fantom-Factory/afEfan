@@ -13,15 +13,22 @@ logicless templates with [Mustache]`https://bitbucket.org/xored/mustache/`.
 
 Quick Start [#quickStart]
 *************************
-
+xmas.efan:
 pre>
-  @Inject EfanTemplates? efanTemplates
+  <% ctx.times |i| { %>
+    Ho!
+  <% } %>
+  Merry Christmas!
+<pre
+
+Fantom code:
+pre>
+  @Inject EfanTemplates efanTemplates
 
   ...
 
-  template := "<% ctx.times |i| { %>Ho! <% } %>Merry Christmas!"
-  output   := efanTemplates.renderFromStr(template, 3)
   // --> Ho! Ho! Ho! Merry Christmas!
+  txt := efanTemplates.renderFromFile(`xmas.efan`.toFile, 3)
 <pre
 
 Usage [#usage]

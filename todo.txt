@@ -2,6 +2,7 @@
 For v1.0
 --------
 use afIoc to make() the renderers - Can Helpers define afIoc services?
+ - Add compilation hooks so external people can add their own generated methods & fields
 
 <%! using webmod %>
 
