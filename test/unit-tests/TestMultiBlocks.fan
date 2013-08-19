@@ -10,8 +10,7 @@ internal class TestMultiBlocks : EfanTest {
 		       <%= i+1 %>
 		       <% } %>"""
 		// test the code looks pretty
-		code := compiler.parseIntoCode(c)
-		Env.cur.err.printLine(code)
+		code := compiler.parseIntoCode(``, c)
 		verify( code.contains("\t\t3.times |i| {"))
 		verify( code.contains("\t\t\t_afCode.add( i+1 )"))
 	}
@@ -19,28 +18,28 @@ internal class TestMultiBlocks : EfanTest {
 	Void testBlocksTrimmed() {
 		c :="""<%     echo("dude")     %>"""
 		// test the code looks pretty
-		code := compiler.parseIntoCode(c)
+		code := compiler.parseIntoCode(``, c)
 		verify( code.contains("\t\techo(\"dude\")"))
 	}
 
 	Void testEmptyTextBlocksAreIgnored() {
 		c :="""<% %><% %><% %>"""
 		// test the code looks pretty
-		code := compiler.parseIntoCode(c)
+		code := compiler.parseIntoCode(``, c)
 		verify(!code.contains("_afCode.add("))
 	}
 
 	Void testEmptyCodeBlocksAreIgnored() {
 		c :="""<% %>"""
 		// test the code looks pretty
-		code := compiler.parseIntoCode(c)
+		code := compiler.parseIntoCode(``, c)
 		verify(!code.contains("_afCode.add("))
 	}
 
 	Void testEmptyEvalBlocksAreIgnored() {
 		c :="""<%= %>"""
 		// test the code looks pretty
-		code := compiler.parseIntoCode(c)
+		code := compiler.parseIntoCode(``, c)
 		verify(!code.contains("_afCode.add("))
 	}
 }
