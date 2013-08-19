@@ -16,7 +16,6 @@ Add Ruby h(), x(), j(), etc... view helpers
 
 make 'ctx' configurable
 
-readme.md
 
 Future:
 -------

@@ -8,16 +8,19 @@ internal class EfanModel : Pusher {
 		code.add("_afCode := StrBuf(${bufSize})\n")
 	}
 	
-	override Void onFanCode(Str text) {
+	override Void onFanCode(Int lineNo, Str text) {
 		code := text.trim
+		if (code.isEmpty) return
+
 		if (code.startsWith("}")) {
 			indentSize--
 			// guard against crazy code - this indenting logic ain't perfect!
 			if (indentSize < 0) 
 				indentSize = 0
 		}
+
+		addLine(lineNo)
 		
-		if (code.isEmpty) return
 		if (code.contains("\n"))
 			addMultiline(code)
 		else
@@ -27,18 +30,24 @@ internal class EfanModel : Pusher {
 			indentSize++
 	}
 	
-	override Void onComment(Str text) {
+	override Void onComment(Int lineNo, Str text) {
 		comment := text.trim
 		if (comment.isEmpty) return
+
+		addLine(lineNo)
+
 		comment.split('\n').each |line| {
 			if (line.isEmpty) return
 			indent.add("""// ${line}""")
 		}
 	}
 
-	override Void onEval(Str text) {
+	override Void onEval(Int lineNo, Str text) {
 		code := text.trim
 		if (code.isEmpty) return
+
+		addLine(lineNo)
+
 		if (code.contains("\n")) {
 			indent.add("_afCode.add(")
 			addMultiline(code)
@@ -47,8 +56,11 @@ internal class EfanModel : Pusher {
 			indent.add("""_afCode.add( ${code} )""")
 	}
 
-	override Void onText(Str text) {
+	override Void onText(Int lineNo, Str text) {
 		if (text.isEmpty) return
+
+		addLine(lineNo)
+
 		if (text.contains("\n")) {
 			first := true
 			text.split('\n', false).each |line| {
@@ -71,6 +83,11 @@ internal class EfanModel : Pusher {
 		return code.toStr
 	}
 
+	private This addLine(Int lineNo) {
+		indent.add("// -> Line ${lineNo}")
+		return this
+	}
+	
 	private This add(Str txt) {
 		code.add(txt).addChar('\n')
 		return this
