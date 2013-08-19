@@ -48,8 +48,20 @@ internal const class EfanParser {
 				// consume \r\n
 				if (peekEq(efanIn, "\n")) { }
 			}
-			
+
 			buf.addChar(char)
+			
+			newLine := (char == '\n')
+			if (char == '\r') {
+				newLine = true
+				// consume \r\n
+				if (peekEq(efanIn, "\n")) { 
+					buf.addChar('\n')
+				}
+			}
+			
+			if (newLine)
+				data.newLine
 		}
 		
 		if (data.inBlock)
@@ -57,7 +69,8 @@ internal const class EfanParser {
 
 		data.push
 	}
-	
+
+	** If tag is next, consume it and return true
 	Bool peekEq(Buf buf, Str tag) {
 		if (buf.remaining < tag.size)
 			return false
@@ -70,13 +83,14 @@ internal const class EfanParser {
 			buf.seek(buf.pos - tag.size)
 			return false
 		}
-	}	
+	}
 }
 
 internal class ParserData {
 	Pusher 		pusher
 	StrBuf		buf
 	BlockType	blockType	:= BlockType.text
+	Int			lineNo		:= 1
 
 	new make(|This|in) { in(this) }
 	
@@ -104,15 +118,18 @@ internal class ParserData {
 	Bool inText() {
 		blockType == BlockType.text
 	}
+	Void newLine() {
+		lineNo++
+	}
 	Void push() {
 		if (blockType == BlockType.text)
-			pusher.onText(buf.toStr)
+			pusher.onText(lineNo, buf.toStr)
 		if (blockType == BlockType.comment)
-			pusher.onComment(buf.toStr)
+			pusher.onComment(lineNo, buf.toStr)
 		if (blockType == BlockType.fanCode)
-			pusher.onFanCode(buf.toStr)
+			pusher.onFanCode(lineNo, buf.toStr)
 		if (blockType == BlockType.eval)
-			pusher.onEval(buf.toStr)
+			pusher.onEval(lineNo, buf.toStr)
 		buf.clear
 	}
 }
@@ -122,8 +139,8 @@ internal enum class BlockType {
 }
 
 internal mixin Pusher {
-	abstract Void onFanCode(Str fanCode)
-	abstract Void onComment(Str comment)
-	abstract Void onText(Str text)
-	abstract Void onEval(Str text)
+	abstract Void onFanCode(Int lineNo, Str fanCode)
+	abstract Void onComment(Int lineNo, Str comment)
+	abstract Void onText(Int lineNo, Str text)
+	abstract Void onEval(Int lineNo, Str text)
 }
