@@ -68,7 +68,7 @@ const class EfanCompiler {
 	private Int? findEfanLineNo(SrcErrLocation plasticErrLoc) {
 		fanCodeLines	:= plasticErrLoc.srcCode
 		fanLineNo		:= plasticErrLoc.errLineNo - 1	// from 1 to 0 based
-		reggy 			:= Regex<|^\s+?// --> ([0-9])+$|>
+		reggy 			:= Regex<|^\s+?// --> ([0-9]+)$|>
 		efanLineNo		:= (Int?) null
 		
 		while (fanLineNo > 0 && efanLineNo == null) {

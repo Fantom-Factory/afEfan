@@ -31,8 +31,24 @@ pre>
   txt := efanTemplates.renderFromFile(`xmas.efan`.toFile, 3)
 <pre
 
+
+
 Usage [#usage]
 **************
+To use 'afEfan' just add it as dependency in your project's 'build.fan'. Example:
+
+pre>
+depends = ["sys 1.0", "afIoc 1.4+", "afBedSheet 1.0+", "afEfan 0.0.4+", ... ]
+<pre
+
+...and that's it!
+
+Because 'afEfan' defines [pod meta-data]`http://repo.status302.com/doc/afIoc/RegistryBuilder.html` for
+[afIoc]`http://repo.status302.com/doc/afIoc/#overview`, no more configuration or setup is required.
+
+
+Tags [#tags]
+************
 Efan supports the following tags:
 
 Eval Tags [#eval]
@@ -151,6 +167,12 @@ the return value can not be a static mixin type. Therefore all renderer invocati
 
 Release Notes [#releaseNotes]
 *****************************
+
+v0.0.4 [#v0.0.4]
+----------------
+ - New: Hooked error reporting int
+ - New: `EfanErr` now gives code snippets and line numbers of parsing and compilation errors.
+ - Chg: Re-factored fantom code generation.
 
 v0.0.2 [#v0.0.2]
 ----------------

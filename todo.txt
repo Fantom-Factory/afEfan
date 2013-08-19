@@ -7,12 +7,9 @@ use afIoc to make() the renderers - Can Helpers define afIoc services?
 <%! using webmod %>
 
 Add line numbers for efan src compilation errs (keep a map of fantom src line nos => efan line nos) for converting src l-nos to efan l-nos
-
-Raise proper compilation errs AND runtime errs.
-
 Do BedSheet pretty Err src handling, with ErrPage contributions.
 
-Add Ruby h(), x(), j(), etc... view helpers
+Raise proper compilation errs AND runtime errs.
 
 make 'ctx' configurable
 
