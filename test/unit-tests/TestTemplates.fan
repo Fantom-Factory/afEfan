@@ -15,6 +15,16 @@ internal class TestTemplates : EfanTest {
 		output   = efan.renderFromFile(file, T_Val1() { it.val = 2 } )
 		verifyEq("Ho! Ho! Merry Christmas!", output)
 	}
+
+	Void testPlagueScanFile() {	// testing can find double numbers, like 17
+		file := `test/unit-tests/plagueScan.efan`.toFile		
+		try {
+			output := efan.renderFromFile(file, T_Val2() { it.val = 3 } )
+			fail
+		} catch (EfanCompilationErr err) {
+			verifyEq(err.srcErrLoc.errLineNo, 17)
+		}
+	}
 }
 
 @NoDoc

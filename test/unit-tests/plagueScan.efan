@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Plague Scanner :: Essay Submission</title>
+</head>
+<body>
+	<h1> Plague Scanner :: Essay Submission </h1>
+
+	<form>
+		<textarea id="essayText" name="essayText" rows="15" cols="100">
+The Space Shuttle was a partially reusable launch system and orbital spacecraft operated by the U.S. National Aeronautics and Space Administration (NASA) for human spaceflight missions. The system combined rocket launch, orbital spacecraft, and re-entry spaceplane with modular add-ons. The first of four orbital test flights occurred in 1981 leading to operational flights beginning in 1982. It was used on a total of 135 missions from 1981 to 2011 all launched from the Kennedy Space Center, Florida. Major missions included launching numerous satellites, interplanetary probes, the Hubble Space Telescope (HST), conducting space science experiments, and constructing and servicing the International Space Station. Major components included the orbiters, recoverable boosters, external tanks, payloads, and supporting infrastructure.
+Five space-worthy orbiters were built; two were destroyed in mission accidents.The Space Shuttle at launch consisted of the Orbiter Vehicle (OV), one external tank (ET), and two Solid Rocket Boosters (SRBs). It was launched vertically like a conventional rocket with thrust from the two SRBs and three main engines. During launch, the external tank provided fuel for the orbiter's main engines. The SRBs and ET were jettisoned before the orbiter reached orbit. At the conclusion of the orbiter's space mission, it fired its thrusters to drop out of orbit and re-enter the lower atmosphere. The orbiter decelerated in the atmosphere before flying like a glider but with reaction control system thrusters before landing on a long runway.
+</textarea><br/>
+		<input id="submitButton" type="button" value="Submit">
+	</form>
+
+<% dude %> 
+<script type="text/javascript">
+	// the host domain where the plague scanner is located - should NOT end with slash
+//	var plagueHost = "";	// "http://af-plague-scanner.plagiarismchecker.net";
+	var plagueHost = "http://fan.home.com:8069";	// "http://af-plague-scanner.plagiarismchecker.net";
+	
+	// relative url of the results page
+	var plagueResultsUrl = "plagueResults.html"
+</script>
+
+<!-- Keep this script at the bottom of the page -->
+<script type="text/javascript" src="/pub/js-libs/require-2.1.6/require.js"></script>
+<script type="text/javascript">
+	requirejs.config({
+		"baseUrl"	: plagueHost + "/pub/js-modules",
+		"paths": {
+			"jquery"	: "../js-libs/jquery-1.9.1/jquery",
+		},
+	});
+
+	// load the main app module to start the app
+	requirejs(["af/plagueScanner/scan"], function(results) {
+		// "essayText"		: The html textarea that holds the essay text
+		// "submitButton"	: The html button that will kick the scanning off
+		results.init(plagueHost, "essayText", "submitButton", plagueResultsUrl);
+	});
+</script>
+
+</body>
+</html>

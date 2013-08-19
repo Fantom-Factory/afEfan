@@ -4,7 +4,8 @@ class Build : BuildPod {
 
 	new make() {
 		podName = "afEfan"
-		summary = "A library for rendering Embedded Fantom (efan) templates"
+//		summary = "A library for rendering Embedded Fantom (efan) templates"
+		summary = "A library for integrating Embedded Fantom (efan) templates with the afBedSheet web framework."
 		version = Version([0,0,3])
 
 		meta	= [	"org.name"		: "Alien-Factory",
