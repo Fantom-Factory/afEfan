@@ -40,10 +40,11 @@ const class EfanCompiler {
 		} catch (PlasticCompilationErr err) {
 			plasticErrLoc	:= (SrcErrLocation) err.srcErrLoc
 			
+			Env.cur.err.printLine(model.toFantomCode)
 			fanCodeLines	:= model.toFantomCode.splitLines
 			fanLineNo		:= plasticErrLoc.errLineNo - 1	// from 1 to 0 based
 			
-			reggy 			:= Regex<|^\s+?// -> Line ([0-9])+$|>
+			reggy 			:= Regex<|^\s+?// --> ([0-9])+$|>
 			efanLineNo		:= 0
 			
 			while (fanLineNo > 0 && efanLineNo == 0) {
