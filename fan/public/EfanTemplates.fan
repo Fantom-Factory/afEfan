@@ -29,7 +29,7 @@ internal const class EfanTemplatesImpl : EfanTemplates {
 	}
 
 	override Str renderFromStr(Str efan, Obj? ctx) {
-		renderer	:= compiler.compile(efan, ctx?.typeof, viewHelpers.mixins)
+		renderer	:= compiler.compile(`rendered/from/str`, efan, ctx?.typeof, viewHelpers.mixins)
 		return renderer->render(ctx)
 	}
 
@@ -39,7 +39,7 @@ internal const class EfanTemplatesImpl : EfanTemplates {
 
 		renderer := fileCache.getOrAddOrUpdate(efanFile) |->Obj| {
 			template 	:= efanFile.readAllStr
-			renderer	:= compiler.compile(template, ctx?.typeof, viewHelpers.mixins)
+			renderer	:= compiler.compile(efanFile.normalize.uri, template, ctx?.typeof, viewHelpers.mixins)
 			return renderer			
 		}
 
@@ -48,7 +48,7 @@ internal const class EfanTemplatesImpl : EfanTemplates {
 			if (ctxType == null || !ctx.typeof.fits(ctxType)) {
 				log.warn(LogMsgs.templatesCtxDoesNotFitRendererCts(ctx.typeof, renderer->ctxType, efanFile))
 				template 	:= efanFile.readAllStr
-				renderer	= compiler.compile(template, ctx?.typeof, viewHelpers.mixins)
+				renderer	= compiler.compile(efanFile.normalize.uri, template, ctx?.typeof, viewHelpers.mixins)
 				fileCache[efanFile] = renderer
 			}
 		}

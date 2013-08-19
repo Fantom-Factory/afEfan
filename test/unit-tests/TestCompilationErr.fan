@@ -11,11 +11,10 @@ internal class TestCompilationErr : EfanTest {
 		       <% } %>"""
 
 		try {
-			type := compiler.compile(c, null)
+			type := compiler.compile(``, c, null)
 			fail
 		} catch (EfanCompilationErr err) {
 			srcErrLoc := err.srcErrLoc
-			Env.cur.err.printLine(srcErrLoc)
 			verifyEq(srcErrLoc.errLineNo, 2)
 		}
 	}

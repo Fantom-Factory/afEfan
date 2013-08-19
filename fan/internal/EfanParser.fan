@@ -1,3 +1,4 @@
+using afIoc::SrcErrLocation
 
 internal const class EfanParser {
 
@@ -9,11 +10,11 @@ internal const class EfanParser {
 	
 	new make(|This|? in := null) { in?.call(this) }
 	
-	Void parse(Pusher pusher, Str efan) {
-		efanIn	:= efan.toBuf
+	Void parse(Uri srcLocation, Pusher pusher, Str efanCode) {
+		efanIn	:= efanCode.toBuf
 		
 		buf		:= StrBuf(100)	// 100 being an average line length; it's better than 16 anyhow!
-		data	:= ParserData() { it.buf = buf; it.pusher = pusher }
+		data	:= ParserData() { it.buf = buf; it.pusher = pusher; it.efanCode = efanCode; it.srcLocation = srcLocation }
 		line	:= 1
 		while (efanIn.more) {
 			if (peekEq(efanIn, tokenCommentStart)) {
@@ -66,8 +67,11 @@ internal const class EfanParser {
 			}
 		}
 		
-		if (data.inBlock)
-			throw EfanParserErr(ErrMsgs.parserBlockNotClosed(data.blockType))
+		if (data.inBlock) {
+			errMsg		:= ErrMsgs.parserBlockNotClosed(data.blockType)
+			srcErrLoc 	:= SrcErrLocation(srcLocation, efanCode, efanCode.splitLines.size, errMsg)
+			throw EfanParserErr(srcErrLoc)
+		}
 
 		data.push
 	}
@@ -91,24 +95,35 @@ internal const class EfanParser {
 internal class ParserData {
 	Pusher 		pusher
 	StrBuf		buf
+	Str			efanCode
+	Uri 		srcLocation
 	BlockType	blockType	:= BlockType.text
 	Int			lineNo		:= 1
 
 	new make(|This|in) { in(this) }
 	
 	Void enteringFanCode() {
-		if (inBlock)
-			throw EfanParserErr(ErrMsgs.parserBlockInBlockNotAllowed(blockType, BlockType.fanCode))
+		if (inBlock) {
+			errMsg		:= ErrMsgs.parserBlockInBlockNotAllowed(blockType, BlockType.fanCode)
+			srcErrLoc 	:= SrcErrLocation(srcLocation, efanCode, lineNo, errMsg)
+			throw EfanParserErr(srcErrLoc)
+		}
 		blockType = BlockType.fanCode
 	}
 	Void enteringEval() {
-		if (inBlock)
-			throw EfanParserErr(ErrMsgs.parserBlockInBlockNotAllowed(blockType, BlockType.eval))
+		if (inBlock) {
+			errMsg		:= ErrMsgs.parserBlockInBlockNotAllowed(blockType, BlockType.eval)
+			srcErrLoc 	:= SrcErrLocation(srcLocation, efanCode, lineNo, errMsg)
+			throw EfanParserErr(srcErrLoc)
+		}
 		blockType = BlockType.eval
 	}
 	Void enteringComment() {
-		if (inBlock)
-			throw EfanParserErr(ErrMsgs.parserBlockInBlockNotAllowed(blockType, BlockType.comment))
+		if (inBlock) {
+			errMsg		:= ErrMsgs.parserBlockInBlockNotAllowed(blockType, BlockType.comment)
+			srcErrLoc 	:= SrcErrLocation(srcLocation, efanCode, lineNo, errMsg)
+			throw EfanParserErr(srcErrLoc)
+		}
 		blockType = BlockType.comment
 	}
 	Void exitingBlock() {
