@@ -8,11 +8,11 @@ const mixin EfanTemplates {
 	** 
 	** WARN: Overuse of this method could cause a memory leak! A new Fantom Type is created on 
 	** every call. 
-	abstract Str renderFromStr(Str efan, Obj? ctx)
+	abstract Str renderFromStr(Str efan, Obj? ctx := null)
 	
 	** Renders an '.efan' template file with the given ctx. 
 	** The compiled '.efan' template is cached for re-use.   
-	abstract Str renderFromFile(File efanFile, Obj? ctx)
+	abstract Str renderFromFile(File efanFile, Obj? ctx := null)
 	
 }
 
@@ -28,12 +28,12 @@ internal const class EfanTemplatesImpl : EfanTemplates {
 		fileCache = FileCache(10sec)	// TODO: make config
 	}
 
-	override Str renderFromStr(Str efan, Obj? ctx) {
+	override Str renderFromStr(Str efan, Obj? ctx := null) {
 		renderer	:= compiler.compile(`rendered/from/str`, efan, ctx?.typeof, viewHelpers.mixins)
 		return renderer->render(ctx)
 	}
 
-	override Str renderFromFile(File efanFile, Obj? ctx) {
+	override Str renderFromFile(File efanFile, Obj? ctx := null) {
 		if (!efanFile.exists)
 			throw IOErr(ErrMsgs.templatesFileNotFound(efanFile))
 
