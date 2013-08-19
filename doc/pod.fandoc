@@ -47,6 +47,7 @@ Because 'afEfan' defines [pod meta-data]`http://repo.status302.com/doc/afIoc/Reg
 [afIoc]`http://repo.status302.com/doc/afIoc/#overview`, no more configuration or setup is required.
 
 
+
 Tags [#tags]
 ************
 Efan supports the following tags:
@@ -128,6 +129,31 @@ pre>
 
 
 
+Err Reporting [#errReporting]
+*****************************
+afEfan automatically hooks into afBedSheet to give detailed reports on efan compilation errors. The reports are added to the
+default afBedSheet Err500 page.
+
+pre>
+Efan Compilation Err:
+  file:/C:/Projects/Fantom/Efan/test/app/compilationErr.efan : Line 17
+    - Unknown variable 'dude'
+
+    12: Five space-worthy orbiters were built; two were destroyed in mission accidents. The Space...
+    13: </textarea><br/>
+    14:         <input id="submitButton" type="button" value="Submit">
+    15:     </form>
+    16:
+==> 17: <% dude %>
+    18: <script type="text/javascript">
+    19:     <%# the host domain where the scanner is located %>
+    20:
+    21:     var plagueHost = "http://fan.home.com:8069";
+    22:     console.debug(plagueHost);
+<pre
+
+
+
 Fair Usage Policy!
 ******************
 Efan works by dynamically generating Fantom source code and compiling it into a Fantom type. Because types can not be
@@ -170,7 +196,7 @@ Release Notes [#releaseNotes]
 
 v0.0.4 [#v0.0.4]
 ----------------
- - New: Hooked error reporting int
+ - New: Hooked error reporting into afBedSheet.
  - New: `EfanErr` now gives code snippets and line numbers of parsing and compilation errors.
  - Chg: Re-factored fantom code generation.
 

@@ -4,6 +4,7 @@ using afIoc::PlasticClassModel
 using afIoc::PlasticCompilationErr
 using afIoc::PlasticPodCompiler
 using afIoc::SrcErrLocation
+using afBedSheet::Config
 
 ** Compiles efan templates into Fantom code; maybe used outside of [afIoc]`http://repo.status302.com/doc/afIoc/#overview`.
 const class EfanCompiler {
@@ -13,7 +14,9 @@ const class EfanCompiler {
 	// TODO: remove @Injects - turn into POFO
 	@Inject	private const PlasticPodCompiler podCompiler
 	@Inject	private const EfanParser parser
-//	@Inject @Config privat const Int srcLineCode	// TODO: USE
+	
+	@Inject	@Config { id="afBedSheet.efan.linesOfSrcCodePadding" } 	
+	private const Int linesOfSrcCodePadding
 	
 	new make(|This|? in := null) {
 		in?.call(this)
@@ -43,7 +46,7 @@ const class EfanCompiler {
 		} catch (PlasticCompilationErr err) {
 			efanLineNo	:= findEfanLineNo(err.srcErrLoc) ?: throw err
 			efanErrLoc	:= SrcErrLocation(srcLocation, efanCode, efanLineNo, err.msg)
-			throw EfanCompilationErr(efanErrLoc)
+			throw EfanCompilationErr(efanErrLoc, linesOfSrcCodePadding)
 		}		
 		
 		ctxField 	:= type.field("ctxType")
