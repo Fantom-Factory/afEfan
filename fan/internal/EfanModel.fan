@@ -2,6 +2,7 @@
 internal class EfanModel : Pusher {
 	StrBuf 	code
 	Int		indentSize	:= 2
+	Str		evalBuf		:= ""
 	
 	new make(Int bufSize) {
 		code = StrBuf(bufSize)
@@ -36,46 +37,41 @@ internal class EfanModel : Pusher {
 
 		addLine(lineNo)
 
-		comment.split('\n').each |line| {
-			if (line.isEmpty) return
-			indent.add("""// ${line}""")
-		}
+		// add the '#' so no-one can confuse with "// --> Line XXX"
+		indent.add("// # ${comment}")	
 	}
 
 	override Void onEval(Int lineNo, Str text) {
 		code := text.trim
 		if (code.isEmpty) return
 
-		addLine(lineNo)
-
-		if (code.contains("\n")) {
+		if (evalBuf.isEmpty) {
+			addLine(lineNo)
+		} else {
+			evalBuf += (addLineStr(lineNo) + "\n")
+		}
+		evalBuf += (code + "\n")
+	}
+	
+	override Void onExit(Int lineNo) {
+		if (evalBuf.trim.isEmpty) return
+		
+		if (evalBuf.trim.containsChar('\n')) {
 			indent.add("_afCode.add(")
-			addMultiline(code)
+			addMultiline(evalBuf)
 			indent.add(")")
-		} else
-			indent.add("""_afCode.add( ${code} )""")
+		} else {
+			indent.add("_afCode.add( ${evalBuf.trim} )")
+		}
+		
+		evalBuf = ""
 	}
 
 	override Void onText(Int lineNo, Str text) {
 		if (text.isEmpty) return
 
 		addLine(lineNo)
-
-		if (text.contains("\n")) {
-			first := true
-			text.split('\n', false).each |line| {
-				if (first) {
-					indent
-					code.add("_afCode.add(\"\"\"").add(escapeTripleQuotes(line)).addChar('\n')
-					first = false
-				} else
-					indent(15).add(escapeTripleQuotes(line))
-			}
-			code.remove(-1).add("\"\"\")\n")
-		} else {
-			escaped := text.replace("\"", "\\\"")
-			indent.add("""_afCode.add("${escaped}")""")
-		}
+		indent.add("_afCode.add(${text.toCode})")
 	}
 
 	Str toFantomCode() {
@@ -84,8 +80,11 @@ internal class EfanModel : Pusher {
 	}
 
 	private This addLine(Int lineNo) {
-		indent.add("// -> Line ${lineNo}")
+		add(addLineStr(lineNo))
 		return this
+	}
+	private Str addLineStr(Int lineNo) {
+		indentStr + "// --> ${lineNo}"
 	}
 	
 	private This add(Str txt) {
@@ -104,25 +103,10 @@ internal class EfanModel : Pusher {
 	}
 	
 	private This indent(Int spaces := 0) {
-		indentSize.times |i| { code.addChar('\t') }
-		spaces.times { code.addChar(' ') }
+		code.add(indentStr(spaces))
 		return this
 	}
-
-	private This indentStr(Int spaces := 0) {
-		indentSize.times |i| { code.addChar('\t') }
-		spaces.times { code.addChar(' ') }
-		return this
-	}
-	
-	private Str escapeTripleQuotes(Str text) {
-		if (!text.contains("\"\"\""))
-			return text
-		// I know this is ugly - but, heck, it's what you get for putting triple quotes in your templates!
-		in := "\"\"\" + Str<|\"\"\"|> +\n"
-		indentSize.times { in = in + "\t" }
-		12.times { in = in + " " }
-		in += "\"\"\""
-		return text.replace("\"\"\"", in)
+	private Str indentStr(Int spaces := 0) {
+		"".padl(indentSize, '\t') + "".padl(spaces, ' ')
 	}
 }

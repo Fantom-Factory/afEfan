@@ -12,7 +12,7 @@ internal const class EfanParser {
 	Void parse(Pusher pusher, Str efan) {
 		efanIn	:= efan.toBuf
 		
-		buf		:= StrBuf(100)	// 100 being an average line length
+		buf		:= StrBuf(100)	// 100 being an average line length; it's better than 16 anyhow!
 		data	:= ParserData() { it.buf = buf; it.pusher = pusher }
 		line	:= 1
 		while (efanIn.more) {
@@ -41,27 +41,29 @@ internal const class EfanParser {
 			}
 
 			char := efanIn.readChar
+
+			newLine := (char == '\n')
 			
-			// normalise new lines in blocks (leave template text as is) 
-			if (data.inBlock && char == '\r') {
-				char = '\n'
-				// consume \r\n
-				if (peekEq(efanIn, "\n")) { }
+			// normalise new lines in blocks (leave template text as is)
+			if (char == '\r') {
+				newLine = true
+				if (data.inBlock) {
+					if (peekEq(efanIn, "\n")) { }
+					char = '\n'
+				} else {
+					if (peekEq(efanIn, "\n")) { 
+						buf.addChar(char)
+						char = '\n'
+					}					
+				}
 			}
 
 			buf.addChar(char)
-			
-			newLine := (char == '\n')
-			if (char == '\r') {
-				newLine = true
-				// consume \r\n
-				if (peekEq(efanIn, "\n")) { 
-					buf.addChar('\n')
-				}
-			}
-			
-			if (newLine)
+
+			if (newLine) {
+				data.push
 				data.newLine
+			}
 		}
 		
 		if (data.inBlock)
@@ -110,6 +112,7 @@ internal class ParserData {
 		blockType = BlockType.comment
 	}
 	Void exitingBlock() {
+		pusher.onExit(lineNo)
 		blockType = BlockType.text
 	}
 	Bool inBlock() {
@@ -143,4 +146,5 @@ internal mixin Pusher {
 	abstract Void onComment(Int lineNo, Str comment)
 	abstract Void onText(Int lineNo, Str text)
 	abstract Void onEval(Int lineNo, Str text)
+	abstract Void onExit(Int lineNo)
 }

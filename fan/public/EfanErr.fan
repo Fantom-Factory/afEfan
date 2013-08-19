@@ -5,10 +5,10 @@ const class EfanErr : Err {
 	new make(Str msg := "", Err? cause := null) : super(msg, cause) {}
 }
 
+// FIXME: add SrcErrLocation
 internal const class EfanParserErr : EfanErr {
 	new make(Str msg := "", Err? cause := null) : super(msg, cause) {}
 }
-
 
 internal const class EfanCompilationErr : EfanErr {
 	internal const SrcErrLocation srcErrLoc

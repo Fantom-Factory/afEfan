@@ -6,45 +6,47 @@ internal class TestMultiLines : EfanTest {
 	@Inject EfanCompiler?	compiler
 	
 	Void testCommentWithMultiLines() {
-		c :="""Hel <%#
-		       Line 1 
-		           	Line 2 
-		       %> lo!""" 
+		c :="""Hel <%# blah
+		       blah blah
+		           	b-b-b-b-blah
+		
+		        \$\$boobs %> lo!""" 
 		text := efan.renderFromStr(c, null)
 		verifyEq(text, "Hel  lo!")
 
 		// test the code looks pretty
 		code := compiler.parseIntoCode(c)
 		verify(!code.contains("\t\t// \n"))		// check empty lines are removed
-		verify( code.contains("\t\t// Line 1"))
-		verify( code.contains("\t\t// Line 2"))	// test line trimming
+		verify( code.contains("\t\t// --> 1\n\t\t// # blah"))
+		verify( code.contains("\t\t// --> 3\n\t\t// # b-b-b-b-blah")) // test line trimming
 	}
 	
 	Void testEvalWithMultiLines() {
 		c :="""Hel <%= 60 + 
 		       9 
 		       %> lo!""" 
+		
 		text := efan.renderFromStr(c, null)
 		verifyEq(text, "Hel 69 lo!")
 
 		// test the code looks pretty
-		code := compiler.parseIntoCode(c)		
+		code := compiler.parseIntoCode(c)
 		verify( code.contains("\t\t\t60 +"))
 		verify( code.contains("\t\t\t9"))
 	}
-	
+
 	Void testTextWithMulilines() {
 		c :="""Hel
-		       6
-		       9
+		       		6
+		       		9	
 		       lo!""" 
 		text := efan.renderFromStr(c, null)
-		verifyEq(text, "Hel\n6\n9\nlo!")
+		verifyEq(text, "Hel\n\t\t6\n\t\t9\t\nlo!")
 		
 		// test the code looks pretty
 		code := compiler.parseIntoCode(c)
-		verify( code.contains("\t\t               6"))
-		verify( code.contains("\t\t               9"))
+		verify( code.contains("""_afCode.add("\\t\\t6\\n")"""))
+		verify( code.contains("""_afCode.add("\\t\\t9\\t\\n")"""))
 	}
 
 	Void testTextWithMulilines2() {
@@ -54,8 +56,8 @@ internal class TestMultiLines : EfanTest {
 
 		// test the code looks pretty - \r's make for ugly code - not a lot I can do about it
 		code := compiler.parseIntoCode(c)
-		verify( code.contains("\r6"))
-		verify( code.contains("\r9"))
+		verify( code.contains("""_afCode.add("6\\r")"""))
+		verify( code.contains("""_afCode.add("9\\r")"""))
 	}
 	
 	Void testTextWithMulilinesAndQuotes() {
@@ -68,8 +70,8 @@ internal class TestMultiLines : EfanTest {
 		
 		// test the code looks pretty
 		code := compiler.parseIntoCode(c)
-		verify( code.contains("\t\t               6"))
-		verify( code.contains("\t\t               \"9\""))
+		verify( code.contains("""_afCode.add("6\\n")"""))
+		verify( code.contains("""_afCode.add("\\"9\\"\\n")"""))
 	}
 
 	Void testTextWithMulilinesAndTrippleQuotes() {
@@ -79,7 +81,11 @@ internal class TestMultiLines : EfanTest {
 		          lo!|>
 		text := efan.renderFromStr(c, null)
 		verifyEq(text, "Hel\n6\n\"\"\"9\"\"\"\nlo!")
-		// the code is ugly - no need to test it!
+		
+		// test the code STILL looks pretty!
+		code := compiler.parseIntoCode(c)
+		verify( code.contains("""_afCode.add("6\\n")"""))
+		verify( code.contains("""_afCode.add("\\"\\"\\"9\\"\\"\\"\\n")"""))
 	}
 
 }

@@ -11,7 +11,7 @@ internal class TestMultiBlocks : EfanTest {
 		       <% } %>"""
 		// test the code looks pretty
 		code := compiler.parseIntoCode(c)
-//		Env.cur.err.printLine(code)
+		Env.cur.err.printLine(code)
 		verify( code.contains("\t\t3.times |i| {"))
 		verify( code.contains("\t\t\t_afCode.add( i+1 )"))
 	}
