@@ -1,22 +1,12 @@
 using compiler::CompilerErr
-using afIoc::Inject
-using afIoc::PlasticClassModel
-using afIoc::PlasticCompilationErr
-using afIoc::PlasticPodCompiler
-using afIoc::SrcErrLocation
-using afBedSheet::Config
 
 ** Compiles efan templates into Fantom code; maybe used outside of [afIoc]`http://repo.status302.com/doc/afIoc/#overview`.
 const class EfanCompiler {
 	
-	private const Str rendererClassName	:= "EfanRenderer"  
-	
-	// TODO: remove @Injects - turn into POFO
-	@Inject	private const PlasticPodCompiler podCompiler
-	@Inject	private const EfanParser parser
-	
-	@Inject	@Config { id="afBedSheet.efan.linesOfSrcCodePadding" } 	
-	private const Int linesOfSrcCodePadding
+	private const Str 					rendererClassName	:= "EfanRenderer"  
+	private const PlasticPodCompiler	podCompiler			:= PlasticPodCompiler() 
+	private const EfanParser 			parser				:= EfanParser() 
+	private const Int 					srcCodePadding		:= 5 
 	
 	new make(|This|? in := null) {
 		in?.call(this)
@@ -46,7 +36,7 @@ const class EfanCompiler {
 		} catch (PlasticCompilationErr err) {
 			efanLineNo	:= findEfanLineNo(err.srcErrLoc) ?: throw err
 			efanErrLoc	:= SrcErrLocation(srcLocation, efanCode, efanLineNo, err.msg)
-			throw EfanCompilationErr(efanErrLoc, linesOfSrcCodePadding)
+			throw EfanCompilationErr(efanErrLoc, srcCodePadding)
 		}		
 		
 		ctxField 	:= type.field("ctxType")
