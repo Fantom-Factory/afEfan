@@ -20,12 +20,8 @@ xmas.efan:
 
 Fantom code:
 
-    @Inject EfanTemplates efanTemplates
-
-    ...
-
     // --> Ho! Ho! Ho! Merry Christmas!
-    efanTemplates.renderFromFile(`xmas.fan`.toFile, 3)
+    Efan().renderFromStr(`xmas.fan`.toFile.readAllStr, 3)
 
 
 

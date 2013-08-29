@@ -4,9 +4,10 @@ const class EfanErr : Err {
 	new make(Str msg := "", Err? cause := null) : super(msg, cause) {}
 }
 
-internal const class EfanParserErr : EfanErr {
-	internal const SrcErrLocation srcErrLoc
-	internal const Int noOfLinesOfPadding
+@NoDoc
+const class EfanParserErr : EfanErr {
+	const SrcErrLocation srcErrLoc
+	const Int noOfLinesOfPadding
 
 	internal new make(SrcErrLocation srcErrLoc, Int noOfLinesOfPadding := 5) : super(srcErrLoc.errMsg) {
 		this.srcErrLoc = srcErrLoc
@@ -25,9 +26,10 @@ internal const class EfanParserErr : EfanErr {
 	}
 }
 
-internal const class EfanCompilationErr : EfanErr {
-	internal const SrcErrLocation srcErrLoc
-	internal const Int noOfLinesOfPadding
+@NoDoc
+const class EfanCompilationErr : EfanErr {
+	const SrcErrLocation srcErrLoc
+	const Int noOfLinesOfPadding
 
 	internal new make(SrcErrLocation srcErrLoc, Int noOfLinesOfPadding := 5) : super(srcErrLoc.errMsg) {
 		this.srcErrLoc = srcErrLoc

@@ -1,7 +1,6 @@
 Overview [#overview]
 ********************
-afEfan is a [Fantom]`http://fantom.org/` [afIoc]`http://repo.status302.com/doc/afIoc/#overview` library for rendering
-Embedded Fantom (efan) templates.
+afEfan is a [Fantom]`http://fantom.org/` library for rendering Embedded Fantom (efan) templates.
 
 Much like EJS for Javascript, ERB for Ruby and JSP for Java, EFAN allows you to embed snippets of Fantom code inside textual
 templates.
@@ -23,28 +22,9 @@ pre>
 
 Fantom code:
 pre>
-  @Inject EfanTemplates efanTemplates
-
-  ...
-
   // --> Ho! Ho! Ho! Merry Christmas!
-  txt := efanTemplates.renderFromFile(`xmas.efan`.toFile, 3)
+  Efan().renderFromFile(`xmas.efan`.toFile.readAllStr, 3)
 <pre
-
-
-
-Usage [#usage]
-**************
-To use 'afEfan' just add it as dependency in your project's 'build.fan'. Example:
-
-pre>
-depends = ["sys 1.0", "afIoc 1.4+", "afBedSheet 1.0+", "afEfan 0.0.4+", ... ]
-<pre
-
-...and that's it!
-
-Because 'afEfan' defines [pod meta-data]`http://repo.status302.com/doc/afIoc/RegistryBuilder.html` for
-[afIoc]`http://repo.status302.com/doc/afIoc/#overview`, no more configuration or setup is required.
 
 
 
@@ -80,13 +60,13 @@ you pass in, so you don't need to cast it. Examples:
 Use maps:
 pre>
   template := "Hello <%= ctx["name"] %>!"
-  efanTemplates.renderFromStr(template, ["name":"Emma"])
+  Efan().renderFromStr(template, ["name":"Emma"])
 <pre
 
 Use objs:
 pre>
   template := "Hello <%= ctx.name %>!"
-  efanTemplates.renderFromStr(template, Entity() { it.name = "Emma"})
+  Efan().renderFromStr(template, Entity() { it.name = "Emma"})
 
   ...
 
@@ -97,8 +77,8 @@ pre>
 
 
 
-View Helpers
-************
+View Helpers [#viewHelpers]
+***************************
 Efan lets you provide view helpers for common tasks. View helpers are 'mixins' that your efan template can extend, giving your
 templates access to commonly used methods. Example, for escaping XML:
 
@@ -110,13 +90,10 @@ const mixin XmlViewHelper {
 }
 <pre
 
-Contribute View Helpers in your 'AppModule':
+Set view helpers when calling efan:
 
 pre>
-  @Contribute { serviceType=EfanViewHelpers# }
-  static Void contrib(OrderedConfig conf) {
-    conf.add(XmlViewHelper#)
-  }
+  Efan().renderFromStr(template, ctx, [XmlViewHelper#])
 <pre
 
 Template usage would then be:
@@ -131,12 +108,11 @@ pre>
 
 Err Reporting [#errReporting]
 *****************************
-afEfan automatically hooks into afBedSheet to give detailed reports on efan compilation errors. The reports are added to the
-default afBedSheet Err500 page.
+Efan compilation errs return snippets of code showing on which line in the 'efan' src the error occurred.
 
 pre>
 Efan Compilation Err:
-  file:/C:/Projects/Fantom/Efan/test/app/compilationErr.efan : Line 17
+  file:/projects/fantom/Efan/test/app/compilationErr.efan : Line 17
     - Unknown variable 'dude'
 
     12: Five space-worthy orbiters were built; two were destroyed in mission accidents. The Space...
@@ -154,45 +130,39 @@ Efan Compilation Err:
 
 
 
-Fair Usage Policy!
-******************
-Efan works by dynamically generating Fantom source code and compiling it into a Fantom type. Because types can not be
-*unloaded*, if you were compile 1000s of efan templates, it could be considered a memory leak.
-
-For this reason, templates compiled from files are cached and reused, therefore posing no risk in your typical web
-application(*). But templates compiled [from Strs]`EfanTemplates.renderFromStr` are not cached and so calls to this method
-should be made judiciously.
-
-(*) If a template file seen to be modified, the efan template is re-compiled on the fly. This is fine in dev, but be weary of
-modifying template files in live.
-
-
-
-Non afIoc Applications
+Renderers [#renderers]
 **********************
-Efan was created predominantly for [afIoc]`http://repo.status302.com/doc/afIoc/#overview` applications but may still be used
-outside of an IoC by means of the `EfanCompiler` class. Example:
+Efan works by dynamically generating Fantom source code and compiling it into a Fantom type. Because types can not be
+*unloaded*, if you were compile 1000s of efan templates, it could be considered a memory leak. Example:
 
 pre>
   template := "<% ctx.times |i| { %>Ho! <% } %>Merry Christmas!"
-  output   := EfanCompiler().compile(template, Int#)->render(3)
+  renderer := EfanCompiler().compile(template, Int#)
+  output   := renderer->render(3)
 <pre
 
-Note that each invocation of 'EfanCompiler.compile' creates a new Fantom type. So it is suggested that it be called sparingly
-as not to cause a memory leaks. Caching of the returned renderers is highly recommended.
+Each invocation of 'compile' creates a new Fantom type, so use it judiciously. Caching of the returned renderers is highly
+recommended.
 
-The Obj returned from 'compile' has the following slots:
+The 'renderer' returned from 'compile' has the following slots:
 
   Type ctxType
   Str render(<ctxType> ctx)
 
-where ctxType is the type passed into the compile method. Because the render() method signature is dependant on the ctx type,
-the return value can not be a static mixin type. Therefore all renderer invocations must be dynamic.
+where ctxType is the type passed into the compile method. Because the 'render()' method signature is dependant on the ctx type,
+it cannot be declared by a mixin. Therefore all renderer invocations must be dynamic.
 
 
 
 Release Notes [#releaseNotes]
 *****************************
+
+v0.0.6 [#v0.0.6]
+----------------
+ - Chg: Removed dependency on [afIoc]`http://repo.status302.com/doc/afIoc/#overview`, all 'afPlastic' has been copied in to efan.
+ - Chg: Removed dependency on [afBedSheet]`http://repo.status302.com/doc/afBedSheet/#overview` - see
+ [afBedSheetEfan]`http://repo.status302.com/doc/afBedSheetEfan/#overview` for BedSheet integration.
+ - Chg: Updated docs.
 
 v0.0.4 [#v0.0.4]
 ----------------
