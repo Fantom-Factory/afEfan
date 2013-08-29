@@ -84,32 +84,32 @@ internal class TestPlasticModel : PlasticTest {
 
 }
 
-internal const mixin T_PlasticService01 { }
+const mixin T_PlasticService01 { }
 
-internal mixin T_PlasticService02 { }
+mixin T_PlasticService02 { }
 
-internal mixin T_PlasticService03 { }
+mixin T_PlasticService03 { }
 
-internal class T_PlasticService04 { }
+class T_PlasticService04 { }
 
-internal mixin T_PlasticService05 { 
+mixin T_PlasticService05 { 
 	internal abstract Str oops()
 }
 
-internal mixin T_PlasticService06 { 
+mixin T_PlasticService06 { 
 	Str oops() { "oops" }
 }
 
-internal mixin T_PlasticService07 { 
+mixin T_PlasticService07 { 
 	internal abstract Str oops
 }
 
-internal mixin T_PlasticService08 { 
+mixin T_PlasticService08 { 
 	abstract Void redirect(Uri uri, Int statusCode := 303)
 }
 
-internal const mixin T_PlasticService09 {
+const mixin T_PlasticService09 {
 	abstract Void deeDee()
 }
 
-internal const mixin T_PlasticService10 : T_PlasticService09 { }
+const mixin T_PlasticService10 : T_PlasticService09 { }
