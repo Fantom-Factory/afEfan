@@ -1,20 +1,14 @@
 
 For v1.0
 --------
-split into afEfan / adBedSheetEfan 
 
-use afIoc to make() the renderers - Can Helpers define afIoc services? (need to add facets to plastic)
- - Add compilation hooks so external people can add their own generated methods & fields
-
-<%! using webmod %>
-
-Raise proper efan runtime errs - with code snippets?
-
-make 'ctx' configurable
 
 
 Future:
 -------
-Multiple ctx args (optionally give mixin render mixin method?)
-extend class
+add compilation hooks so external people can add their own generated methods & fields
 
+<%! using webmod %>
+
+Multiple ctx args (optionally give mixin render mixin method?)
+extend a class, not just mixins

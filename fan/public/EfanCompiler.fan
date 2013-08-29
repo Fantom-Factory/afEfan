@@ -3,6 +3,9 @@ using compiler::CompilerErr
 ** Compiles efan templates into Fantom code; maybe used outside of [afIoc]`http://repo.status302.com/doc/afIoc/#overview`.
 const class EfanCompiler {
 	
+	** The name given to the 'ctx' variable in the render method. 
+	public const  Str					ctxVarName			:= "ctx"
+	
 	private const Str 					rendererClassName	:= "EfanRenderer"  
 	private const PlasticPodCompiler	podCompiler			:= PlasticPodCompiler() 
 	private const EfanParser 			parser				:= EfanParser() 
@@ -25,7 +28,7 @@ const class EfanCompiler {
 		model.addField(Type?#, "ctxType")
 
 		renderCode	:= parseIntoCode(srcLocation, efanCode)
-		renderSig	:= (ctxType == null) ? "" : "${ctxType.qname} ctx"
+		renderSig	:= (ctxType == null) ? "" : "${ctxType.qname} ${ctxVarName}"
 		model.addMethod(Str#, "render", renderSig, renderCode)
 
 		type		:= (Type?) null
