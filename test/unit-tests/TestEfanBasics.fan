@@ -1,8 +1,5 @@
-using afIoc
 
 internal class TestEfanBasics : EfanTest {
-	
-	@Inject EfanTemplates?	efan
 	
 	Void testOneLineText() {
 		text := efan.renderFromStr("Hello!", null)

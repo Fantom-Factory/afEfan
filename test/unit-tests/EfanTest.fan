@@ -1,20 +1,8 @@
-using afIoc::Registry
-using afIoc::RegistryBuilder
-using afBedSheet::BedSheetWebMod
 
 abstract internal class EfanTest : Test {
 	
-	Registry? 	reg
-	Type[]		modules	:= [EfanModule#, BedSheetWebMod#.pod.type("BedSheetModule")]
-	
-	override Void setup() {
-		reg = (Registry) RegistryBuilder(["suppressLogging":true]).addModules(modules).build(["suppressStartupMsg":true]).startup
-		reg.injectIntoFields(this)
-	}
-	
-	override Void teardown() {
-		reg?.shutdown
-	}
+	EfanCompiler	compiler	:= EfanCompiler()
+	Efan			efan		:= Efan()
 	
 	Void verifyEfanErrMsg(Str errMsg, |Obj| func) {
 		verifyErrTypeMsg(EfanErr#, errMsg, func)

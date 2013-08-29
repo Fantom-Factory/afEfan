@@ -1,10 +1,6 @@
-using afIoc::Inject
 
 internal class TestMultiLines : EfanTest {
 
-	@Inject	EfanTemplates?	efan
-	@Inject EfanCompiler?	compiler
-	
 	Void testCommentWithMultiLines() {
 		c :="""Hel <%# blah
 		       blah blah

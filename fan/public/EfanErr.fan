@@ -1,4 +1,3 @@
-using afIoc::SrcErrLocation
 
 ** As thrown by Efan.
 const class EfanErr : Err {

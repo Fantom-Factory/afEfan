@@ -1,9 +1,5 @@
-using afIoc::Inject
 
 internal class TestMultiBlocks : EfanTest {
-	
-	@Inject	EfanTemplates?	efan
-	@Inject EfanCompiler?	compiler
 	
 	Void testMulilBlocksAreIndended() {
 		c :="""<% 3.times |i| { %>
