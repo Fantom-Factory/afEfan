@@ -6,7 +6,6 @@ internal class EfanModel : Pusher {
 	
 	new make(Int bufSize) {
 		code = StrBuf(bufSize)
-		code.add("_afCode := StrBuf(${bufSize})\n")
 	}
 	
 	override Void onFanCode(Int lineNo, Str text) {

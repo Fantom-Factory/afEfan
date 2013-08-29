@@ -21,11 +21,12 @@ const class EfanCompiler {
 			parser = EfanParser()
 	}
 
-	Obj compile(Uri srcLocation, Str efanCode, Type? ctxType, Type[] viewHelpers := Type#.emptyList) {
-		model	:= PlasticClassModel(rendererClassName, true)
+	EfanRenderer compile(Uri srcLocation, Str efanCode, Type? ctxType, Type[] viewHelpers := Type#.emptyList) {
+		model	:= PlasticClassModel(rendererClassName, false)
 		viewHelpers.each { model.extendMixin(it) }
 
 		model.addField(Type?#, "ctxType")
+		model.addField(StrBuf#, "_afCode")
 
 		renderCode	:= parseIntoCode(srcLocation, efanCode)
 		renderSig	:= (ctxType == null) ? "" : "${ctxType.qname} ${ctxVarName}"
@@ -40,15 +41,11 @@ const class EfanCompiler {
 			efanLineNo	:= findEfanLineNo(err.srcErrLoc) ?: throw err
 			efanErrLoc	:= SrcErrLocation(srcLocation, efanCode, efanLineNo, err.msg)
 			throw EfanCompilationErr(efanErrLoc, srcCodePadding)
-		}		
-		
-		ctxField 	:= type.field("ctxType")
-		ctorPlan	:= Field:Obj?[ctxField:ctxType]
-		ctorFunc	:= Field.makeSetFunc(ctorPlan)
+		}
 
-		return type.make([ctorFunc])
+		return EfanRenderer(type, ctxType, efanCode.size)		
 	}
-	
+
 	internal Str parseIntoCode(Uri srcLocation, Str efan) {
 		data := EfanModel(efan.size)
 		parser.parse(srcLocation, data, efan)
