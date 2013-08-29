@@ -5,11 +5,11 @@ const class EfanCompiler {
 	
 	** The name given to the 'ctx' variable in the render method. 
 	public const  Str					ctxVarName			:= "ctx"
+	public const  Int 					srcCodePadding		:= 5 
 	
 	private const Str 					rendererClassName	:= "EfanRenderer"  
 	private const PlasticPodCompiler	podCompiler			:= PlasticPodCompiler() 
 	private const EfanParser 			parser				:= EfanParser() 
-	private const Int 					srcCodePadding		:= 5 
 	
 	new make(|This|? in := null) {
 		in?.call(this)
