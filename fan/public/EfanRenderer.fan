@@ -27,14 +27,13 @@ const class EfanRenderer {
 	Str nestedRender(|Obj| bodyFunc, Obj bodyObj, StrBuf codeBuf, Obj? ctx) {
 		// FIXME: ctx (like above)
 		renderer := renderer(codeBuf)
-		renderer->bodyFunc 	= bodyFunc
-		renderer->bodyObj 	= bodyObj
+		renderer->_bodyFunc	= bodyFunc
+		renderer->_bodyObj 	= bodyObj
 		return renderer->render(ctx)
 	}
 
 	private Obj renderer(StrBuf codeBuf) {
 		bob	:= CtorPlanBuilder(rendererType)
-		bob["ctxType"] = ctxType
 		bob["_afCode"] = codeBuf
 		return bob.makeObj
 	}
