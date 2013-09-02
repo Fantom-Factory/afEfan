@@ -7,6 +7,7 @@ const class EfanCompiler {
 	public const  Str					ctxVarName			:= "ctx"
 	public const  Int 					srcCodePadding		:= 5 
 	
+	private const Str 					addCode 			:= "_afCode.add"	
 	private const Str 					rendererClassName	:= "EfanRenderer"  
 	private const PlasticPodCompiler	podCompiler			:= PlasticPodCompiler() 
 	private const EfanParser 			parser				:= EfanParser() 
@@ -25,9 +26,19 @@ const class EfanCompiler {
 		model	:= PlasticClassModel(rendererClassName, false)
 		viewHelpers.each { model.extendMixin(it) }
 
-		model.addField(Type?#, "ctxType")
+		model.usingType(EfanRenderer#)
+		model.usingType(EfanBodyRenderer#)
+		
+		model.addField(Type?#, 		"ctxType")
+		model.addField(|EfanBodyRenderer t|?#, 	"bodyFunc")
+		model.addField(EfanBodyRenderer?#, 		"bodyObj")
 		model.addField(StrBuf#, "_afCode")
-
+		
+		model.addMethod(EfanBodyRenderer#, "renderEfan", "EfanRenderer renderer, Obj? ctx", "EfanBodyRenderer(renderer, ctx, _afCode)")
+		model.addMethod(Void#, "renderBody", Str.defVal, "bodyFunc?.call(bodyObj)")
+		
+//		model.addMethod(Void#, "_afAddCode", "Str code", "_afCode.add(code)")
+		
 		renderCode	:= parseIntoCode(srcLocation, efanCode)
 		renderSig	:= (ctxType == null) ? "" : "${ctxType.qname} ${ctxVarName}"
 		model.addMethod(Str#, "render", renderSig, renderCode)
@@ -40,14 +51,14 @@ const class EfanCompiler {
 		} catch (PlasticCompilationErr err) {
 			efanLineNo	:= findEfanLineNo(err.srcErrLoc) ?: throw err
 			efanErrLoc	:= SrcErrLocation(srcLocation, efanCode, efanLineNo, err.msg)
-			throw EfanCompilationErr(efanErrLoc, srcCodePadding)
+			throw EfanCompilationErr(efanErrLoc, srcCodePadding, err)
 		}
 
 		return EfanRenderer(type, ctxType, efanCode.size)		
 	}
 
 	internal Str parseIntoCode(Uri srcLocation, Str efan) {
-		data := EfanModel(efan.size)
+		data := EfanModel(efan.size, addCode)
 		parser.parse(srcLocation, data, efan)
 		return data.toFantomCode
 	}

@@ -1,11 +1,14 @@
 
 internal class EfanModel : Pusher {
+	
+	Str 	addCode
 	StrBuf 	code
 	Int		indentSize	:= 2
 	Str		evalBuf		:= ""
 	
-	new make(Int bufSize) {
-		code = StrBuf(bufSize)
+	new make(Int bufSize, Str addCode) {
+		this.code 		= StrBuf(bufSize)
+		this.addCode	= addCode
 	}
 	
 	override Void onFanCode(Int lineNo, Str text) {
@@ -56,11 +59,11 @@ internal class EfanModel : Pusher {
 		if (evalBuf.trim.isEmpty) return
 		
 		if (evalBuf.trim.containsChar('\n')) {
-			indent.add("_afCode.add(")
+			indent.add("${addCode}(")
 			addMultiline(evalBuf)
 			indent.add(")")
 		} else {
-			indent.add("_afCode.add( ${evalBuf.trim} )")
+			indent.add("${addCode}( ${evalBuf.trim} )")
 		}
 		
 		evalBuf = ""
@@ -70,7 +73,7 @@ internal class EfanModel : Pusher {
 		if (text.isEmpty) return
 
 		addLine(lineNo)
-		indent.add("_afCode.add(${text.toCode})")
+		indent.add("${addCode}(${text.toCode})")
 	}
 
 	Str toFantomCode() {

@@ -1,0 +1,3 @@
+  <html> <%= ctx %>
+  <% renderBody %>
+  </html>

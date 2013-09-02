@@ -106,6 +106,50 @@ pre>
 
 
 
+Layout Pattern [#layoutPattern]
+*******************************
+When templating HTML pages and the like, it's common to place the meat of the page in one file, and common content in another.
+
+layout.efan:
+pre>
+<html>
+<head>
+  <title>My Page</title>
+</head>
+<body>
+  <div> header </div>
+  <div> menu stuff </div>
+
+  <% ctx.renderBody %>
+
+  <div> footer </div>
+</body>
+</html>
+<pre
+
+meat.efan:
+pre>
+<div>
+  ...my cool page content...
+</div>
+<pre
+
+Meat.fan:
+pre>
+class Meat {
+  Str renderMeat() {
+    Efan().renderFromFile(`layout.efan`.toFile.readAllStr, this)
+  }
+
+  Str renderBody() {
+    ctx := ...
+    Efan().renderFromFile(`meat.efan`.toFile.readAllStr, ctx)
+  }
+}
+<pre
+
+
+
 Err Reporting [#errReporting]
 *****************************
 Efan compilation errs return snippets of code showing on which line in the 'efan' src the error occurred.
