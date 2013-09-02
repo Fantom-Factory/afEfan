@@ -7,14 +7,13 @@ const class EfanCompiler {
 	public const  Str					ctxVarName			:= "ctx"
 	public const  Int 					srcCodePadding		:= 5 
 	
-	private const Str 					addCode 			:= "_afCode.add"	
 	private const Str 					rendererClassName	:= "EfanRenderer"  
 	private const PlasticPodCompiler	podCompiler			:= PlasticPodCompiler() 
 	private const EfanParser 			parser				:= EfanParser() 
 	
 	new make(|This|? in := null) {
 		in?.call(this)
-		
+
 		// create new services for non-afIoc projects
 		if (podCompiler == null)
 			podCompiler = PlasticPodCompiler()
@@ -29,21 +28,17 @@ const class EfanCompiler {
 		model.usingType(EfanRenderer#)
 		model.usingType(EfanBodyRenderer#)
 		
-		model.addField(Type?#, 		"ctxType")
-		model.addField(|EfanBodyRenderer t|?#, 	"bodyFunc")
-		model.addField(EfanBodyRenderer?#, 		"bodyObj")
-		model.addField(StrBuf#, "_afCode")
+		model.addField(|EfanBodyRenderer t|?#, 	"_bodyFunc")
+		model.addField(EfanBodyRenderer?#, 		"_bodyObj")
+		model.addField(StrBuf#, 				"_afCode")
 		
 		model.addMethod(EfanBodyRenderer#, "renderEfan", "EfanRenderer renderer, Obj? ctx", "EfanBodyRenderer(renderer, ctx, _afCode)")
-		model.addMethod(Void#, "renderBody", Str.defVal, "bodyFunc?.call(bodyObj)")
+		model.addMethod(Void#, "renderBody", Str.defVal, "_bodyFunc?.call(_bodyObj)")
 		
-//		model.addMethod(Void#, "_afAddCode", "Str code", "_afCode.add(code)")
-		
+		type		:= (Type?) null
 		renderCode	:= parseIntoCode(srcLocation, efanCode)
 		renderSig	:= (ctxType == null) ? "" : "${ctxType.qname} ${ctxVarName}"
 		model.addMethod(Str#, "render", renderSig, renderCode)
-
-		type		:= (Type?) null
 		
 		try {
 			type	= compileCode(model.toFantomCode, rendererClassName)
@@ -58,7 +53,7 @@ const class EfanCompiler {
 	}
 
 	internal Str parseIntoCode(Uri srcLocation, Str efan) {
-		data := EfanModel(efan.size, addCode)
+		data := EfanModel(efan.size, "_afCode.add")
 		parser.parse(srcLocation, data, efan)
 		return data.toFantomCode
 	}
