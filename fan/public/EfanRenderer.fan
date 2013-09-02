@@ -6,11 +6,11 @@ const class EfanRenderer {
 	private const Int initBufSize
 	
 	const Type? ctxType
-	
-	new make(Type rendererType, Type? ctxType, Int initBufSize) {
-		this.rendererType = rendererType
-		this.ctxType = ctxType
-		this.initBufSize = initBufSize
+
+	internal new make(Type rendererType, Type? ctxType, Int initBufSize) {
+		this.rendererType 	= rendererType
+		this.ctxType 		= ctxType
+		this.initBufSize 	= initBufSize
 	}
 	
 	Str render(Obj? ctx) {
@@ -18,12 +18,24 @@ const class EfanRenderer {
 			throw Err("Bollocks!")	// FIXME: Err msg
 		if (ctx != null && !ctx.typeof.fits(ctxType))
 			throw Err("Bollocks!")	// FIXME: Err msg
-		
+
+		renderer := renderer(StrBuf(initBufSize))
+		return renderer->render(ctx)
+	}
+	
+	@NoDoc
+	Str nestedRender(|Obj| bodyFunc, Obj bodyObj, StrBuf codeBuf, Obj? ctx) {
+		// FIXME: ctx (like above)
+		renderer := renderer(codeBuf)
+		renderer->bodyFunc 	= bodyFunc
+		renderer->bodyObj 	= bodyObj
+		return renderer->render(ctx)
+	}
+
+	private Obj renderer(StrBuf codeBuf) {
 		bob	:= CtorPlanBuilder(rendererType)
 		bob["ctxType"] = ctxType
-		bob["_afCode"] = StrBuf(initBufSize)
-		renderer := bob.makeObj
-		
-		return renderer->render(ctx)
+		bob["_afCode"] = codeBuf
+		return bob.makeObj
 	}
 }

@@ -31,7 +31,7 @@ const class EfanCompilationErr : EfanErr {
 	const SrcErrLocation srcErrLoc
 	const Int noOfLinesOfPadding
 
-	internal new make(SrcErrLocation srcErrLoc, Int noOfLinesOfPadding := 5) : super(srcErrLoc.errMsg) {
+	internal new make(SrcErrLocation srcErrLoc, Int noOfLinesOfPadding := 5, Err? cause := null) : super(srcErrLoc.errMsg, cause) {
 		this.srcErrLoc = srcErrLoc
 		this.noOfLinesOfPadding = noOfLinesOfPadding
 	}
