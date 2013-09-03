@@ -1,7 +1,6 @@
 
-For v1.0
---------
-
+For v1.0.2
+----------
 
 
 Future:
@@ -11,4 +10,5 @@ add compilation hooks so external people can add their own generated methods & f
 <%! using webmod %>
 
 Multiple ctx args (optionally give mixin render mixin method?)
-extend a class, not just mixins
+
+Be able to extend a class, not just mixins

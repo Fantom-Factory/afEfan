@@ -2,10 +2,13 @@
 ** A sane (const) wrapper around the generated efan renderer.
 const class EfanRenderer {
 	
-	private const Type rendererType
-	private const Int initBufSize
+	** The generated efan renderer.
+	const Type rendererType
 	
+	** The 'ctx' type the renderer was generated for.
 	const Type? ctxType
+
+	private const Int initBufSize
 
 	internal new make(Type rendererType, Type? ctxType, Int initBufSize) {
 		this.rendererType 	= rendererType
@@ -13,6 +16,8 @@ const class EfanRenderer {
 		this.initBufSize 	= initBufSize
 	}
 	
+	** Instanstiates the efan renderer and renders with the given 'ctx'. Ensure the give 'ctx' is of 
+	** the same type as [ctxType]`#ctxType`.
 	Str render(Obj? ctx) {
 		if (ctx == null && ctxType != null && !ctxType.isNullable)
 			throw Err("Bollocks!")	// FIXME: Err msg
@@ -22,10 +27,11 @@ const class EfanRenderer {
 		renderer := renderer(StrBuf(initBufSize))
 		return renderer->render(ctx)
 	}
-	
+
+	** I'd like this to be internal but it's called by renderers in diff pods
 	@NoDoc
 	Str nestedRender(|Obj| bodyFunc, Obj bodyObj, StrBuf codeBuf, Obj? ctx) {
-		// FIXME: ctx (like above)
+		// FIXME: check ctx (like above)
 		renderer := renderer(codeBuf)
 		renderer->_bodyFunc	= bodyFunc
 		renderer->_bodyObj 	= bodyObj

@@ -5,12 +5,16 @@ const class EfanCompiler {
 	
 	** The name given to the 'ctx' variable in the render method. 
 	public const  Str					ctxVarName			:= "ctx"
+	
+	** When generating code snippets to report compilation Errs, this is the number of lines of src 
+	** code the erroneous line should be padded with.  
 	public const  Int 					srcCodePadding		:= 5 
 	
 	private const Str 					rendererClassName	:= "EfanRenderer"  
 	private const PlasticPodCompiler	podCompiler			:= PlasticPodCompiler() 
 	private const EfanParser 			parser				:= EfanParser() 
 	
+	** Create an 'EfanCompiler'.
 	new make(|This|? in := null) {
 		in?.call(this)
 
@@ -21,7 +25,10 @@ const class EfanCompiler {
 			parser = EfanParser()
 	}
 
-	EfanRenderer compile(Uri srcLocation, Str efanCode, Type? ctxType, Type[] viewHelpers := Type#.emptyList) {
+	** Compiles a new renderer from the given efanTemplate.
+	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
+	** 'srcLocation' is only used for Err msgs.
+	EfanRenderer compile(Uri srcLocation, Str efanTemplate, Type? ctxType, Type[] viewHelpers := Type#.emptyList) {
 		model	:= PlasticClassModel(rendererClassName, false)
 		viewHelpers.each { model.extendMixin(it) }
 
@@ -36,7 +43,7 @@ const class EfanCompiler {
 		model.addMethod(Void#, "renderBody", Str.defVal, "_bodyFunc?.call(_bodyObj)")
 		
 		type		:= (Type?) null
-		renderCode	:= parseIntoCode(srcLocation, efanCode)
+		renderCode	:= parseIntoCode(srcLocation, efanTemplate)
 		renderSig	:= (ctxType == null) ? "" : "${ctxType.qname} ${ctxVarName}"
 		model.addMethod(Str#, "render", renderSig, renderCode)
 		
@@ -45,13 +52,27 @@ const class EfanCompiler {
 
 		} catch (PlasticCompilationErr err) {
 			efanLineNo	:= findEfanLineNo(err.srcErrLoc) ?: throw err
-			efanErrLoc	:= SrcErrLocation(srcLocation, efanCode, efanLineNo, err.msg)
+			efanErrLoc	:= SrcErrLocation(srcLocation, efanTemplate, efanLineNo, err.msg)
 			throw EfanCompilationErr(efanErrLoc, srcCodePadding, err)
 		}
 
-		return EfanRenderer(type, ctxType, efanCode.size)		
+		return EfanRenderer(type, ctxType, efanTemplate.size)		
 	}
 
+	** Called by afbedSheetEfan - ensures all given ViewHelper types are valid. 
+	@NoDoc
+	static Type[] validateViewHelpers(Type[] viewHelpers) {
+		viewHelpers.each { 
+			if (!it.isMixin)
+				throw EfanErr(ErrMsgs.viewHelperMixinIsNotMixin(it))
+			if (it.isConst)
+				throw EfanErr(ErrMsgs.viewHelperMixinIsConst(it))
+			if (!it.isPublic)
+				throw EfanErr(ErrMsgs.viewHelperMixinIsNotPublic(it))
+		}
+		return viewHelpers
+	}
+	
 	internal Str parseIntoCode(Uri srcLocation, Str efan) {
 		data := EfanModel(efan.size, "_afCode.add")
 		parser.parse(srcLocation, data, efan)

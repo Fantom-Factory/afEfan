@@ -84,32 +84,42 @@ internal class TestPlasticModel : PlasticTest {
 
 }
 
+@NoDoc
 const mixin T_PlasticService01 { }
 
+@NoDoc
 mixin T_PlasticService02 { }
 
+@NoDoc
 mixin T_PlasticService03 { }
 
+@NoDoc
 class T_PlasticService04 { }
 
+@NoDoc
 mixin T_PlasticService05 { 
 	internal abstract Str oops()
 }
 
+@NoDoc
 mixin T_PlasticService06 { 
 	Str oops() { "oops" }
 }
 
+@NoDoc
 mixin T_PlasticService07 { 
 	internal abstract Str oops
 }
 
+@NoDoc
 mixin T_PlasticService08 { 
 	abstract Void redirect(Uri uri, Int statusCode := 303)
 }
 
+@NoDoc
 const mixin T_PlasticService09 {
 	abstract Void deeDee()
 }
 
+@NoDoc
 const mixin T_PlasticService10 : T_PlasticService09 { }

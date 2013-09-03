@@ -5,7 +5,7 @@ afEfan is a [Fantom]`http://fantom.org/` library for rendering Embedded Fantom (
 Much like EJS for Javascript, ERB for Ruby and JSP for Java, EFAN allows you to embed snippets of Fantom code inside textual
 templates.
 
-Efan hopes to hit the middle ground between programmatically rendering markup with `web::WebOutStream` and using
+Efan aims to hit the middle ground between programmatically rendering markup with `web::WebOutStream` and using
 logicless templates with [Mustache]`https://bitbucket.org/xored/mustache/`.
 
 
@@ -36,7 +36,7 @@ Eval Tags [#eval]
 =================
 Any tag with the prefix '<%=' will evaluate the fantom expression and write it out as a Str.
 
-  Hello, <%= "Emma" %>!
+  Hello, <%= "Emma".upper %>!
 
 Comment Tags [#comment]
 =======================
@@ -57,22 +57,26 @@ Tags are nice, but not much use unless you can pass data in. Thankfully, you can
 Each render method takes an argument called 'ctx' which you can reference in your template. 'ctx' is typed to whatever Obj
 you pass in, so you don't need to cast it. Examples:
 
-Use maps:
+Using maps:
 pre>
   template := "Hello <%= ctx["name"] %>!"
-  Efan().renderFromStr(template, ["name":"Emma"])
+
+  ctx      := ["name":"Emma"]
+  Efan().renderFromStr(template, ctx)
 <pre
 
-Use objs:
+Using objs:
 pre>
-  template := "Hello <%= ctx.name %>!"
-  Efan().renderFromStr(template, Entity() { it.name = "Emma"})
-
-  ...
-
   class Entity {
     Str? name
   }
+
+  ...
+
+  template := "Hello <%= ctx.name %>!"
+
+  ctx      := Entity() { it.name = "Emma"}
+  Efan().renderFromStr(template, ctx)
 <pre
 
 
@@ -106,46 +110,103 @@ pre>
 
 
 
-Layout Pattern [#layoutPattern]
-*******************************
-When templating HTML pages and the like, it's common to place the meat of the page in one file, and common content in another.
+Renderers [#renderers]
+**********************
+Efan works by dynamically generating Fantom source code and compiling it into a Fantom type. Because types can not be
+*unloaded*, if you were compile 1000s of efan templates, it could be considered a memory leak.
+
+Each invocation of `EfanCompiler.compile` creates a new Fantom type, so use it judiciously. Caching the returned `EfanRenderer`s is highly
+recommended. Example:
+
+pre>
+  template := "<% ctx.times |i| { %>Ho! <% } %>Merry Christmas!"
+  renderer := EfanCompiler().compile(template, Int#)	// <-- cache this renderer!
+
+  ho       := renderer.render(1)
+  hoho     := renderer.render(2)
+  hohoho   := renderer.render(3)
+<pre
+
+
+
+Nesting Templates [#nestingTemplates]
+*************************************
+Efan templates may be nested inside one another, effectively allowing you to componentise your templates. This is accomplished
+by use of 2 methods added to every efan renderer:
+
+  ** Renders the given renderer with the given ctx.
+  renderEfan(EfanRenderer renderer, Obj? ctx)
+
+  ** When nested, renders the body of the outer component.
+  renderBody()
+
+This is best explained in an example. Here we will use the Layout Pattern to move some common HTML into a 'layout.efan' file:
+
+meat.efan:
+pre>
+<html>
+<% renderEfan(ctx["layout"], ctx["layoutCtx"]) { %>
+  <div>
+    ...my cool page content...
+  </div>
+<% } %>
+</html>
+<pre
 
 layout.efan:
 pre>
-<html>
 <head>
-  <title>My Page</title>
+  <title><%= ctx["pageTitle"] %></title>
 </head>
 <body>
   <div> header </div>
   <div> menu stuff </div>
 
-  <% ctx.renderBody %>
+  <% renderBody %>
+
+  <div> footer </div>
+</body>
+<pre
+
+Note that the layout component wraps content in 'meat.efan' which is rendered by the call to 'renderBody'.
+
+Meat.fan:
+pre>
+using afEfan
+
+class Meat {
+  Str renderMeat() {
+    compiler  := EfanCompiler()
+
+    layout    := compiler.compile(`layout.efan`, `layout.efan`.toFile.readAllStr, Map#)
+    meat      := compiler.compile(`meat.efan`,   `meat.efan`.toFile.readAllStr,   Map#)
+
+    layoutCtx := ["pageTitle": "Meat Page"]
+    meatCtx   := ["layout": layout, "layoutCtx": layoutCtx]
+
+    return meat.render(meatCtx)
+  }
+}
+<pre
+
+Running the above would then produce an amalgamation of the two templates:
+
+pre>
+<html>
+<head>
+  <title>Meat Page</title>
+</head>
+<body>
+  <div> header </div>
+  <div> menu stuff </div>
+
+  <div>
+    ...my cool page content...
+  </div>
 
   <div> footer </div>
 </body>
 </html>
-<pre
-
-meat.efan:
-pre>
-<div>
-  ...my cool page content...
-</div>
-<pre
-
-Meat.fan:
-pre>
-class Meat {
-  Str renderMeat() {
-    Efan().renderFromFile(`layout.efan`.toFile.readAllStr, this)
-  }
-
-  Str renderBody() {
-    ctx := ...
-    Efan().renderFromFile(`meat.efan`.toFile.readAllStr, ctx)
-  }
-}
 <pre
 
 
@@ -171,22 +232,6 @@ Efan Compilation Err:
     21:     var plagueHost = "http://fan.home.com:8069";
     22:     console.debug(plagueHost);
 <pre
-
-
-
-Renderers [#renderers]
-**********************
-Efan works by dynamically generating Fantom source code and compiling it into a Fantom type. Because types can not be
-*unloaded*, if you were compile 1000s of efan templates, it could be considered a memory leak. Example:
-
-pre>
-  template := "<% ctx.times |i| { %>Ho! <% } %>Merry Christmas!"
-  renderer := EfanCompiler().compile(template, Int#)
-  output   := renderer->render(3)
-<pre
-
-Each invocation of 'compile' creates a new Fantom type, so use it judiciously. Caching of the returned renderers is highly
-recommended.
 
 
 
