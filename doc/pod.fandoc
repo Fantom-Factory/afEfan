@@ -87,8 +87,8 @@ Efan lets you provide view helpers for common tasks. View helpers are 'mixins' t
 templates access to commonly used methods. Example, for escaping XML:
 
 pre>
-const mixin XmlViewHelper {
-  Str x(Str str) {
+mixin XmlViewHelper {
+  Str xml(Str str) {
     str.toXml()
   }
 }
@@ -104,7 +104,7 @@ Template usage would then be:
 
 pre>
   <p>
-    Hello <%= x(ctx.name) %>!
+    Hello <%= xml(ctx.name) %>!
   </p>
 <pre
 
@@ -238,12 +238,13 @@ Efan Compilation Err:
 Release Notes [#releaseNotes]
 *****************************
 
-v0.0.6 [#v0.0.6]
+v1.0.0 [#v1.0.0]
 ----------------
  - New: Efan templates may now be nested and can optionally render their body!
- - Chg: Removed dependency on [afIoc]`http://repo.status302.com/doc/afIoc/#overview`, all 'afPlastic' has been copied in to efan.
+ - Chg: `EfanCompiler` wraps the generated renderer in a sane 'const' `EfanRenderer` wrapper.
  - Chg: Removed dependency on [afBedSheet]`http://repo.status302.com/doc/afBedSheet/#overview` - see
  [afBedSheetEfan]`http://repo.status302.com/doc/afBedSheetEfan/#overview` for BedSheet integration.
+ - Chg: Removed dependency on [afIoc]`http://repo.status302.com/doc/afIoc/#overview`, all 'afPlastic' has been copied in to efan.
  - Chg: Updated docs.
 
 v0.0.4 [#v0.0.4]

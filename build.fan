@@ -15,7 +15,7 @@ class Build : BuildPod {
 					"repo.private"	: "true",
 				]
 
-		// TODO: remove web & bedsheet once we break efan in two
+		// TODO: remove concurrent once afPlastic is split out
 		depends = ["sys 1.0", "compiler 1.0", "concurrent 1.0"]
 		srcDirs = [`test/unit-tests/`, `test/unit-tests/plastic/`, `fan/`, `fan/public/`, `fan/plastic/`, `fan/internal/`, `fan/internal/utils/`]
 		resDirs = [`doc/`]
