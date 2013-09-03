@@ -21,4 +21,12 @@ internal class ErrMsgs {
 		"${blockType.name.toDisplayName} block not closed."
 	}
 
+	static Str rendererCtxIsNull(Type ctx) {
+		"ctx is null - but renderer ctx type is not nullable: ${ctx.signature}"
+	}
+
+	static Str rendererCtxBadFit(Type ctx, Type ctxType) {
+		"ctx ${ctx.signature} does not fit ctx renderer type ${ctxType.signature}"
+	}
+
 }

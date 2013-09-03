@@ -19,11 +19,7 @@ const class EfanRenderer {
 	** Instanstiates the efan renderer and renders with the given 'ctx'. Ensure the give 'ctx' is of 
 	** the same type as [ctxType]`#ctxType`.
 	Str render(Obj? ctx) {
-		if (ctx == null && ctxType != null && !ctxType.isNullable)
-			throw Err("Bollocks!")	// FIXME: Err msg
-		if (ctx != null && !ctx.typeof.fits(ctxType))
-			throw Err("Bollocks!")	// FIXME: Err msg
-
+		validateCtx(ctx)
 		renderer := renderer(StrBuf(initBufSize))
 		return renderer->render(ctx)
 	}
@@ -31,7 +27,7 @@ const class EfanRenderer {
 	** I'd like this to be internal but it's called by renderers in diff pods
 	@NoDoc
 	Str nestedRender(|Obj| bodyFunc, Obj bodyObj, StrBuf codeBuf, Obj? ctx) {
-		// FIXME: check ctx (like above)
+		validateCtx(ctx)
 		renderer := renderer(codeBuf)
 		renderer->_bodyFunc	= bodyFunc
 		renderer->_bodyObj 	= bodyObj
@@ -42,5 +38,12 @@ const class EfanRenderer {
 		bob	:= CtorPlanBuilder(rendererType)
 		bob["_afCode"] = codeBuf
 		return bob.makeObj
+	}
+	
+	private Void validateCtx(Obj? ctx) {
+		if (ctx == null && ctxType != null && !ctxType.isNullable)
+			throw Err(ErrMsgs.rendererCtxIsNull(ctxType))
+		if (ctx != null && !ctx.typeof.fits(ctxType))
+			throw Err(ErrMsgs.rendererCtxBadFit(ctx, ctxType))
 	}
 }
