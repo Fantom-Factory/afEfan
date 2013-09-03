@@ -60,7 +60,7 @@ class PlasticClassModel {
 			throw PlasticErr(PlasticMsgs.canOnlyExtendMixins(mixinType))
 		if (mixinType.isInternal)
 			throw PlasticErr(PlasticMsgs.superTypesMustBePublic(className, mixinType))
-		
+
 		mixins.add(mixinType)
 		extends.add(mixinType)
 		return this

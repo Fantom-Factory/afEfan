@@ -4,7 +4,7 @@ afEfan is a [Fantom](http://fantom.org/) [afIoc](http://repo.status302.com/doc/a
 
 Much like EJS for Javascript, ERB for Ruby and JSP for Java, EFAN allows you to embed snippets of Fantom code inside textual templates.
 
-Efan hopes to hit the middle ground between programmatically rendering markup with `web::WebOutStream` and using logicless templates with [Mustache](https://bitbucket.org/xored/mustache/).
+Efan aims to hit the middle ground between programmatically rendering markup with `web::WebOutStream` and using logicless templates with [Mustache](https://bitbucket.org/xored/mustache/).
 
 
 
