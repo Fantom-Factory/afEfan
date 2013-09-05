@@ -1,3 +1,4 @@
+using afPlastic::SrcErrLocation
 
 ** As thrown by Efan.
 const class EfanErr : Err {

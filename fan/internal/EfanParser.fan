@@ -1,3 +1,4 @@
+using afPlastic::SrcErrLocation
 
 internal const class EfanParser {
 
