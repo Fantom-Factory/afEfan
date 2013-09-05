@@ -1,4 +1,7 @@
-using compiler::CompilerErr
+using afPlastic::PlasticCompilationErr
+using afPlastic::PlasticClassModel
+using afPlastic::PlasticPodCompiler
+using afPlastic::SrcErrLocation
 
 ** Compiles efan templates into Fantom code; maybe used outside of [afIoc]`http://repo.status302.com/doc/afIoc/#overview`.
 const class EfanCompiler {

@@ -15,9 +15,8 @@ class Build : BuildPod {
 					"repo.private"	: "true"
 				]
 
-		// TODO: remove concurrent once afPlastic is split out
-		depends = ["sys 1.0", "compiler 1.0", "concurrent 1.0"]
-		srcDirs = [`test/unit-tests/`, `test/unit-tests/plastic/`, `fan/`, `fan/public/`, `fan/plastic/`, `fan/internal/`, `fan/internal/utils/`]
+		depends = ["sys 1.0", "afPlastic 0+"]
+		srcDirs = [`test/unit-tests/`, `fan/`, `fan/public/`, `fan/internal/`, `fan/internal/utils/`]
 		resDirs = [`doc/`]
 
 		docApi = true
