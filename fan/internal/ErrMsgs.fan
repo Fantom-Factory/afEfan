@@ -5,8 +5,8 @@ internal class ErrMsgs {
 		"View Helper type ${vht.qname} should be a mixin."
 	}
 	
-	static Str viewHelperMixinIsConst(Type vht) {
-		"View Helper mixin ${vht.qname} should NOT be const."
+	static Str viewHelperMixinIsNotConst(Type vht) {
+		"View Helper mixin ${vht.qname} should be const."
 	}
 
 	static Str viewHelperMixinIsNotPublic(Type vht) {

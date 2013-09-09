@@ -238,6 +238,10 @@ Efan Compilation Err:
 Release Notes [#releaseNotes]
 *****************************
 
+v1.0.2 [#v1.0.2]
+----------------
+ - Chg: Updated to use [afPlastic]`http://repo.status302.com/doc/afPlastic/#overview`.
+
 v1.0.0 [#v1.0.0]
 ----------------
  - New: Efan templates may now be nested and can optionally render their body!
