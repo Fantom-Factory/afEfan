@@ -8,7 +8,7 @@ internal class TestViewHelpers : EfanTest {
 	}
 	
 	Void testHelpersAreConst() {
-		verifyEfanErrMsg(ErrMsgs.viewHelperMixinIsConst(T_Vh1#)) {
+		verifyEfanErrMsg(ErrMsgs.viewHelperMixinIsNotConst(T_Vh1#)) {
 			EfanCompiler.validateViewHelpers([T_Vh1#])
 		}		
 	}
@@ -27,16 +27,16 @@ internal class TestViewHelpers : EfanTest {
 }
 
 @NoDoc
-const mixin T_Vh1 {}
+mixin T_Vh1 {}
 
-internal mixin T_Vh2 {}
+internal const mixin T_Vh2 {}
 
 @NoDoc
-mixin T_Vh3 {
+const mixin T_Vh3 {
 	Str a() { "Judge" }
 }
 
 @NoDoc
-mixin T_Vh4 {
+const mixin T_Vh4 {
 	Str b() { "Dredd" }
 }

@@ -10,8 +10,8 @@ class TestLayout : Test {
 		verifyEq("1 2 3", output)
 	}
 
+	// for layout
 	Str renderBody() {
 		return efan.renderFromStr("2", this)
-	}
-	
+	}	
 }

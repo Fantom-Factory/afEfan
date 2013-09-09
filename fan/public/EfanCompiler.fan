@@ -12,46 +12,60 @@ const class EfanCompiler {
 	** When generating code snippets to report compilation Errs, this is the number of lines of src 
 	** code the erroneous line should be padded with.  
 	public const  Int 					srcCodePadding		:= 5 
-	
+
 	private const Str 					rendererClassName	:= "EfanRenderer"  
-	private const PlasticPodCompiler	podCompiler			:= PlasticPodCompiler() 
+	private const PlasticPodCompiler	plasticCompiler		:= PlasticPodCompiler()
 	private const EfanParser 			parser				:= EfanParser() 
-	
+		
 	** Create an 'EfanCompiler'.
 	new make(|This|? in := null) {
 		in?.call(this)
+	}
 
-		// create new services for non-afIoc projects
-		if (podCompiler == null)
-			podCompiler = PlasticPodCompiler()
-		if (parser == null)
-			parser = EfanParser()
+	** Standard compilation method.
+	** Compiles a new renderer from the given efanTemplate.
+	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
+	** 'srcLocation' is only used for Err msgs.
+	EfanRenderer compile(Uri srcLocation, Str efanTemplate, Type? ctxType) {
+		return compileWithHelpers(srcLocation, efanTemplate, ctxType)
 	}
 
 	** Compiles a new renderer from the given efanTemplate.
 	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
 	** 'srcLocation' is only used for Err msgs.
-	EfanRenderer compile(Uri srcLocation, Str efanTemplate, Type? ctxType, Type[] viewHelpers := Type#.emptyList) {
-		model	:= PlasticClassModel(rendererClassName, false)
+	EfanRenderer compileWithHelpers(Uri srcLocation, Str efanTemplate, Type? ctxType, Type[] viewHelpers := Type#.emptyList) {
+		model	:= PlasticClassModel(rendererClassName, true)
 		viewHelpers.each { model.extendMixin(it) }
+		return compileWithModel(srcLocation, efanTemplate, ctxType, model)
+	}
 
-		model.usingType(EfanRenderer#)
-		model.usingType(EfanBodyRenderer#)
-		
-		model.addField(|EfanBodyRenderer t|?#, 	"_bodyFunc")
-		model.addField(EfanBodyRenderer?#, 		"_bodyObj")
-		model.addField(StrBuf#, 				"_afCode")
-		
-		model.addMethod(EfanBodyRenderer#, "renderEfan", "EfanRenderer renderer, Obj? ctx", "EfanBodyRenderer(renderer, ctx, _afCode)")
-		model.addMethod(Void#, "renderBody", Str.defVal, "_bodyFunc?.call(_bodyObj)")
-		
+	** Compiles a new renderer from the given efanTemplate.
+	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
+	** 'srcLocation' is only used for Err msgs.
+	EfanRenderer compileWithModel(Uri srcLocation, Str efanTemplate, Type? ctxType, PlasticClassModel model) {
+
+		if (!model.isConst)
+			throw Err("model is const!")	// FIXME: better Err msg
+
 		type		:= (Type?) null
-		renderCode	:= parseIntoCode(srcLocation, efanTemplate)
-		renderSig	:= (ctxType == null) ? "" : "${ctxType.qname} ${ctxVarName}"
-		model.addMethod(Str#, "render", renderSig, renderCode)
+		ctxSig		:= (ctxType == null) ? "Obj?" : ctxType.signature
+		renderCode	:= "${ctxSig} ctx := validateCtx(_ctx)\n\n"
+		renderCode  += """renderEfan := |EfanRenderer renderer, Obj? rendererCtx, |EfanRenderer obj| bodyFunc| {
+		                  	renderer._af_render(_af_code, rendererCtx, bodyFunc, this)
+		                  }\n"""
+		renderCode  += """renderBody := |->| {
+		                  	_bodyFunc?.call(_bodyObj)
+		                  }\n"""
+		renderCode	+= parseIntoCode(srcLocation, efanTemplate)
+		
+		model.usingType(EfanRenderer#)
+		model.extendMixin(EfanRenderer#)
+		model.addField(Type?#, "_af_ctxType")
+		model.overrideField(EfanRenderer#ctxType, "_af_ctxType", Str.defVal)	// TODO: throw Err
+		model.overrideMethod(EfanRenderer#_af_render, renderCode)
 		
 		try {
-			type	= compileCode(model.toFantomCode, rendererClassName)
+			type	= plasticCompiler.compileModel(model)
 
 		} catch (PlasticCompilationErr err) {
 			efanLineNo	:= findEfanLineNo(err.srcErrLoc) ?: throw err
@@ -59,7 +73,9 @@ const class EfanCompiler {
 			throw EfanCompilationErr(efanErrLoc, srcCodePadding, err)
 		}
 
-		return EfanRenderer(type, ctxType, efanTemplate.size)		
+		bob	:= CtorPlanBuilder(type)
+		bob["_af_ctxType"] = ctxType
+		return bob.makeObj
 	}
 
 	** Called by afbedSheetEfan - ensures all given ViewHelper types are valid. 
@@ -68,8 +84,8 @@ const class EfanCompiler {
 		viewHelpers.each { 
 			if (!it.isMixin)
 				throw EfanErr(ErrMsgs.viewHelperMixinIsNotMixin(it))
-			if (it.isConst)
-				throw EfanErr(ErrMsgs.viewHelperMixinIsConst(it))
+			if (!it.isConst)
+				throw EfanErr(ErrMsgs.viewHelperMixinIsNotConst(it))
 			if (!it.isPublic)
 				throw EfanErr(ErrMsgs.viewHelperMixinIsNotPublic(it))
 		}
@@ -77,17 +93,13 @@ const class EfanCompiler {
 	}
 	
 	internal Str parseIntoCode(Uri srcLocation, Str efan) {
-		data := EfanModel(efan.size, "_afCode.add")
+		data := EfanModel(efan.size)
 		parser.parse(srcLocation, data, efan)
-		return data.toFantomCode
+		code := data.toFantomCode
+		
+		return code
 	}
 
-	private Type compileCode(Str fanCode, Str className) {
-		pod		:= podCompiler.compile(fanCode)
-		type	:= pod.type(className)
-		return type
-	}
-	
 	private Int? findEfanLineNo(SrcErrLocation plasticErrLoc) {
 		fanCodeLines	:= plasticErrLoc.srcCode
 		fanLineNo		:= plasticErrLoc.errLineNo - 1	// from 1 to 0 based

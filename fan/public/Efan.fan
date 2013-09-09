@@ -6,13 +6,13 @@ const class Efan {
 	
 	** Renders the given efan 'Str' template.
 	Str renderFromStr(Str efan, Obj? ctx := null, Type[] viewHelpers := Type#.emptyList) {
-		renderer := compiler.compile(`rendered/from/str`, efan, ctx?.typeof, viewHelpers)
+		renderer := compiler.compileWithHelpers(`rendered/from/str`, efan, ctx?.typeof, viewHelpers)
 		return renderer.render(ctx)
 	}
 
 	** Renders the given efan 'File' template.
 	Str renderFromFile(File efan, Obj? ctx := null, Type[] viewHelpers := Type#.emptyList) {
-		renderer := compiler.compile(efan.normalize.uri, efan.readAllStr, ctx?.typeof, viewHelpers)
+		renderer := compiler.compileWithHelpers(efan.normalize.uri, efan.readAllStr, ctx?.typeof, viewHelpers)
 		return renderer.render(ctx)
 	}
 

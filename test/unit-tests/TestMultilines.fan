@@ -41,8 +41,8 @@ internal class TestMultiLines : EfanTest {
 		
 		// test the code looks pretty
 		code := compiler.parseIntoCode(``, c)
-		verify( code.contains("""_afCode.add("\\t\\t6\\n")"""))
-		verify( code.contains("""_afCode.add("\\t\\t9\\t\\n")"""))
+		verify( code.contains("""_af_code.add("\\t\\t6\\n")"""))
+		verify( code.contains("""_af_code.add("\\t\\t9\\t\\n")"""))
 	}
 
 	Void testTextWithMulilines2() {
@@ -52,8 +52,8 @@ internal class TestMultiLines : EfanTest {
 
 		// test the code looks pretty - \r's make for ugly code - not a lot I can do about it
 		code := compiler.parseIntoCode(``, c)
-		verify( code.contains("""_afCode.add("6\\r")"""))
-		verify( code.contains("""_afCode.add("9\\r")"""))
+		verify( code.contains("""_af_code.add("6\\r")"""))
+		verify( code.contains("""_af_code.add("9\\r")"""))
 	}
 	
 	Void testTextWithMulilinesAndQuotes() {
@@ -66,8 +66,8 @@ internal class TestMultiLines : EfanTest {
 		
 		// test the code looks pretty
 		code := compiler.parseIntoCode(``, c)
-		verify( code.contains("""_afCode.add("6\\n")"""))
-		verify( code.contains("""_afCode.add("\\"9\\"\\n")"""))
+		verify( code.contains("""_af_code.add("6\\n")"""))
+		verify( code.contains("""_af_code.add("\\"9\\"\\n")"""))
 	}
 
 	Void testTextWithMulilinesAndTrippleQuotes() {
@@ -80,8 +80,8 @@ internal class TestMultiLines : EfanTest {
 		
 		// test the code STILL looks pretty!
 		code := compiler.parseIntoCode(``, c)
-		verify( code.contains("""_afCode.add("6\\n")"""))
-		verify( code.contains("""_afCode.add("\\"\\"\\"9\\"\\"\\"\\n")"""))
+		verify( code.contains("""_af_code.add("6\\n")"""))
+		verify( code.contains("""_af_code.add("\\"\\"\\"9\\"\\"\\"\\n")"""))
 	}
 
 }
