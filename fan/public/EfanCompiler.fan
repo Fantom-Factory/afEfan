@@ -26,14 +26,14 @@ const class EfanCompiler {
 	** Compiles a new renderer from the given efanTemplate.
 	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
 	** 'srcLocation' is only used for Err msgs.
-	EfanRenderer compile(Uri srcLocation, Str efanTemplate, Type? ctxType) {
+	Type compile(Uri srcLocation, Str efanTemplate, Type? ctxType) {
 		return compileWithHelpers(srcLocation, efanTemplate, ctxType)
 	}
 
 	** Compiles a new renderer from the given efanTemplate.
 	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
 	** 'srcLocation' is only used for Err msgs.
-	EfanRenderer compileWithHelpers(Uri srcLocation, Str efanTemplate, Type? ctxType, Type[] viewHelpers := Type#.emptyList) {
+	Type compileWithHelpers(Uri srcLocation, Str efanTemplate, Type? ctxType, Type[] viewHelpers := Type#.emptyList) {
 		model	:= PlasticClassModel(rendererClassName, true)
 		viewHelpers.each { model.extendMixin(it) }
 		return compileWithModel(srcLocation, efanTemplate, ctxType, model)
@@ -42,14 +42,14 @@ const class EfanCompiler {
 	** Compiles a new renderer from the given efanTemplate.
 	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
 	** 'srcLocation' is only used for Err msgs.
-	EfanRenderer compileWithModel(Uri srcLocation, Str efanTemplate, Type? ctxType, PlasticClassModel model) {
+	Type compileWithModel(Uri srcLocation, Str efanTemplate, Type? ctxType, PlasticClassModel model) {
 
 		if (!model.isConst)
 			throw Err("model is const!")	// FIXME: better Err msg
 
 		type		:= (Type?) null
-		ctxSig		:= (ctxType == null) ? "Obj?" : ctxType.signature
-		renderCode	:= "${ctxSig} ctx := validateCtx(_ctx)\n\n"
+		ctxTypeSig	:= (ctxType == null) ? "Obj?" : ctxType.signature
+		renderCode	:= "${ctxTypeSig} ctx := validateCtx(_ctx)\n\n"
 		renderCode  += """renderEfan := |EfanRenderer renderer, Obj? rendererCtx, |EfanRenderer obj| bodyFunc| {
 		                  	renderer._af_render(_af_code, rendererCtx, bodyFunc, this)
 		                  }\n"""
@@ -61,7 +61,7 @@ const class EfanCompiler {
 		model.usingType(EfanRenderer#)
 		model.extendMixin(EfanRenderer#)
 		model.addField(Type?#, "_af_ctxType")
-		model.overrideField(EfanRenderer#ctxType, "_af_ctxType", Str.defVal)	// TODO: throw Err
+		model.overrideField(EfanRenderer#ctxType, "${ctxTypeSig}#", Str.defVal)	// TODO: throw Err
 		model.overrideMethod(EfanRenderer#_af_render, renderCode)
 		
 		try {
@@ -73,9 +73,7 @@ const class EfanCompiler {
 			throw EfanCompilationErr(efanErrLoc, srcCodePadding, err)
 		}
 
-		bob	:= CtorPlanBuilder(type)
-		bob["_af_ctxType"] = ctxType
-		return bob.makeObj
+		return type
 	}
 
 	** Called by afbedSheetEfan - ensures all given ViewHelper types are valid. 

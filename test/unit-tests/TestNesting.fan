@@ -2,8 +2,8 @@
 internal class TestNesting : EfanTest {
 	
 	Void testNestedRendering() {
-		index  	:= compiler.compile(`index.efan`,  `test/unit-tests/index.efan` .toFile.readAllStr, Map#)
-		layout 	:= compiler.compile(`layout.efan`, `test/unit-tests/layout.efan`.toFile.readAllStr, Obj#)
+		index  	:= compiler.compile(`index.efan`,  `test/unit-tests/index.efan` .toFile.readAllStr, Map#).make as EfanRenderer
+		layout 	:= compiler.compile(`layout.efan`, `test/unit-tests/layout.efan`.toFile.readAllStr, Obj#).make as EfanRenderer
 		html 	:= index.render(["layout":layout, "layoutCtx":69])		
 
 		output := """before
@@ -36,9 +36,8 @@ internal class TestNesting : EfanTest {
 
 const class T_Index : EfanRenderer {
 	
-	private const Type? _af_ctxType
 	override Type? ctxType {
-		get { _af_ctxType }
+		get { [Str:Obj]# }
 		set { }
 	}
 	
@@ -67,9 +66,8 @@ const class T_Index : EfanRenderer {
 
 const class T_Layout : EfanRenderer {
 	
-	private const Type? _af_ctxType
 	override Type? ctxType {
-		get { _af_ctxType }
+		get { Int# }
 		set { }
 	}
 	
