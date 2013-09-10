@@ -14,12 +14,15 @@ const class EfanCompiler {
 	public const  Int 					srcCodePadding		:= 5 
 
 	private const Str 					rendererClassName	:= "EfanRenderer"  
-	private const PlasticPodCompiler	plasticCompiler		:= PlasticPodCompiler()
 	private const EfanParser 			parser				:= EfanParser() 
+	private const PlasticPodCompiler	plasticCompiler
 		
 	** Create an 'EfanCompiler'.
 	new make(|This|? in := null) {
 		in?.call(this)
+		plasticCompiler	= PlasticPodCompiler() {
+			it.srcCodePadding = this.srcCodePadding
+		}
 	}
 
 	** Standard compilation method.
@@ -49,16 +52,23 @@ const class EfanCompiler {
 
 		type		:= (Type?) null
 		ctxTypeSig	:= (ctxType == null) ? "Obj?" : ctxType.signature
-		renderCode	:= "${ctxTypeSig} ctx := validateCtx(_ctx)\n\n"
-		renderCode  += """renderEfan := |EfanRenderer renderer, Obj? rendererCtx, |EfanRenderer obj| bodyFunc| {
-		                  	renderer._af_render(_af_code, rendererCtx, bodyFunc, this)
-		                  }\n"""
-		renderCode  += """renderBody := |->| {
-		                  	_bodyFunc?.call(_bodyObj)
-		                  }\n"""
+		renderCode	:= "${ctxTypeSig} ctx := _af_validateCtx(_ctx)\n"
+		renderCode	+= "\n"
+		// TODO: remove these and move to methods in EfanRenderer
+		renderCode  += """\t\trenderEfan := |EfanRenderer renderer, Obj? rendererCtx, |EfanRenderer obj| bodyFunc| {
+		                  \t\t	renderer._af_render(_af_code, rendererCtx, bodyFunc, this)
+		                  \t\t}\n"""
+		renderCode  += """\t\trenderBody := |->| {
+		                  \t\t	_bodyFunc?.call(_bodyObj)
+		                  \t\t}\n"""
+		renderCode	+= "\n"
+		renderCode	+= "_efanCtx := EfanRenderCtx.ctx(false) ?: EfanRenderCtx()\n"
+		renderCode	+= "_efanCtx.renderWithBuf(this, _af_code) |->| {\n"
 		renderCode	+= parseIntoCode(srcLocation, efanTemplate)
+		renderCode	+= "}\n"
 		
 		model.usingType(EfanRenderer#)
+		model.usingType(EfanRenderCtx#)
 		model.extendMixin(EfanRenderer#)
 		model.addField(Type?#, "_af_ctxType")
 		model.overrideField(EfanRenderer#ctxType, "${ctxTypeSig}#", Str.defVal)	// TODO: throw Err

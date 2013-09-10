@@ -46,7 +46,7 @@ const class T_Index : EfanRenderer {
 	}
 
 	override Void _af_render(StrBuf _af_code, Obj? _ctx, |EfanRenderer t|? _bodyFunc, EfanRenderer? _bodyObj) {
-		[Str:Obj] ctx := validateCtx(_ctx)
+		[Str:Obj] ctx := _af_validateCtx(_ctx)
 		
 		renderEfan := |EfanRenderer renderer, Obj? rendererCtx, |EfanRenderer obj| bodyFunc| {
 			renderer._af_render(_af_code, rendererCtx, bodyFunc, this)
@@ -76,7 +76,7 @@ const class T_Layout : EfanRenderer {
 	}
 
 	override Void _af_render(StrBuf _af_code, Obj? _ctx, |EfanRenderer t|? _bodyFunc, EfanRenderer? _bodyObj) {
-		Int ctx := validateCtx(_ctx)
+		Int ctx := _af_validateCtx(_ctx)
 		
 		renderEfan := |EfanRenderer renderer, Obj? rendererCtx, |EfanRenderer obj| bodyFunc| {
 			renderer._af_render(_af_code, rendererCtx, bodyFunc, this)
