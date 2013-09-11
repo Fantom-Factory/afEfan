@@ -34,7 +34,7 @@ internal class TestNesting : EfanTest {
 
 }
 
-const class T_Index : EfanRenderer {
+internal const class T_Index : EfanRenderer {
 	
 	override Type? ctxType {
 		get { [Str:Obj]# }
@@ -64,7 +64,7 @@ const class T_Index : EfanRenderer {
 	}
 }
 
-const class T_Layout : EfanRenderer {
+internal const class T_Layout : EfanRenderer {
 	
 	override Type? ctxType {
 		get { Int# }
