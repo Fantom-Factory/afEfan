@@ -13,11 +13,11 @@ const mixin EfanRenderer {
 	}
 
 	virtual Void renderEfan(EfanRenderer renderer, Obj? rendererCtx := null, |EfanRenderer obj|? bodyFunc := null) {
-		EfanRenderCtx.ctx.renderEfan(renderer, rendererCtx, bodyFunc)
+		EfanRenderCtx.render.efan(renderer, rendererCtx, bodyFunc)
 	}
 
 	virtual Void renderBody() {
-		EfanRenderCtx.ctx.renderBody
+		EfanRenderCtx.render.body
 	}
 	
 	@NoDoc
