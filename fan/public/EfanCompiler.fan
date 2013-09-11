@@ -1,48 +1,65 @@
 using afPlastic::PlasticCompilationErr
 using afPlastic::PlasticClassModel
-using afPlastic::PlasticPodCompiler
+using afPlastic::PlasticCompiler
 using afPlastic::SrcErrLocation
 
-** Compiles efan templates into Fantom code; maybe used outside of [afIoc]`http://repo.status302.com/doc/afIoc/#overview`.
+** Compiles efan templates into Fantom types. Compiled types extend `EfanRenderer` and have the 
+** standard serialisation ctor:
+** 
+**    new make(|This|? f) { f?.call(this) }
+** 
+** This ensures you can create an instance of the render just by calling 'make()'. Call 'render()' 
+** to render the efan template into a Str. 
+** 
+**    template := ...
+**    efanType := EfanCompiler().compile(`index.efan`, template)
+**    htmlStr  := efanType.make.render(null)
+** 
 const class EfanCompiler {
 	
 	** The name given to the 'ctx' variable in the render method. 
-	public const  Str					ctxVarName			:= "ctx"
+	public const  Str				ctxVarName			:= "ctx"
 	
 	** When generating code snippets to report compilation Errs, this is the number of lines of src 
 	** code the erroneous line should be padded with.  
-	public const  Int 					srcCodePadding		:= 5 
+	public const  Int 				srcCodePadding		:= 5 
 
-	private const Str 					rendererClassName	:= "EfanRenderer"  
-	private const EfanParser 			parser				:= EfanParser() 
-	private const PlasticPodCompiler	plasticCompiler
+	private const Str 				rendererClassName	:= "EfanRenderer"  
+	private const EfanParser 		parser				:= EfanParser() 
+	private const PlasticCompiler	plasticCompiler
 		
 	** Create an 'EfanCompiler'.
 	new make(|This|? in := null) {
 		in?.call(this)
-		plasticCompiler	= PlasticPodCompiler() {
+		plasticCompiler	= PlasticCompiler() {
 			it.srcCodePadding = this.srcCodePadding
 		}
 	}
 
-	** Standard compilation method.
+	** Standard compilation usage.
 	** Compiles a new renderer from the given efanTemplate.
+	** 
 	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
 	** 'srcLocation' is only used for Err msgs.
-	Type compile(Uri srcLocation, Str efanTemplate, Type? ctxType) {
-		return compileWithHelpers(srcLocation, efanTemplate, ctxType)
+	Type compile(Uri srcLocation, Str efanTemplate, Type? ctxType := null) {
+		model	:= PlasticClassModel(rendererClassName, true)
+		return compileWithModel(srcLocation, efanTemplate, ctxType, model)
 	}
 
-	** Compiles a new renderer from the given efanTemplate.
+	** Intermediate compilation usage.
+	** The compiled renderer extends the given view helper mixins.
+	** 
 	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
 	** 'srcLocation' is only used for Err msgs.
-	Type compileWithHelpers(Uri srcLocation, Str efanTemplate, Type? ctxType, Type[] viewHelpers := Type#.emptyList) {
+	Type compileWithHelpers(Uri srcLocation, Str efanTemplate, Type? ctxType := null, Type[] viewHelpers := Type#.emptyList) {
 		model	:= PlasticClassModel(rendererClassName, true)
 		viewHelpers.each { model.extendMixin(it) }
 		return compileWithModel(srcLocation, efanTemplate, ctxType, model)
 	}
 
-	** Compiles a new renderer from the given efanTemplate.
+	** Advanced compiler usage.
+	** The efan render methods are added to the given afPlastic model.
+	** 
 	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
 	** 'srcLocation' is only used for Err msgs.
 	Type compileWithModel(Uri srcLocation, Str efanTemplate, Type? ctxType, PlasticClassModel model) {
@@ -54,7 +71,7 @@ const class EfanCompiler {
 		ctxTypeSig	:= (ctxType == null) ? "Obj?" : ctxType.signature
 		renderCode	:= "${ctxTypeSig} ctx := _af_validateCtx(_ctx)\n"
 		renderCode	+= "\n"
-		// TODO: remove these and move to methods in EfanRenderer
+		// TODO: remove these and move to methods in EfanRenderer - make bodyFunc optional!!!
 		renderCode  += """\t\trenderEfan := |EfanRenderer renderer, Obj? rendererCtx, |EfanRenderer obj| bodyFunc| {
 		                  \t\t	renderer._af_render(_af_code, rendererCtx, bodyFunc, this)
 		                  \t\t}\n"""
@@ -73,7 +90,7 @@ const class EfanCompiler {
 		model.addField(Type?#, "_af_ctxType")
 		model.overrideField(EfanRenderer#ctxType, "${ctxTypeSig}#", Str.defVal)	// TODO: throw Err
 		model.overrideMethod(EfanRenderer#_af_render, renderCode)
-		
+	
 		try {
 			type	= plasticCompiler.compileModel(model)
 

@@ -1,13 +1,12 @@
 
-** A sane wrapper around the generated efan renderer.
+** As implemented by all generated efan types.
 const mixin EfanRenderer {
 
 	** The 'ctx' type the renderer was generated for.
 	abstract Type? ctxType
 	
-	** Renders with the given 'ctx'. 
-	** Ensure the give 'ctx' is of the same type as [ctxType]`#ctxType`.
-	Str render(Obj? ctx) {
+	** Renders with the given 'ctx', which must fit [ctxType]`#ctxType`.
+	virtual Str render(Obj? ctx) {
 		codeBuf := StrBuf()
 		_af_render(codeBuf, ctx, null, null)
 		return codeBuf.toStr

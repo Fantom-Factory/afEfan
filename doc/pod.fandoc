@@ -62,6 +62,7 @@ pre>
   template := "Hello <%= ctx["name"] %>!"
 
   ctx      := ["name":"Emma"]
+
   Efan().renderFromStr(template, ctx)
 <pre
 
@@ -76,6 +77,7 @@ pre>
   template := "Hello <%= ctx.name %>!"
 
   ctx      := Entity() { it.name = "Emma"}
+
   Efan().renderFromStr(template, ctx)
 <pre
 
