@@ -12,18 +12,15 @@ const mixin EfanRenderer {
 		return codeBuf.toStr
 	}
 
-	// TODO: remove and call dynamically
+	virtual Void renderEfan(EfanRenderer renderer, Obj? rendererCtx := null, |EfanRenderer obj|? bodyFunc := null) {
+		EfanRenderCtx.ctx.renderEfan(renderer, rendererCtx, bodyFunc)
+	}
+
+	virtual Void renderBody() {
+		EfanRenderCtx.ctx.renderBody
+	}
+	
 	@NoDoc
 	abstract Void _af_render(StrBuf _af_code, Obj? _ctx, |EfanRenderer t|? _bodyFunc, EfanRenderer? _bodyObj)
-
-	// TODO: inline in compiler
-	@NoDoc
-	protected Obj? _af_validateCtx(Obj? ctx) {
-		if (ctx == null && ctxType != null && !ctxType.isNullable)
-			throw Err(ErrMsgs.rendererCtxIsNull(ctxType))
-		if (ctx != null && ctxType != null && !ctx.typeof.fits(ctxType))
-			throw Err(ErrMsgs.rendererCtxBadFit(ctx, ctxType))
-		return ctx
-	}
 
 }

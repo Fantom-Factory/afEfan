@@ -63,32 +63,28 @@ const class EfanCompiler {
 	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
 	** 'srcLocation' is only used for Err msgs.
 	Type compileWithModel(Uri srcLocation, Str efanTemplate, Type? ctxType, PlasticClassModel model) {
-
 		if (!model.isConst)
-			throw Err("model is const!")	// FIXME: better Err msg
+			throw EfanErr(ErrMsgs.rendererModelMustBeConst(model))
 
 		type		:= (Type?) null
 		ctxTypeSig	:= (ctxType == null) ? "Obj?" : ctxType.signature
-		renderCode	:= "${ctxTypeSig} ctx := _af_validateCtx(_ctx)\n"
+		renderCode	:= "if (_ctx == null && ctxType != null && !ctxType.isNullable)\n"
+		renderCode	+= "	throw Err(\"${ErrMsgs.rendererCtxIsNull} \${ctxType.typeof.signature}\")\n"
+		renderCode	+= "if (_ctx != null && ctxType != null && !_ctx.typeof.fits(ctxType))\n"
+		renderCode	+= "	throw Err(\"ctx \${_ctx.typeof.signature} ${ErrMsgs.rendererCtxBadFit(ctxType)}\")\n"
 		renderCode	+= "\n"
-		// TODO: remove these and move to methods in EfanRenderer - make bodyFunc optional!!!
-		renderCode  += """\t\trenderEfan := |EfanRenderer renderer, Obj? rendererCtx, |EfanRenderer obj| bodyFunc| {
-		                  \t\t	renderer._af_render(_af_code, rendererCtx, bodyFunc, this)
-		                  \t\t}\n"""
-		renderCode  += """\t\trenderBody := |->| {
-		                  \t\t	_bodyFunc?.call(_bodyObj)
-		                  \t\t}\n"""
+		renderCode	+= "${ctxTypeSig} ctx := _ctx\n"
 		renderCode	+= "\n"
 		renderCode	+= "_efanCtx := EfanRenderCtx.ctx(false) ?: EfanRenderCtx()\n"
-		renderCode	+= "_efanCtx.renderWithBuf(this, _af_code) |->| {\n"
+		renderCode	+= "_efanCtx.renderWithBuf(this, _af_code, _bodyFunc, _bodyObj) |->| {\n"
 		renderCode	+= parseIntoCode(srcLocation, efanTemplate)
 		renderCode	+= "}\n"
 		
-		model.usingType(EfanRenderer#)
 		model.usingType(EfanRenderCtx#)
+		model.usingType(EfanErr#)
 		model.extendMixin(EfanRenderer#)
 		model.addField(Type?#, "_af_ctxType")
-		model.overrideField(EfanRenderer#ctxType, "${ctxTypeSig}#", Str.defVal)	// TODO: throw Err
+		model.overrideField(EfanRenderer#ctxType, "${ctxTypeSig}#", """throw EfanErr("ctxType may not be set!")""")
 		model.overrideMethod(EfanRenderer#_af_render, renderCode)
 	
 		try {

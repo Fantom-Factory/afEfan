@@ -10,17 +10,25 @@ class EfanRenderCtx {
 		private set { }
 	}
 	
-	private StrBuf[] 		renderBufs	:= [,]
-	private EfanRenderer[] 	renderings	:= [,]
+	private StrBuf[] 			renderBufs	:= [,]
+	private EfanRenderer[]		renderings	:= [,]
+	private |EfanRenderer|?[] 	bodyFuncs	:= [,]
+	private EfanRenderer?[] 	bodyObjs	:= [,]
 
-	Void renderEfan(EfanRenderer renderer, Obj? rendererCtx, |EfanRenderer obj| bodyFunc) {
+	Void renderEfan(EfanRenderer renderer, Obj? rendererCtx, |EfanRenderer obj|? bodyFunc) {
 		renderer._af_render(renderBuf, rendererCtx, bodyFunc, renderings.peek)
 	}
+
+	Void renderBody() {
+		bodyFuncs.peek?.call(bodyObjs.peek)
+	}
 	
-	Void renderWithBuf(EfanRenderer rendering, StrBuf renderBuf, |->| renderFunc) {
+	Void renderWithBuf(EfanRenderer rendering, StrBuf renderBuf, |EfanRenderer|? bodyFunc, EfanRenderer? bodyObj, |->| renderFunc) {
 		Actor.locals[localsName] = this
 		renderBufs.push(renderBuf)
 		renderings.push(rendering)
+		bodyFuncs.push(bodyFunc)
+		bodyObjs.push(bodyObj)
 		
 		try {
 			renderFunc()
@@ -28,6 +36,8 @@ class EfanRenderCtx {
 		} finally {
 			renderBufs.pop
 			renderings.pop
+			bodyFuncs.pop
+			bodyObjs.pop
 			if (renderBufs.isEmpty) {
 				Actor.locals[localsName] = null
 			}			

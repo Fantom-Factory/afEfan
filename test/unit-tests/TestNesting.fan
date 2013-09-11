@@ -20,76 +20,92 @@ internal class TestNesting : EfanTest {
 
 	
 	Void testNestedRendering2() {
-		index  	:= T_Index(Void#)
-		layout 	:= T_Layout(Void#)
+		index  	:= T_Index()
+		layout 	:= T_Layout()
 		html 	:= index.render(["layout":layout, "layoutCtx":69])		
 		output := """before
 		               <html> 69
 		                 body
 		               </html>
 		             after"""
-		echo(html)
 		verifyEq(html, output)
 	}
 
+	Void testNestedRenderingWithNoBody() {
+		index  	:= T_Index2()
+		layout 	:= T_Layout()
+		html 	:= index.render(["layout":layout, "layoutCtx":69])		
+		output := """before
+		               <html> 69
+		               </html>
+		             after"""
+		verifyEq(html, output)
+	}
+
+	Void testBodyRenderingWithNoBody() {
+		html := T_Layout().render(69)		
+		output := """  <html> 69
+		               </html>
+		             """
+		// Look! No Err!
+		verifyEq(html, output)
+	}
 }
 
 internal const class T_Index : EfanRenderer {
-	
 	override Type? ctxType {
 		get { [Str:Obj]# }
 		set { }
 	}
 	
-	internal new make(Type? ctxType) {
-		this.ctxType 		= ctxType
-	}
-
 	override Void _af_render(StrBuf _af_code, Obj? _ctx, |EfanRenderer t|? _bodyFunc, EfanRenderer? _bodyObj) {
-		[Str:Obj] ctx := _af_validateCtx(_ctx)
-		
-		renderEfan := |EfanRenderer renderer, Obj? rendererCtx, |EfanRenderer obj| bodyFunc| {
-			renderer._af_render(_af_code, rendererCtx, bodyFunc, this)
+		[Str:Obj] ctx := _ctx
+
+		_efanCtx := EfanRenderCtx.ctx(false) ?: EfanRenderCtx()
+		_efanCtx.renderWithBuf(this, _af_code, _bodyFunc, _bodyObj) |->| {
+			_af_code.add("before\n")
+			renderEfan(ctx["layout"], ctx["layoutCtx"]) {
+				_af_code.add("    body\n")
+			}
+			_af_code.add("after")
 		}
-		
-		renderBody := |->| {
-			_bodyFunc?.call(_bodyObj)
-		}
-	
-		_af_code.add("before\n")
-		renderEfan(ctx["layout"], ctx["layoutCtx"]) {
-			_af_code.add("    body\n")
-		}
-		_af_code.add("after")
 	}
 }
 
 internal const class T_Layout : EfanRenderer {
-	
 	override Type? ctxType {
 		get { Int# }
 		set { }
 	}
 	
-	internal new make(Type? ctxType) {
-		this.ctxType 		= ctxType
-	}
-
 	override Void _af_render(StrBuf _af_code, Obj? _ctx, |EfanRenderer t|? _bodyFunc, EfanRenderer? _bodyObj) {
-		Int ctx := _af_validateCtx(_ctx)
+		Int ctx := _ctx
 		
-		renderEfan := |EfanRenderer renderer, Obj? rendererCtx, |EfanRenderer obj| bodyFunc| {
-			renderer._af_render(_af_code, rendererCtx, bodyFunc, this)
+		_efanCtx := EfanRenderCtx.ctx(false) ?: EfanRenderCtx()
+		_efanCtx.renderWithBuf(this, _af_code, _bodyFunc, _bodyObj) |->| {
+			_af_code.add("  <html> ")
+			_af_code.add(ctx)
+			_af_code.add("\n")
+			renderBody
+			_af_code.add("  </html>\n")
 		}
-		
-		renderBody := |->| {
-			_bodyFunc?.call(_bodyObj)
-		}
+	}
+}
+
+internal const class T_Index2 : EfanRenderer {
+	override Type? ctxType {
+		get { [Str:Obj]# }
+		set { }
+	}
 	
-		_af_code.add("  <html> ")
-		_af_code.add(ctx)
-		_af_code.add("\n")
-		renderBody()
-		_af_code.add("  </html>\n")
+	override Void _af_render(StrBuf _af_code, Obj? _ctx, |EfanRenderer t|? _bodyFunc, EfanRenderer? _bodyObj) {
+		[Str:Obj] ctx := _ctx
+		
+		_efanCtx := EfanRenderCtx.ctx(false) ?: EfanRenderCtx()
+		_efanCtx.renderWithBuf(this, _af_code, _bodyFunc, _bodyObj) |->| {
+			_af_code.add("before\n")
+			renderEfan(ctx["layout"], ctx["layoutCtx"])
+			_af_code.add("after")
+		}
 	}
 }
