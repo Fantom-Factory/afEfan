@@ -1,3 +1,4 @@
+using afPlastic::PlasticClassModel
 
 internal class ErrMsgs {
 
@@ -21,12 +22,16 @@ internal class ErrMsgs {
 		"${blockType.name.toDisplayName} block not closed."
 	}
 
-	static Str rendererCtxIsNull(Type ctx) {
-		"ctx is null - but renderer ctx type is not nullable: ${ctx.signature}"
+	static Str rendererCtxIsNull() {
+		"ctx is null - but renderer ctx type is not nullable:"
 	}
 
-	static Str rendererCtxBadFit(Type ctx, Type ctxType) {
-		"ctx ${ctx.signature} does not fit ctx renderer type ${ctxType.signature}"
+	static Str rendererCtxBadFit(Type? ctxType) {
+		"does not fit ctx renderer type ${ctxType?.signature}"
+	}
+
+	static Str rendererModelMustBeConst(PlasticClassModel model) {
+		"afPlastic model for '${model.className}' must be const"
 	}
 
 }

@@ -12,9 +12,9 @@ internal class TestMultiLines : EfanTest {
 
 		// test the code looks pretty
 		code := compiler.parseIntoCode(``, c)
-		verify(!code.contains("\t\t// \n"))		// check empty lines are removed
-		verify( code.contains("\t\t// --> 1\n\t\t// # blah"))
-		verify( code.contains("\t\t// --> 3\n\t\t// # b-b-b-b-blah")) // test line trimming
+		verify(!code.contains("\t// \n"))		// check empty lines are removed
+		verify( code.contains("\t// --> 1\n\t// # blah"))
+		verify( code.contains("\t// --> 3\n\t// # b-b-b-b-blah")) // test line trimming
 	}
 	
 	Void testEvalWithMultiLines() {
@@ -27,8 +27,8 @@ internal class TestMultiLines : EfanTest {
 
 		// test the code looks pretty
 		code := compiler.parseIntoCode(``, c)
-		verify( code.contains("\t\t\t60 +"))
-		verify( code.contains("\t\t\t9"))
+		verify( code.contains("\t60 +"))
+		verify( code.contains("\t9"))
 	}
 
 	Void testTextWithMulilines() {
@@ -83,5 +83,4 @@ internal class TestMultiLines : EfanTest {
 		verify( code.contains("""_af_code.add("6\\n")"""))
 		verify( code.contains("""_af_code.add("\\"\\"\\"9\\"\\"\\"\\n")"""))
 	}
-
 }

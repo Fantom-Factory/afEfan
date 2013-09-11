@@ -7,15 +7,15 @@ internal class TestMultiBlocks : EfanTest {
 		       <% } %>"""
 		// test the code looks pretty
 		code := compiler.parseIntoCode(``, c)
-		verify( code.contains("\t\t3.times |i| {"))
-		verify( code.contains("\t\t\t_af_code.add( i+1 )"))
+		verify( code.contains("\t3.times |i| {"))
+		verify( code.contains("\t\t_af_code.add( i+1 )"))
 	}
 
 	Void testBlocksTrimmed() {
 		c :="""<%     echo("dude")     %>"""
 		// test the code looks pretty
 		code := compiler.parseIntoCode(``, c)
-		verify( code.contains("\t\techo(\"dude\")"))
+		verify( code.contains("\techo(\"dude\")"))
 	}
 
 	Void testEmptyTextBlocksAreIgnored() {

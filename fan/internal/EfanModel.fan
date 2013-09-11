@@ -2,7 +2,7 @@
 internal class EfanModel : Pusher {
 	
 	StrBuf 	code
-	Int		indentSize	:= 2
+	Int		indentSize	:= 1
 	Str		evalBuf		:= ""
 	
 	new make(Int bufSize) {
