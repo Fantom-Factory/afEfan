@@ -244,8 +244,9 @@ v1.1.0 [#v1.1.0]
 ----------------
  - New: Added 'EfanRenderCtx' to ease efan extensions.
  - Chg: Updated to use [afPlastic]`http://repo.status302.com/doc/afPlastic/#overview`.
- - Chg: `EfanRenderer` is now a mixin and is implemented by the rendering type.
  - Chg: The `EfanCompiler` now returns the rendering type, not an 'EfanRenderer' instance.
+ - Chg: `EfanRenderer` is now a mixin and is implemented by the rendering type.
+ - Chg: 'renderEfan()' and 'renderBody()' are now methods on `EfanRenderer`.
 
 v1.0.0 [#v1.0.0]
 ----------------

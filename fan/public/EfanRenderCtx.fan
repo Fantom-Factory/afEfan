@@ -24,7 +24,7 @@ class EfanRenderCtx {
 		} finally {
 			efanRenders.pop
 			if (efanRenders.isEmpty) {
-				Actor.locals[localsName] = null
+				Actor.locals.remove(localsName)
 			}			
 		}
 	}

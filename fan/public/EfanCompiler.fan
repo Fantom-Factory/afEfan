@@ -92,7 +92,7 @@ const class EfanCompiler {
 		} catch (PlasticCompilationErr err) {
 			efanLineNo	:= findEfanLineNo(err.srcCode.srcCode, err.errLineNo) ?: throw err
 			srcCode	:= SrcCodeSnippet(srcLocation, efanTemplate)
-			throw EfanCompilationErr(srcCode, efanLineNo, err.msg, srcCodePadding)
+			throw EfanCompilationErr(srcCode, efanLineNo, err.msg, srcCodePadding, err)
 		}
 
 		return type
