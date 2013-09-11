@@ -10,8 +10,7 @@ internal class TestCompilationErr : EfanTest {
 			type := compiler.compile(``, c, null)
 			fail
 		} catch (EfanCompilationErr err) {
-			srcErrLoc := err.srcErrLoc
-			verifyEq(srcErrLoc.errLineNo, 2)
+			verifyEq(err.errLineNo, 2)
 		}
 	}
 
