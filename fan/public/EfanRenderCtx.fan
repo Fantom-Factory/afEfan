@@ -4,41 +4,26 @@ using concurrent::Actor
 class EfanRenderCtx {
 
 	static const Str localsName	:= "efan.renderCtx"
-	
-	StrBuf renderBuf {
-		get { renderBufs.peek }
+
+	EfanRender efanRender {
+		get { efanRenders.peek }
 		private set { }
 	}
 	
-	private StrBuf[] 			renderBufs	:= [,]
-	private EfanRenderer[]		renderings	:= [,]
-	private |EfanRenderer|?[] 	bodyFuncs	:= [,]
-	private EfanRenderer?[] 	bodyObjs	:= [,]
-
-	Void renderEfan(EfanRenderer renderer, Obj? rendererCtx, |EfanRenderer obj|? bodyFunc) {
-		renderer._af_render(renderBuf, rendererCtx, bodyFunc, renderings.peek)
-	}
-
-	Void renderBody() {
-		bodyFuncs.peek?.call(bodyObjs.peek)
-	}
+	private EfanRender[] efanRenders := [,]
 	
 	Void renderWithBuf(EfanRenderer rendering, StrBuf renderBuf, |EfanRenderer|? bodyFunc, EfanRenderer? bodyObj, |->| renderFunc) {
 		Actor.locals[localsName] = this
-		renderBufs.push(renderBuf)
-		renderings.push(rendering)
-		bodyFuncs.push(bodyFunc)
-		bodyObjs.push(bodyObj)
+		
+		render := EfanRender(rendering, renderBuf, bodyFunc, bodyObj)
+		efanRenders.push(render)
 		
 		try {
 			renderFunc()
 
 		} finally {
-			renderBufs.pop
-			renderings.pop
-			bodyFuncs.pop
-			bodyObjs.pop
-			if (renderBufs.isEmpty) {
+			efanRenders.pop
+			if (efanRenders.isEmpty) {
 				Actor.locals[localsName] = null
 			}			
 		}
@@ -47,4 +32,32 @@ class EfanRenderCtx {
 	static EfanRenderCtx? ctx(Bool checked := true) {
 		((EfanRenderCtx?) Actor.locals[localsName]) ?: (checked ? throw Err("EfanRenderCtx does not exist") : null) 
 	}	
+
+	static EfanRender? render() {
+		ctx.efanRender
+	}	
+}
+
+
+@NoDoc
+class EfanRender {
+			StrBuf 			renderBuf
+	private EfanRenderer	rendering
+	private |EfanRenderer|? bodyFunc
+	private EfanRenderer? 	bodyObj
+
+	new make(EfanRenderer rendering, StrBuf renderBuf, |EfanRenderer|? bodyFunc, EfanRenderer? bodyObj) {
+		this.rendering 	= rendering
+		this.renderBuf 	= renderBuf
+		this.bodyFunc 	= bodyFunc
+		this.bodyObj 	= bodyObj
+	}
+	
+	Void efan(EfanRenderer renderer, Obj? rendererCtx, |EfanRenderer obj|? bodyFunc) {
+		renderer._af_render(renderBuf, rendererCtx, bodyFunc, rendering)
+	}
+
+	Void body() {
+		bodyFunc?.call(bodyObj)
+	}
 }
