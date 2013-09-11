@@ -1,4 +1,5 @@
-using afPlastic::SrcErrLocation
+using afPlastic::SrcCodeErr
+using afPlastic::SrcCodeSnippet
 
 ** As thrown by Efan.
 const class EfanErr : Err {
@@ -6,46 +7,37 @@ const class EfanErr : Err {
 }
 
 @NoDoc
-const class EfanParserErr : EfanErr {
-	const SrcErrLocation srcErrLoc
-	const Int noOfLinesOfPadding
+const class EfanParserErr : EfanErr, SrcCodeErr {
+	const override SrcCodeSnippet 	srcCode
+	const override Int 				errLineNo
+	private const  Int 				linesOfPadding
 
-	internal new make(SrcErrLocation srcErrLoc, Int noOfLinesOfPadding := 5) : super(srcErrLoc.errMsg) {
-		this.srcErrLoc = srcErrLoc
-		this.noOfLinesOfPadding = noOfLinesOfPadding
+	internal new make(SrcCodeSnippet srcCode, Int errLineNo, Str errMsg, Int linesOfPadding) : super(errMsg) {
+		this.srcCode = srcCode
+		this.errLineNo = errLineNo
+		this.linesOfPadding = linesOfPadding
 	}
-
+	
 	override Str toStr() {
-		buf := StrBuf()
-		buf.add("${typeof.qname}: ${msg}")
-		buf.add("\nEfan Parser Err:\n")
-
-		buf.add(srcErrLoc.srcCodeSnippet(noOfLinesOfPadding))
-
-		buf.add("\nStack Trace:")
-		return buf.toStr
+		print(msg, linesOfPadding)
 	}
 }
 
 @NoDoc
-const class EfanCompilationErr : EfanErr {
-	const SrcErrLocation srcErrLoc
-	const Int noOfLinesOfPadding
+const class EfanCompilationErr : EfanErr, SrcCodeErr {
+	const override SrcCodeSnippet 	srcCode
+	const override Int 				errLineNo
+	private const  Int 				linesOfPadding
 
-	internal new make(SrcErrLocation srcErrLoc, Int noOfLinesOfPadding := 5, Err? cause := null) : super(srcErrLoc.errMsg, cause) {
-		this.srcErrLoc = srcErrLoc
-		this.noOfLinesOfPadding = noOfLinesOfPadding
+	internal new make(SrcCodeSnippet srcCode, Int errLineNo, Str errMsg, Int linesOfPadding) : super(errMsg) {
+		this.srcCode = srcCode
+		this.errLineNo = errLineNo
+		this.linesOfPadding = linesOfPadding
 	}
-
+	
 	override Str toStr() {
-		buf := StrBuf()
-		buf.add("${typeof.qname}: ${msg}")
-		buf.add("\nEfan Compilation Err:\n")
-
-		buf.add(srcErrLoc.srcCodeSnippet(noOfLinesOfPadding))
-
-		buf.add("\nStack Trace:")
-		return buf.toStr
+		print(msg, linesOfPadding)
 	}
 }
+
 

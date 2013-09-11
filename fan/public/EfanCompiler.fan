@@ -1,7 +1,7 @@
 using afPlastic::PlasticCompilationErr
 using afPlastic::PlasticClassModel
 using afPlastic::PlasticCompiler
-using afPlastic::SrcErrLocation
+using afPlastic::SrcCodeSnippet
 
 ** Compiles efan templates into Fantom types. Compiled types extend `EfanRenderer` and have the 
 ** standard serialisation ctor:
@@ -25,15 +25,14 @@ const class EfanCompiler {
 	public const  Int 				srcCodePadding		:= 5 
 
 	private const Str 				rendererClassName	:= "EfanRenderer"  
-	private const EfanParser 		parser				:= EfanParser() 
+	private const EfanParser 		parser 
 	private const PlasticCompiler	plasticCompiler
 		
 	** Create an 'EfanCompiler'.
 	new make(|This|? in := null) {
 		in?.call(this)
-		plasticCompiler	= PlasticCompiler() {
-			it.srcCodePadding = this.srcCodePadding
-		}
+		parser			= EfanParser() 		{ it.srcCodePadding = this.srcCodePadding }
+		plasticCompiler	= PlasticCompiler() { it.srcCodePadding = this.srcCodePadding }
 	}
 
 	** Standard compilation usage.
@@ -84,16 +83,16 @@ const class EfanCompiler {
 		model.usingType(EfanErr#)
 		model.extendMixin(EfanRenderer#)
 		model.addField(Type?#, "_af_ctxType")
-		model.overrideField(EfanRenderer#ctxType, "${ctxTypeSig}#", """throw EfanErr("ctxType may not be set!")""")
+		model.overrideField(EfanRenderer#ctxType, "${ctxTypeSig}#", """throw Err("ctxType may not be set!")""")
 		model.overrideMethod(EfanRenderer#_af_render, renderCode)
 	
 		try {
 			type	= plasticCompiler.compileModel(model)
 
 		} catch (PlasticCompilationErr err) {
-			efanLineNo	:= findEfanLineNo(err.srcErrLoc) ?: throw err
-			efanErrLoc	:= SrcErrLocation(srcLocation, efanTemplate, efanLineNo, err.msg)
-			throw EfanCompilationErr(efanErrLoc, srcCodePadding, err)
+			efanLineNo	:= findEfanLineNo(err.srcCode.srcCode, err.errLineNo) ?: throw err
+			srcCode	:= SrcCodeSnippet(srcLocation, efanTemplate)
+			throw EfanCompilationErr(srcCode, efanLineNo, err.msg, srcCodePadding)
 		}
 
 		return type
@@ -121,9 +120,8 @@ const class EfanCompiler {
 		return code
 	}
 
-	private Int? findEfanLineNo(SrcErrLocation plasticErrLoc) {
-		fanCodeLines	:= plasticErrLoc.srcCode
-		fanLineNo		:= plasticErrLoc.errLineNo - 1	// from 1 to 0 based
+	private Int? findEfanLineNo(Str[] fanCodeLines, Int errLineNo) {
+		fanLineNo		:= errLineNo - 1	// from 1 to 0 based
 		reggy 			:= Regex<|^\s+?// --> ([0-9]+)$|>
 		efanLineNo		:= (Int?) null
 		
