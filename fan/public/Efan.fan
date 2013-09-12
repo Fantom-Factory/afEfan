@@ -1,5 +1,5 @@
 
-** Service methods for compiling and rendering efan templates.
+** Simple service methods for compiling and rendering efan templates.
 const class Efan {
 	
 	const private EfanCompiler	compiler	:= EfanCompiler()

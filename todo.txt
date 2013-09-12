@@ -1,6 +1,8 @@
 
-For v1.0.2
+For v1.1.2
 ----------
+Check for render recursion
+
 
 
 Future:
