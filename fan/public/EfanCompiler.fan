@@ -13,10 +13,10 @@ using afPlastic::SrcCodeSnippet
 ** 
 **    template := ...
 **    efanType := EfanCompiler().compile(`index.efan`, template)
-**    htmlStr  := efanType.make.render(null)
+**    htmlStr  := efanType.make.render(...)
 ** 
 const class EfanCompiler {
-	
+
 	** The name given to the 'ctx' variable in the render method. 
 	public const  Str				ctxVarName			:= "ctx"
 	
@@ -35,7 +35,7 @@ const class EfanCompiler {
 		plasticCompiler	= PlasticCompiler() { it.srcCodePadding = this.srcCodePadding }
 	}
 
-	** Standard compilation usage.
+	** Standard compilation usage; the returned type extends `EfanRenderer`.
 	** Compiles a new renderer from the given efanTemplate.
 	** 
 	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
@@ -45,7 +45,7 @@ const class EfanCompiler {
 		return compileWithModel(srcLocation, efanTemplate, ctxType, model)
 	}
 
-	** Intermediate compilation usage.
+	** Intermediate compilation usage; the returned type extends `EfanRenderer`.
 	** The compiled renderer extends the given view helper mixins.
 	** 
 	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
@@ -55,8 +55,8 @@ const class EfanCompiler {
 		viewHelpers.each { model.extendMixin(it) }
 		return compileWithModel(srcLocation, efanTemplate, ctxType, model)
 	}
-
-	** Advanced compiler usage.
+ 
+	** Advanced compiler usage; the returned type extends `EfanRenderer`.
 	** The efan render methods are added to the given afPlastic model.
 	** 
 	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
@@ -64,7 +64,7 @@ const class EfanCompiler {
 	Type compileWithModel(Uri srcLocation, Str efanTemplate, Type? ctxType, PlasticClassModel model) {
 		if (!model.isConst)
 			throw EfanErr(ErrMsgs.rendererModelMustBeConst(model))
-
+ 
 		type		:= (Type?) null
 		ctxTypeSig	:= (ctxType == null) ? "Obj?" : ctxType.signature
 		renderCode	:= "if (_ctx == null && ctxType != null && !ctxType.isNullable)\n"

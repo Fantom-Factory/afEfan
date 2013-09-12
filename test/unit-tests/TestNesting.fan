@@ -2,8 +2,8 @@
 internal class TestNesting : EfanTest {
 	
 	Void testNestedRendering() {
-		index  	:= compiler.compile(`index.efan`,  `test/unit-tests/index.efan` .toFile.readAllStr, Map#).make as EfanRenderer
-		layout 	:= compiler.compile(`layout.efan`, `test/unit-tests/layout.efan`.toFile.readAllStr, Obj#).make as EfanRenderer
+		index  	:= compiler.compile(`index.efan`,  File(`test/unit-tests/index.efan` ).readAllStr, Map#).make as EfanRenderer
+		layout 	:= compiler.compile(`layout.efan`, File(`test/unit-tests/layout.efan`).readAllStr, Obj#).make as EfanRenderer
 		html 	:= index.render(["layout":layout, "layoutCtx":69])		
 
 		output := """before
