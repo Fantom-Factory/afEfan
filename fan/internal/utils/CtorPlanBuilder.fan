@@ -17,11 +17,11 @@ internal class CtorPlanBuilder {
 		ctorPlan[field] = val
 		return this
 	}
-	
+
 	|Obj| toCtorFunc() {
 		Field.makeSetFunc(ctorPlan)
 	}
-	
+
 	Obj makeObj() {
 		type.make([toCtorFunc])
 	}

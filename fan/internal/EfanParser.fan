@@ -17,7 +17,6 @@ internal const class EfanParser {
 		
 		buf		:= StrBuf(100)	// 100 being an average line length; it's better than 16 anyhow!
 		data	:= ParserData() { it.buf = buf; it.pusher = pusher; it.efanCode = efanCode; it.srcLocation = srcLocation; it.srcCodePadding = this.srcCodePadding }
-		line	:= 1
 		while (efanIn.more) {
 			if (peekEq(efanIn, tokenCommentStart)) {
 				data.push

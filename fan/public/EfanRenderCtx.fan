@@ -19,6 +19,7 @@ class EfanRenderCtx {
 		efanRenders.push(render)
 		
 		try {
+			// FIXME: catch Runtime expcetions and report srcErr
 			renderFunc()
 
 		} finally {
