@@ -27,7 +27,7 @@ const class EfanCompiler {
 	private const Str 				rendererClassName	:= "EfanRenderer"  
 	private const EfanParser 		parser 
 	private const PlasticCompiler	plasticCompiler
-		
+
 	** Create an 'EfanCompiler'.
 	new make(|This|? in := null) {
 		in?.call(this)
@@ -55,7 +55,7 @@ const class EfanCompiler {
 		viewHelpers.each { model.extendMixin(it) }
 		return compileWithModel(srcLocation, efanTemplate, ctxType, model)
 	}
- 
+
 	** Advanced compiler usage; the returned type extends `EfanRenderer`.
 	** The efan render methods are added to the given afPlastic model.
 	** 
@@ -68,19 +68,17 @@ const class EfanCompiler {
 		type		:= (Type?) null
 		ctxTypeSig	:= (ctxType == null) ? "Obj?" : ctxType.signature
 		renderCode	:= "if (_ctx == null && ctxType != null && !ctxType.isNullable)\n"
-		renderCode	+= "	throw Err(\"${ErrMsgs.rendererCtxIsNull} \${ctxType.typeof.signature}\")\n"
+		renderCode	+= "	throw afEfan::EfanErr(\"${ErrMsgs.rendererCtxIsNull} \${ctxType.typeof.signature}\")\n"
 		renderCode	+= "if (_ctx != null && ctxType != null && !_ctx.typeof.fits(ctxType))\n"
-		renderCode	+= "	throw Err(\"ctx \${_ctx.typeof.signature} ${ErrMsgs.rendererCtxBadFit(ctxType)}\")\n"
+		renderCode	+= "	throw afEfan::EfanErr(\"ctx \${_ctx.typeof.signature} ${ErrMsgs.rendererCtxBadFit(ctxType)}\")\n"
 		renderCode	+= "\n"
 		renderCode	+= "${ctxTypeSig} ctx := _ctx\n"
 		renderCode	+= "\n"
-		renderCode	+= "_efanCtx := EfanRenderCtx.ctx(false) ?: EfanRenderCtx()\n"
+		renderCode	+= "_efanCtx := afEfan::EfanRenderCtx.ctx(false) ?: afEfan::EfanRenderCtx()\n"
 		renderCode	+= "_efanCtx.renderWithBuf(this, _af_code, _bodyFunc, _bodyObj) |->| {\n"
 		renderCode	+= parseIntoCode(srcLocation, efanTemplate)
 		renderCode	+= "}\n"
-		
-		model.usingType(EfanRenderCtx#)
-		model.usingType(EfanErr#)
+
 		model.extendMixin(EfanRenderer#)
 		model.addField(Type?#, "_af_ctxType")
 		model.overrideField(EfanRenderer#ctxType, "${ctxTypeSig}#", """throw Err("ctxType may not be set!")""")
@@ -101,7 +99,7 @@ const class EfanCompiler {
 	** Called by afbedSheetEfan - ensures all given ViewHelper types are valid. 
 	@NoDoc
 	static Type[] validateViewHelpers(Type[] viewHelpers) {
-		viewHelpers.each { 
+		viewHelpers.each {
 			if (!it.isMixin)
 				throw EfanErr(ErrMsgs.viewHelperMixinIsNotMixin(it))
 			if (!it.isConst)

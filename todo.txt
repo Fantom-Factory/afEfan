@@ -3,6 +3,7 @@ For v1.1.2
 ----------
 Check for render recursion
 
+runtime error reporting
 
 
 Future:
@@ -11,6 +12,4 @@ add compilation hooks so external people can add their own generated methods & f
 
 <%! using webmod %>
 
-Multiple ctx args (optionally give mixin render mixin method?)
-
-Be able to extend a class, not just mixins
+Multiple ctx args (optionally give mixin render mixin method? use a map [Str:Type])
