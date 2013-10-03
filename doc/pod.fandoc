@@ -124,7 +124,7 @@ Each invocation of `EfanCompiler.compile` creates a new Fantom type, so use it j
 
 pre>
   template := "<% ctx.times |i| { %>Ho! <% } %>"
-  renderer := EfanCompiler().compile(template, Int#)	// <-- cache this type!
+  renderer := EfanCompiler().compile(template, Int#)  // <-- cache this type!
 
   ho       := renderer.make.render(1)
   hoho     := renderer.make.render(2)
@@ -136,7 +136,7 @@ pre>
 Layout Pattern / Nesting Templates [#nestingTemplates]
 ******************************************************
 Efan templates may be nested inside one another, effectively allowing you to componentise your templates. This is accomplished
-by 2 in `EfanRenderer`:
+by 2 methods in `EfanRenderer`:
 
   ** Renders the given efan renderer.
   Void renderEfan(EfanRenderer renderer, Obj? ctx)
