@@ -13,8 +13,8 @@ internal class TestMultiLines : EfanTest {
 		// test the code looks pretty
 		code := compiler.parseIntoCode(``, c)
 		verify(!code.contains("\t// \n"))		// check empty lines are removed
-		verify( code.contains("\t// --> 1\n\t// # blah"))
-		verify( code.contains("\t// --> 3\n\t// # b-b-b-b-blah")) // test line trimming
+		verify( code.contains("\t// # blah\t// (efan) --> 1\n"))
+		verify( code.contains("\t// # b-b-b-b-blah\t// (efan) --> 3\n")) // test line trimming
 	}
 	
 	Void testEvalWithMultiLines() {
@@ -27,8 +27,24 @@ internal class TestMultiLines : EfanTest {
 
 		// test the code looks pretty
 		code := compiler.parseIntoCode(``, c)
-		verify( code.contains("\t60 +"))
-		verify( code.contains("\t9"))
+		verify( code.contains("\t60 +\t// (efan) --> 1"))
+		verify( code.contains("\t9\t// (efan) --> 2"))
+		verify( code.contains("_af_code.add(\" lo!\")\t// (efan) --> 3"))
+	}
+
+	Void testCodeWithMultiLines() {
+		c :="""Hel <% s := 60 + 
+		       9 
+		       %> lo!""" 
+		
+		text := efan.renderFromStr(c, null)
+		verifyEq(text, "Hel  lo!")
+
+		// test the code looks pretty
+		code := compiler.parseIntoCode(``, c)
+		verify( code.contains("\ts := 60 +\t// (efan) --> 1"))
+		verify( code.contains("\t9\t// (efan) --> 2"))
+		verify( code.contains("_af_code.add(\" lo!\")\t// (efan) --> 3"))
 	}
 
 	Void testTextWithMulilines() {
@@ -40,9 +56,10 @@ internal class TestMultiLines : EfanTest {
 		verifyEq(text, "Hel\n\t\t6\n\t\t9\t\nlo!")
 		
 		// test the code looks pretty
-		code := compiler.parseIntoCode(``, c)
-		verify( code.contains("""_af_code.add("\\t\\t6\\n")"""))
-		verify( code.contains("""_af_code.add("\\t\\t9\\t\\n")"""))
+		code := compiler.parseIntoCode(``, c).split('\n')
+		verifyEq( code[0], """_af_code.add("Hel\\n")\t// (efan) --> 1""")
+		verifyEq( code[1], """_af_code.add("\\t\\t6\\n")\t// (efan) --> 2""")
+		verifyEq( code[2], """_af_code.add("\\t\\t9\\t\\n")\t// (efan) --> 3""")
 	}
 
 	Void testTextWithMulilines2() {
