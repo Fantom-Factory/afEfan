@@ -53,8 +53,8 @@ internal class TestNesting : EfanTest {
 }
 
 internal const class T_Index : EfanRenderer {
-	override Type? ctxType {
-		get { [Str:Obj]# }
+	override EfanMetaData efanMetaData {
+		get { EfanMetaData() { it.ctxName=""; it.srcLocation=``; it.efanTemplate="" } }
 		set { }
 	}
 	
@@ -73,8 +73,8 @@ internal const class T_Index : EfanRenderer {
 }
 
 internal const class T_Layout : EfanRenderer {
-	override Type? ctxType {
-		get { Int# }
+	override EfanMetaData efanMetaData {
+		get { EfanMetaData() { it.ctxName=""; it.srcLocation=``; it.efanTemplate="" } }
 		set { }
 	}
 	
@@ -93,8 +93,8 @@ internal const class T_Layout : EfanRenderer {
 }
 
 internal const class T_Index2 : EfanRenderer {
-	override Type? ctxType {
-		get { [Str:Obj]# }
+	override EfanMetaData efanMetaData {
+		get { EfanMetaData() { it.ctxName=""; it.srcLocation=``; it.efanTemplate="" } }
 		set { }
 	}
 	

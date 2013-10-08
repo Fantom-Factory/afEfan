@@ -2,8 +2,8 @@
 ** As implemented by all generated efan types returned from `EfancCompiler`.
 const mixin EfanRenderer {
 
-	** The 'ctx' type the renderer was generated for.
-	abstract Type? ctxType
+	** Meta data about the compiled efan templates
+	abstract EfanMetaData efanMetaData
 	
 	** The main render method. 
 	** 

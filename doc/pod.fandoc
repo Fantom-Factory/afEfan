@@ -246,6 +246,7 @@ Release Notes [#releaseNotes]
 *****************************
 v1.2.0 [#v1.2.0]
 ----------------
+ - New: `EfanRenderer` now has an 'efanMetaData' field with more contextual information.
  - Chg: `EfanCompiler` now returns a 'const' `EfanRenderer` instance, not a rendering type.
 
 v1.1.0 [#v1.1.0]
