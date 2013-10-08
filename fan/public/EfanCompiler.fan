@@ -1,7 +1,6 @@
 using afPlastic::PlasticCompilationErr
 using afPlastic::PlasticClassModel
 using afPlastic::PlasticCompiler
-using afPlastic::SrcCodeSnippet
 
 ** Compiles efan templates into `EfanRenderer`s. 
 ** Call 'render()' to render the efan template into a Str. 
@@ -77,22 +76,21 @@ const class EfanCompiler {
 		model.overrideField(EfanRenderer#efanMetaData, "_af_efanMetaData", """throw Err("efanMetaData is read only.")""")
 		model.overrideMethod(EfanRenderer#_af_render, renderCode)
 	
-		try {
-			renderType	= plasticCompiler.compileModel(model)
-
-		} catch (PlasticCompilationErr err) {
-			efanLineNo	:= findEfanLineNo(err.srcCode.srcCode, err.errLineNo) ?: throw err
-			srcCode	:= SrcCodeSnippet(srcLocation, efanTemplate)
-			throw EfanCompilationErr(srcCode, efanLineNo, err.msg, srcCodePadding, err)
-		}
-
 		efanMetaData	:= EfanMetaData {
 			it.srcLocation 	= srcLocation
 			it.ctxName		= ctxVarName
 			it.ctxType		= ctxType
 			it.efanTemplate	= efanTemplate
 			it.efanSrcCode	= model.toFantomCode
+			it.srcCodePadding= this.srcCodePadding
 		}
+
+		try {
+			renderType	= plasticCompiler.compileModel(model)
+		} catch (PlasticCompilationErr err) {
+			efanMetaData.throwCompilationErr(err, err.errLineNo)
+		}
+
 		renderer		:= CtorPlanBuilder(renderType).set("_af_efanMetaData", efanMetaData).makeObj
 		return renderer
 	}
@@ -117,23 +115,5 @@ const class EfanCompiler {
 		code := data.toFantomCode
 		
 		return code
-	}
-
-	private Int? findEfanLineNo(Str[] fanCodeLines, Int errLineNo) {
-		fanLineNo		:= errLineNo - 1	// from 1 to 0 based
-		reggy 			:= Regex<|\s+?// \(efan\) --> ([0-9]+)$|>
-		efanLineNo		:= (Int?) null
-		
-		while (fanLineNo > 0 && efanLineNo == null) {
-			code := fanCodeLines[fanLineNo]
-			reg := reggy.matcher(code)
-			if (reg.find) {
-				efanLineNo = reg.group(1).toInt
-			} else {
-				fanLineNo--
-			}
-		}
-		
-		return efanLineNo
 	}
 }

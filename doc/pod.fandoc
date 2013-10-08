@@ -220,7 +220,8 @@ pre>
 
 Err Reporting [#errReporting]
 *****************************
-Efan compilation errs return snippets of code showing which line in the 'efan' src the error occurred. Example:
+Efan compilation and runtime Errs report snippets of code showing which line in the 'efan' template the error occurred.
+Example:
 
 pre>
 Efan Compilation Err:
@@ -246,7 +247,8 @@ Release Notes [#releaseNotes]
 *****************************
 v1.2.0 [#v1.2.0]
 ----------------
- - New: `EfanRenderer` now has an 'efanMetaData' field with more contextual information.\\
+ - New: Runtime Errs thrown while rendering report efan template code snippets and line numbers.
+ - New: `EfanRenderer` now has an 'efanMetaData' field with more contextual information.
  - Chg: Rejigged the efan parser.
  - Chg: Efan template line numbers no longer take up a whole line of code.
  - Chg: `EfanCompiler` now returns a 'const' `EfanRenderer` instance, not a rendering type.
