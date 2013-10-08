@@ -20,7 +20,6 @@ const class EfanMetaData {
 	** The generated efan fantom code (for the inquisitive).
 	const Str efanSrcCode
 
-	** The generated efan fantom code (for the inquisitive).
 	internal const Int srcCodePadding
 
 	internal new make(|This|in) { in(this) }
