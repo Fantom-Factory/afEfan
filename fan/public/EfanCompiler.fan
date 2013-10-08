@@ -32,7 +32,7 @@ const class EfanCompiler {
 	** Standard compilation usage; compiles a new renderer from the given efanTemplate. 
 	** 
 	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
-	** 'srcLocation' is only used for Err msgs.
+	** 'srcLocation' is only used for reporting Err msgs.
 	EfanRenderer compile(Uri srcLocation, Str efanTemplate, Type? ctxType := null) {
 		model	:= PlasticClassModel(rendererClassName, true)
 		return compileWithModel(srcLocation, efanTemplate, ctxType, model)
@@ -41,7 +41,7 @@ const class EfanCompiler {
 	** Intermediate compilation usage; the compiled renderer extends the given view helper mixins.
 	** 
 	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
-	** 'srcLocation' is only used for Err msgs.
+	** 'srcLocation' is only used for reporting Err msgs.
 	EfanRenderer compileWithHelpers(Uri srcLocation, Str efanTemplate, Type? ctxType := null, Type[] viewHelpers := Type#.emptyList) {
 		model	:= PlasticClassModel(rendererClassName, true)
 		viewHelpers.each { model.extendMixin(it) }
@@ -50,9 +50,12 @@ const class EfanCompiler {
 
 	** Advanced compiler usage; the efan render methods are added to the given afPlastic model.
 	** 
+	** The (optional) 'makeFunc' is used to create an 'EfanRenderer' instance from the supplied Type
+	** and meta data. 
+	** 
 	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
-	** 'srcLocation' is only used for Err msgs.
-	EfanRenderer compileWithModel(Uri srcLocation, Str efanTemplate, Type? ctxType, PlasticClassModel model) {
+	** 'srcLocation' is only used for reporting Err msgs.
+	EfanRenderer compileWithModel(Uri srcLocation, Str efanTemplate, Type? ctxType, PlasticClassModel model, |Type, EfanMetaData->EfanRenderer|? makeFunc := null) {
 		if (!model.isConst)
 			throw EfanErr(ErrMsgs.rendererModelMustBeConst(model))
  
@@ -91,8 +94,11 @@ const class EfanCompiler {
 			efanMetaData.throwCompilationErr(err, err.errLineNo)
 		}
 
-		renderer		:= CtorPlanBuilder(renderType).set("_af_efanMetaData", efanMetaData).makeObj
-		return renderer
+		efan	:= (makeFunc != null)
+				?  makeFunc(renderType, efanMetaData)
+				:  CtorPlanBuilder(renderType).set("_af_efanMetaData", efanMetaData).makeObj
+
+		return efan
 	}
 
 	** Called by afbedSheetEfan - ensures all given ViewHelper types are valid. 

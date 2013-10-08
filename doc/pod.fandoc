@@ -253,6 +253,7 @@ v1.2.0 [#v1.2.0]
  - Chg: Efan template line numbers no longer take up a whole line of code.
  - Chg: `EfanCompiler` now returns a 'const' `EfanRenderer` instance, not a rendering type.
  - Chg: Exposed (made public) the 'EfanErr' hierarchy.
+ - Chg: Added optional 'makeFunc' to 'EfanCompiler.compileWithModel()'.
 
 v1.1.0 [#v1.1.0]
 ----------------
