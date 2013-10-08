@@ -59,7 +59,8 @@ const class EfanCompiler {
  
 		renderType	:= (Type?) null
 		ctxTypeSig	:= (ctxType == null) ? "Obj?" : ctxType.signature
-		renderCode	:= "if (_ctx == null && ctxType != null && !ctxType.isNullable)\n"
+		renderCode	:= "ctxType := efanMetaData.ctxType\n"
+		renderCode	+= "if (_ctx == null && ctxType != null && !ctxType.isNullable)\n"
 		renderCode	+= "	throw afEfan::EfanErr(\"${ErrMsgs.rendererCtxIsNull} \${ctxType.typeof.signature}\")\n"
 		renderCode	+= "if (_ctx != null && ctxType != null && !_ctx.typeof.fits(ctxType))\n"
 		renderCode	+= "	throw afEfan::EfanErr(\"ctx \${_ctx.typeof.signature} ${ErrMsgs.rendererCtxBadFit(ctxType)}\")\n"
@@ -72,8 +73,8 @@ const class EfanCompiler {
 		renderCode	+= "}\n"
 
 		model.extendMixin(EfanRenderer#)
-		model.addField(Type?#, "_af_ctxType")
-		model.overrideField(EfanRenderer#ctxType, "${ctxTypeSig}#", """throw Err("ctxType may not be set!")""")
+		model.addField(EfanMetaData#, "_af_efanMetaData")
+		model.overrideField(EfanRenderer#efanMetaData, "_af_efanMetaData", """throw Err("efanMetaData is read only.")""")
 		model.overrideMethod(EfanRenderer#_af_render, renderCode)
 	
 		try {
@@ -85,7 +86,14 @@ const class EfanCompiler {
 			throw EfanCompilationErr(srcCode, efanLineNo, err.msg, srcCodePadding, err)
 		}
 
-		return (EfanRenderer) renderType.make
+		efanMetaData	:= EfanMetaData {
+			it.srcLocation 	= srcLocation
+			it.ctxName		= ctxVarName
+			it.ctxType		= ctxType
+			it.efanTemplate	= efanTemplate
+		}
+		renderer		:= CtorPlanBuilder(renderType).set("_af_efanMetaData", efanMetaData).makeObj
+		return renderer
 	}
 
 	** Called by afbedSheetEfan - ensures all given ViewHelper types are valid. 

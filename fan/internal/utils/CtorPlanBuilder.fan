@@ -12,7 +12,7 @@ internal class CtorPlanBuilder {
 	private Obj? get(Obj key) { null }
 
 	@Operator
-	This set(Obj fieldName, Obj? val) {
+	This set(Str fieldName, Obj? val) {
 		field := type.field(fieldName)
 		ctorPlan[field] = val
 		return this
