@@ -1,5 +1,5 @@
 
-** As implemented by all generated efan types returned from `EfancCompiler`.
+** Represents a compiled efan template. Returned from `EfanCompiler`.
 const mixin EfanRenderer {
 
 	** Meta data about the compiled efan templates
