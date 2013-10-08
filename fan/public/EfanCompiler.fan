@@ -3,17 +3,12 @@ using afPlastic::PlasticClassModel
 using afPlastic::PlasticCompiler
 using afPlastic::SrcCodeSnippet
 
-** Compiles efan templates into Fantom types. Compiled types extend `EfanRenderer` and have the 
-** standard serialisation ctor:
-** 
-**    new make(|This|? f) { f?.call(this) }
-** 
-** This ensures you can create an instance of the render just by calling 'make()'. Call 'render()' 
-** to render the efan template into a Str. 
+** Compiles efan templates into `EfanRenderer`s. 
+** Call 'render()' to render the efan template into a Str. 
 ** 
 **    template := ...
-**    efanType := EfanCompiler().compile(`index.efan`, template)
-**    htmlStr  := efanType.make.render(...)
+**    renderer := EfanCompiler().compile(`index.efan`, template)
+**    htmlStr  := renderer.render(...)
 ** 
 const class EfanCompiler {
 
@@ -35,37 +30,34 @@ const class EfanCompiler {
 		plasticCompiler	= PlasticCompiler() { it.srcCodePadding = this.srcCodePadding }
 	}
 
-	** Standard compilation usage; the returned type extends `EfanRenderer`.
-	** Compiles a new renderer from the given efanTemplate.
+	** Standard compilation usage; compiles a new renderer from the given efanTemplate. 
 	** 
 	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
 	** 'srcLocation' is only used for Err msgs.
-	Type compile(Uri srcLocation, Str efanTemplate, Type? ctxType := null) {
+	EfanRenderer compile(Uri srcLocation, Str efanTemplate, Type? ctxType := null) {
 		model	:= PlasticClassModel(rendererClassName, true)
 		return compileWithModel(srcLocation, efanTemplate, ctxType, model)
 	}
 
-	** Intermediate compilation usage; the returned type extends `EfanRenderer`.
-	** The compiled renderer extends the given view helper mixins.
+	** Intermediate compilation usage; the compiled renderer extends the given view helper mixins.
 	** 
 	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
 	** 'srcLocation' is only used for Err msgs.
-	Type compileWithHelpers(Uri srcLocation, Str efanTemplate, Type? ctxType := null, Type[] viewHelpers := Type#.emptyList) {
+	EfanRenderer compileWithHelpers(Uri srcLocation, Str efanTemplate, Type? ctxType := null, Type[] viewHelpers := Type#.emptyList) {
 		model	:= PlasticClassModel(rendererClassName, true)
 		viewHelpers.each { model.extendMixin(it) }
 		return compileWithModel(srcLocation, efanTemplate, ctxType, model)
 	}
 
-	** Advanced compiler usage; the returned type extends `EfanRenderer`.
-	** The efan render methods are added to the given afPlastic model.
+	** Advanced compiler usage; the efan render methods are added to the given afPlastic model.
 	** 
 	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
 	** 'srcLocation' is only used for Err msgs.
-	Type compileWithModel(Uri srcLocation, Str efanTemplate, Type? ctxType, PlasticClassModel model) {
+	EfanRenderer compileWithModel(Uri srcLocation, Str efanTemplate, Type? ctxType, PlasticClassModel model) {
 		if (!model.isConst)
 			throw EfanErr(ErrMsgs.rendererModelMustBeConst(model))
  
-		type		:= (Type?) null
+		renderType	:= (Type?) null
 		ctxTypeSig	:= (ctxType == null) ? "Obj?" : ctxType.signature
 		renderCode	:= "if (_ctx == null && ctxType != null && !ctxType.isNullable)\n"
 		renderCode	+= "	throw afEfan::EfanErr(\"${ErrMsgs.rendererCtxIsNull} \${ctxType.typeof.signature}\")\n"
@@ -85,7 +77,7 @@ const class EfanCompiler {
 		model.overrideMethod(EfanRenderer#_af_render, renderCode)
 	
 		try {
-			type	= plasticCompiler.compileModel(model)
+			renderType	= plasticCompiler.compileModel(model)
 
 		} catch (PlasticCompilationErr err) {
 			efanLineNo	:= findEfanLineNo(err.srcCode.srcCode, err.errLineNo) ?: throw err
@@ -93,7 +85,7 @@ const class EfanCompiler {
 			throw EfanCompilationErr(srcCode, efanLineNo, err.msg, srcCodePadding, err)
 		}
 
-		return type
+		return (EfanRenderer) renderType.make
 	}
 
 	** Called by afbedSheetEfan - ensures all given ViewHelper types are valid. 

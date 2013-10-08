@@ -120,15 +120,15 @@ Efan works by dynamically generating Fantom source code and compiling it into a 
 *unloaded*, if you were compile 1000s of efan templates, it could be considered a memory leak.
 
 Each invocation of `EfanCompiler.compile` creates a new Fantom type, so use it judiciously. Caching the returned
-`EfanRenderer` types is highly recommended. Example:
+`EfanRenderer` classes is highly recommended. Example:
 
 pre>
   template := "<% ctx.times |i| { %>Ho! <% } %>"
-  renderer := EfanCompiler().compile(template, Int#)  // <-- cache this type!
+  renderer := EfanCompiler().compile(template, Int#)  // <-- cache this class!
 
-  ho       := renderer.make.render(1)
-  hoho     := renderer.make.render(2)
-  hohoho   := renderer.make.render(3)
+  ho       := renderer.render(1)
+  hoho     := renderer.render(2)
+  hohoho   := renderer.render(3)
 <pre
 
 
@@ -187,8 +187,8 @@ class Index {
   Str renderIndex() {
     compiler  := EfanCompiler()
 
-    index     := compiler.compile(`index.efan`,  `index.efan`.toFile.readAllStr,  IndexCtx#).make
-    layout    := compiler.compile(`layout.efan`, `layout.efan`.toFile.readAllStr, IndexCtx#).make
+    index     := compiler.compile(`index.efan`,  `index.efan`.toFile.readAllStr,  IndexCtx#)
+    layout    := compiler.compile(`layout.efan`, `layout.efan`.toFile.readAllStr, IndexCtx#)
     ctx       := IndexCtx() { it.layout = layout; it.pageTitle = "Wotever" }
 
     return index.render(ctx)
@@ -244,12 +244,15 @@ Efan Compilation Err:
 
 Release Notes [#releaseNotes]
 *****************************
+v1.2.0 [#v1.2.0]
+----------------
+ - Chg: `EfanCompiler` now returns a 'const' `EfanRenderer` instance, not a rendering type.
 
 v1.1.0 [#v1.1.0]
 ----------------
  - New: Added 'EfanRenderCtx' to ease efan extensions.
  - Chg: Updated to use [afPlastic]`http://repo.status302.com/doc/afPlastic/#overview`.
- - Chg: The `EfanCompiler` now returns the rendering type, not an 'EfanRenderer' instance.
+ - Chg: `EfanCompiler` now returns the rendering type, not an 'EfanRenderer' instance.
  - Chg: `EfanRenderer` is now a mixin and is implemented by the rendering type.
  - Chg: 'renderEfan()' and 'renderBody()' are now methods on `EfanRenderer`.
 

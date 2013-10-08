@@ -10,7 +10,7 @@ internal class TestDocExample : EfanTest {
 
 	Void testNonAfIoc() {
 		template := "<% ctx.times |i| { %>Ho! <% } %>Merry Christmas!"
-		output   := EfanCompiler().compile(``, template, Int#).make->render(3)
+		output   := EfanCompiler().compile(``, template, Int#).render(3)
 		
 		verifyEq("Ho! Ho! Ho! Merry Christmas!", output)
 	}

@@ -40,4 +40,21 @@ const class EfanCompilationErr : EfanErr, SrcCodeErr {
 	}
 }
 
+@NoDoc
+const class EfanRuntimeErr : EfanErr, SrcCodeErr {
+	const override SrcCodeSnippet 	srcCode
+	const override Int 				errLineNo
+	private const  Int 				linesOfPadding
+
+	internal new make(SrcCodeSnippet srcCode, Int errLineNo, Str errMsg, Int linesOfPadding, Err cause) : super(errMsg, cause) {
+		this.srcCode = srcCode
+		this.errLineNo = errLineNo
+		this.linesOfPadding = linesOfPadding
+	}
+	
+	override Str toStr() {
+		print(msg, linesOfPadding)
+	}
+}
+
 
