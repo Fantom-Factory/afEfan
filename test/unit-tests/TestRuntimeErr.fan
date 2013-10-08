@@ -9,7 +9,6 @@ internal class TestRuntimeErr : EfanTest {
 
 		try {
 			renderer := compiler.compile(``, c, Int?#)
-			Env.cur.err.printLine(renderer.efanMetaData.efanSrcCode)
 			renderer.render(6)
 			fail
 		} catch (EfanRuntimeErr err) {
