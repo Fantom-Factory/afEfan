@@ -63,7 +63,8 @@ internal const class EfanParser {
 			buf.addChar(char)
 
 			if (newLine) {
-				data.push
+				if (!data.inBlock)
+					data.push
 				data.newLine
 			}
 		}
@@ -100,6 +101,7 @@ internal class ParserData {
 	Uri 		srcLocation
 	BlockType	blockType		:= BlockType.text
 	Int			lineNo			:= 1
+	Int			lineNoToSend	:= 1	// needed 'cos of multilines
 	Int 		srcCodePadding	:= 5
 
 	new make(|This|in) { in(this) }
@@ -129,7 +131,8 @@ internal class ParserData {
 		blockType = BlockType.comment
 	}
 	Void exitingBlock() {
-		pusher.onExit(lineNo)
+		pusher.onExit(lineNoToSend)
+		lineNoToSend = lineNo
 		blockType = BlockType.text
 	}
 	Bool inBlock() {
@@ -145,11 +148,12 @@ internal class ParserData {
 		if (blockType == BlockType.text)
 			pusher.onText(lineNo, buf.toStr)
 		if (blockType == BlockType.comment)
-			pusher.onComment(lineNo, buf.toStr)
+			pusher.onComment(lineNoToSend, buf.toStr)
 		if (blockType == BlockType.fanCode)
-			pusher.onFanCode(lineNo, buf.toStr)
+			pusher.onFanCode(lineNoToSend, buf.toStr)
 		if (blockType == BlockType.eval)
-			pusher.onEval(lineNo, buf.toStr)
+			pusher.onEval(lineNoToSend, buf.toStr)
+		lineNoToSend = lineNo
 		buf.clear
 	}
 }

@@ -3,7 +3,6 @@ internal class EfanModel : Pusher {
 	
 	StrBuf 	code
 	Int		indentSize	:= 1
-	Str		evalBuf		:= ""
 	
 	new make(Int bufSize) {
 		this.code 		= StrBuf(bufSize)
@@ -20,92 +19,83 @@ internal class EfanModel : Pusher {
 				indentSize = 0
 		}
 
-		addLine(lineNo)
-		
-		if (code.contains("\n"))
-			addMultiline(code)
-		else
-			indent.add(code)
+		if (code.contains("\n")) {
+			appendMulti(code, lineNo)
+		} else {
+			indent.append(code).appendLineNo(lineNo).endLine
+		}
 		
 		if (code.endsWith("{"))
 			indentSize++
 	}
-	
+
+	override Void onEval(Int lineNo, Str text) {
+		eval := text.trim
+		if (eval.isEmpty) return
+		
+		if (eval.contains("\n")) {
+			indent.append("_af_code.add(").endLine
+			appendMulti(eval, lineNo)
+			indent.append(")").endLine
+		} else {
+			indent.append("_af_code.add( ${eval} )").appendLineNo(lineNo).endLine
+		}
+	}
+
 	override Void onComment(Int lineNo, Str text) {
 		comment := text.trim
 		if (comment.isEmpty) return
 
-		addLine(lineNo)
-
-		// add the '#' so no-one can confuse with "// --> Line XXX"
-		indent.add("// # ${comment}")	
-	}
-
-	override Void onEval(Int lineNo, Str text) {
-		code := text.trim
-		if (code.isEmpty) return
-
-		if (evalBuf.isEmpty) {
-			addLine(lineNo)
+		// add the '#' so it can not be confused with "// (efan) --> XXX"
+		if (comment.contains("\n")) {
+			appendMulti(comment, lineNo) { "// # " + it }
 		} else {
-			evalBuf += (addLineStr(lineNo) + "\n")
+			indent.append("// # ${comment}").appendLineNo(lineNo).endLine
 		}
-		evalBuf += (code + "\n")
 	}
 	
-	override Void onExit(Int lineNo) {
-		if (evalBuf.trim.isEmpty) return
-		
-		if (evalBuf.trim.containsChar('\n')) {
-			indent.add("_af_code.add(")
-			addMultiline(evalBuf)
-			indent.add(")")
-		} else {
-			indent.add("_af_code.add( ${evalBuf.trim} )")
-		}
-		
-		evalBuf = ""
-	}
-
 	override Void onText(Int lineNo, Str text) {
 		if (text.isEmpty) return
-
-		addLine(lineNo)
-		indent.add("_af_code.add(${text.toCode})")
+		indent.append("_af_code.add(${text.toCode})").appendLineNo(lineNo).endLine
 	}
+
+	override Void onExit(Int lineNo) { }
 
 	Str toFantomCode() {
 		return code.toStr
 	}
 
-	private This addLine(Int lineNo) {
-		add(addLineStr(lineNo))
-		return this
-	}
-	private Str addLineStr(Int lineNo) {
-		indentStr + "// --> ${lineNo}"
+	// ---- Private Methods ----
+	
+	private This indent() {
+		append("".padl(indentSize, '\t'))
 	}
 	
-	private This add(Str txt) {
-		code.add(txt).addChar('\n')
+	private This appendLineNo(Int lineNo) {
+		append("\t// (efan) --> ${lineNo}")
 		return this
 	}
 
-	private This addMultiline(Str code) {
+	private This append(Str txt) {
+		code.add(txt)
+		return this
+	}
+
+	private This endLine() {
+		code.addChar('\n')
+		return this
+	}
+
+	private This appendMulti(Str code, Int lineNo, |Str, Int -> Str|? c := null) {
 		indentSize++
+		lineNo--
 		code.split('\n').each |line| {
+			lineNo++
 			if (line.isEmpty) return
-			indent.add(line) 
+			str := c?.call(line, lineNo) ?: line
+			indent.append(str).appendLineNo(lineNo).endLine
 		}
 		indentSize--
 		return this
-	}
-	
-	private This indent(Int spaces := 0) {
-		code.add(indentStr(spaces))
-		return this
-	}
-	private Str indentStr(Int spaces := 0) {
-		"".padl(indentSize, '\t') + "".padl(spaces, ' ')
 	}
 }
