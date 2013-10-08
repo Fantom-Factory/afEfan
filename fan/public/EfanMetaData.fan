@@ -15,6 +15,9 @@ const class EfanMetaData {
 	
 	** The efan template source code.
 	const Str efanTemplate
+
+	** The generated efan fantom code (for the inquisitive).
+	const Str efanSrcCode
 	
 	internal new make(|This|in) { in(this) }	
 }

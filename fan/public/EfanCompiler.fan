@@ -91,6 +91,7 @@ const class EfanCompiler {
 			it.ctxName		= ctxVarName
 			it.ctxType		= ctxType
 			it.efanTemplate	= efanTemplate
+			it.efanSrcCode	= model.toFantomCode
 		}
 		renderer		:= CtorPlanBuilder(renderType).set("_af_efanMetaData", efanMetaData).makeObj
 		return renderer
