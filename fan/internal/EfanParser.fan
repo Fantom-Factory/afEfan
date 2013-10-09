@@ -1,8 +1,9 @@
+using afPlastic::PlasticCompiler
 using afPlastic::SrcCodeSnippet
 
 internal const class EfanParser {
 
-	const  Int 	srcCodePadding	:= 5 
+	private const PlasticCompiler	plasticCompiler
 	
 	// don't contribute these, as currently, there are a lot of assumptions around <%# starting with <%
 	private static const Str tokenFanCodeStart	:= "<%"
@@ -10,13 +11,16 @@ internal const class EfanParser {
 	private static const Str tokenEvalStart		:= "<%="
 	private static const Str tokenEnd			:= "%>"
 	
-	new make(|This|? in := null) { in?.call(this) }
+	** We pass the PlasticCompiler in so we always get the latest srcCodePadding
+	new make(PlasticCompiler plasticCompiler) {
+		this.plasticCompiler = plasticCompiler
+	}
 	
 	Void parse(Uri srcLocation, Pusher pusher, Str efanCode) {
 		efanIn	:= efanCode.toBuf
 		
 		buf		:= StrBuf(100)	// 100 being an average line length; it's better than 16 anyhow!
-		data	:= ParserData() { it.buf = buf; it.pusher = pusher; it.efanCode = efanCode; it.srcLocation = srcLocation; it.srcCodePadding = this.srcCodePadding }
+		data	:= ParserData() { it.buf = buf; it.pusher = pusher; it.efanCode = efanCode; it.srcLocation = srcLocation; it.srcCodePadding = plasticCompiler.srcCodePadding }
 		while (efanIn.more) {
 			if (peekEq(efanIn, tokenCommentStart)) {
 				data.push
@@ -72,7 +76,7 @@ internal const class EfanParser {
 		if (data.inBlock) {
 			errMsg	:= ErrMsgs.parserBlockNotClosed(data.blockType)
 			srcCode	:= SrcCodeSnippet(srcLocation, efanCode)
-			throw EfanParserErr(srcCode, efanCode.splitLines.size, errMsg, srcCodePadding)
+			throw EfanParserErr(srcCode, efanCode.splitLines.size, errMsg, plasticCompiler.srcCodePadding)
 		}
 
 		data.push
