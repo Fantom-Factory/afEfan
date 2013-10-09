@@ -11,12 +11,17 @@ using afPlastic::PlasticCompiler
 ** 
 const class EfanCompiler {
 
-	** The name given to the 'ctx' variable in the render method. 
-	public const  Str				ctxVarName			:= "ctx"
-	
-	private const Str 				rendererClassName	:= "EfanRenderer"  
 	private const EfanParser 		parser 
-	private const PlasticCompiler	plasticCompiler
+	
+	** The name given to the 'ctx' variable in the render method. 
+	const  Str				ctxVarName			:= "ctx"
+	
+	** The class name given to compiled efan renderer instances.
+	const Str 				rendererClassName	:= "EfanRendererImpl"  
+	
+	** Expose 'PlasticCompiler' so it (and it's mutable srcCodePadding value) may be re-used by 
+	** other projects, such as [afSlim]`http://repo.status302.com/doc/afSlim/#overview`.
+	const PlasticCompiler	plasticCompiler
 
 	** Create an 'EfanCompiler'.
 	new make(|This|? in := null) {
