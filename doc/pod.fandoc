@@ -249,6 +249,7 @@ v1.2.0 [#v1.2.0]
 ----------------
  - New: Runtime Errs thrown while rendering report efan template code snippets and line numbers.
  - New: `EfanRenderer` now has an 'efanMetaData' field with more contextual information.
+ - New: The class name of efan renderer instances is now configurable.
  - Chg: Rejigged the efan parser.
  - Chg: Efan template line numbers no longer take up a whole line of code.
  - Chg: `EfanCompiler` now returns a 'const' `EfanRenderer` instance, not a rendering type.
