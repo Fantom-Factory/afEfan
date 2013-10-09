@@ -14,10 +14,6 @@ const class EfanCompiler {
 	** The name given to the 'ctx' variable in the render method. 
 	public const  Str				ctxVarName			:= "ctx"
 	
-	** When generating code snippets to report compilation Errs, this is the number of lines of src 
-	** code the erroneous line should be padded with.  
-	public const  Int 				srcCodePadding		:= 5 
-
 	private const Str 				rendererClassName	:= "EfanRenderer"  
 	private const EfanParser 		parser 
 	private const PlasticCompiler	plasticCompiler
@@ -25,8 +21,15 @@ const class EfanCompiler {
 	** Create an 'EfanCompiler'.
 	new make(|This|? in := null) {
 		in?.call(this)
-		parser			= EfanParser() 		{ it.srcCodePadding = this.srcCodePadding }
-		plasticCompiler	= PlasticCompiler() { it.srcCodePadding = this.srcCodePadding }
+		this.plasticCompiler	= PlasticCompiler()
+		this.parser				= EfanParser(plasticCompiler)
+	}
+
+	** For use by afIoc.
+	new makeWithServices(PlasticCompiler plasticCompiler, |This|? in := null) {
+		in?.call(this)
+		this.plasticCompiler	= plasticCompiler
+		this.parser				= EfanParser(plasticCompiler)
 	}
 
 	** Standard compilation usage; compiles a new renderer from the given efanTemplate. 
@@ -85,7 +88,7 @@ const class EfanCompiler {
 			it.ctxType		= ctxType
 			it.efanTemplate	= efanTemplate
 			it.efanSrcCode	= model.toFantomCode
-			it.srcCodePadding= this.srcCodePadding
+			it.srcCodePadding= plasticCompiler.srcCodePadding
 		}
 
 		try {
