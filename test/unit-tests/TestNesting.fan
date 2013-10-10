@@ -61,8 +61,7 @@ internal const class T_Index : EfanRenderer {
 	override Void _af_render(StrBuf _af_code, Obj? _ctx, |EfanRenderer t|? _bodyFunc, EfanRenderer? _bodyObj) {
 		[Str:Obj] ctx := _ctx
 
-		_efanCtx := EfanRenderCtx.ctx(false) ?: EfanRenderCtx()
-		_efanCtx.renderWithBuf(this, _af_code, _bodyFunc, _bodyObj) |->| {
+		EfanRenderCtx.renderWithBuf(this, _af_code, _bodyFunc, _bodyObj) |->| {
 			_af_code.add("before\n")
 			renderEfan(ctx["layout"], ctx["layoutCtx"]) {
 				_af_code.add("    body\n")
@@ -81,8 +80,7 @@ internal const class T_Layout : EfanRenderer {
 	override Void _af_render(StrBuf _af_code, Obj? _ctx, |EfanRenderer t|? _bodyFunc, EfanRenderer? _bodyObj) {
 		Int ctx := _ctx
 		
-		_efanCtx := EfanRenderCtx.ctx(false) ?: EfanRenderCtx()
-		_efanCtx.renderWithBuf(this, _af_code, _bodyFunc, _bodyObj) |->| {
+		EfanRenderCtx.renderWithBuf(this, _af_code, _bodyFunc, _bodyObj) |->| {
 			_af_code.add("  <html> ")
 			_af_code.add(ctx)
 			_af_code.add("\n")
@@ -101,8 +99,7 @@ internal const class T_Index2 : EfanRenderer {
 	override Void _af_render(StrBuf _af_code, Obj? _ctx, |EfanRenderer t|? _bodyFunc, EfanRenderer? _bodyObj) {
 		[Str:Obj] ctx := _ctx
 		
-		_efanCtx := EfanRenderCtx.ctx(false) ?: EfanRenderCtx()
-		_efanCtx.renderWithBuf(this, _af_code, _bodyFunc, _bodyObj) |->| {
+		EfanRenderCtx.renderWithBuf(this, _af_code, _bodyFunc, _bodyObj) |->| {
 			_af_code.add("before\n")
 			renderEfan(ctx["layout"], ctx["layoutCtx"])
 			_af_code.add("after")

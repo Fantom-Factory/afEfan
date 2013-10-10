@@ -4,24 +4,12 @@ using afPlastic::SrcCodeSnippet
 @NoDoc
 class EfanRenderCtx {
 
-	static const Str localsName	:= "efan.renderCtx"
-
-	EfanRender efanRender {
-		get { efanRenders.peek }
-		private set { }
-	}
-
-	private EfanRender[] efanRenders := [,]
-
-	Void renderWithBuf(EfanRenderer rendering, StrBuf renderBuf, |EfanRenderer|? bodyFunc, EfanRenderer? bodyObj, |->| renderFunc) {
-		Actor.locals[localsName] = this
-
+	static Void renderWithBuf(EfanRenderer rendering, StrBuf renderBuf, |EfanRenderer|? bodyFunc, EfanRenderer? bodyObj, |->| renderFunc) {
 		render := EfanRender(rendering, renderBuf, bodyFunc, bodyObj)
-		efanRenders.push(render)
 
 		try {
-			renderFunc()
-
+			CallStack.call("efan.renderCtx", render, renderFunc)
+			
 		} catch (Err err) {
 			regex 	:= Regex.fromStr("^\\s*?${rendering.typeof.qname}\\._af_render\\s\\(${rendering.typeof.pod.name}:([0-9]+)\\)\$")
 			codeLineNo := err.traceToStr.splitLines.eachWhile |line -> Int?| {
@@ -30,21 +18,11 @@ class EfanRenderCtx {
 			} ?: throw err
 
 			rendering.efanMetaData.throwRuntimeErr(err, codeLineNo)
-
-		} finally {
-			efanRenders.pop
-			if (efanRenders.isEmpty) {
-				Actor.locals.remove(localsName)
-			}			
 		}
 	}
-
-	static EfanRenderCtx? ctx(Bool checked := true) {
-		((EfanRenderCtx?) Actor.locals[localsName]) ?: (checked ? throw Err("EfanRenderCtx does not exist") : null) 
-	}	
-
+	
 	static EfanRender? render() {
-		ctx.efanRender
+		CallStack.stackable("efan.renderCtx")
 	}
 }
 
