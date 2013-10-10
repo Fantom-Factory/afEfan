@@ -77,8 +77,7 @@ const class EfanCompiler {
 		renderCode	+= "\n"
 		renderCode	+= "${ctxTypeSig} ctx := _ctx\n"
 		renderCode	+= "\n"
-		renderCode	+= "_efanCtx := afEfan::EfanRenderCtx.ctx(false) ?: afEfan::EfanRenderCtx()\n"
-		renderCode	+= "_efanCtx.renderWithBuf(this, _af_code, _bodyFunc, _bodyObj) |->| {\n"
+		renderCode	+= "afEfan::EfanRenderCtx.renderWithBuf(this, _af_code, _bodyFunc, _bodyObj) |->| {\n"
 		renderCode	+= parseIntoCode(srcLocation, efanTemplate)
 		renderCode	+= "}\n"
 
