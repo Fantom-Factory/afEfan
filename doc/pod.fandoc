@@ -245,6 +245,11 @@ Efan Compilation Err:
 
 Release Notes [#releaseNotes]
 *****************************
+
+v1.2.2 [#v1.2.2]
+----------------
+ - Chg: Simplified 'EfanRenderCtx' by introducing 'CallStack' class.
+
 v1.2.0 [#v1.2.0]
 ----------------
  - New: Runtime Errs thrown while rendering report efan template code snippets and line numbers.
