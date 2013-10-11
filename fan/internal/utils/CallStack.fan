@@ -30,6 +30,6 @@ internal class CallStack {
 	}	
 
 	private static CallStack get(Str stackName, Bool make := false) {
-		Actor.locals.getOrAdd(stackName) { make ? CallStack(stackName) : throw Err("Could not find a CallStack instance on thread.") }
+		Actor.locals.getOrAdd(stackName) { make ? CallStack(stackName) : throw Err("Could not find a CallStack instance for '${stackName}' on thread.") }
 	}	
 }
