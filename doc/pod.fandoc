@@ -31,6 +31,9 @@ pre>
 
 Tags [#tags]
 ************
+> **ALIEN-AID:** efan believes templates are sacred! It preserves all formatting and all whitespace **not** contained in
+> '<% ... %>' tags. Even DOS / UNIX line-endings are preserved!
+
 Efan supports the following tags:
 
 Eval Tags [#eval]
