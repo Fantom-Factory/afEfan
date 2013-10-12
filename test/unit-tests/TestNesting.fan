@@ -7,17 +7,17 @@ internal class TestNesting : EfanTest {
 		layout 	:= compiler.compile(`layout.efan`, File(`test/unit-tests/layout.efan`).readAllStr, Obj#)
 		html 	:= index.render(["layout":layout, "layoutCtx":69])		
 
-		output := """before
-		               <html> 69
+		output := """index-before
+		               layout-html 69
 		               
-		                 body
+		                 index-body
 		             
-		               </html>
+		               layout-html
 		             
-		             after
+		             index-after
 		             """
-		Env.cur.err.printLine("[${html}]")
-		Actor.sleep(20ms)
+//		Env.cur.err.printLine("[${html}]")
+//		Actor.sleep(20ms)
 		verifyEq(html, output)
 	}
 
@@ -30,8 +30,8 @@ internal class TestNesting : EfanTest {
 		                 body
 		               </html>
 		             after"""
-		Env.cur.err.printLine("[${html}]")
-		Actor.sleep(20ms)
+//		Env.cur.err.printLine("[${html}]")
+//		Actor.sleep(20ms)
 		verifyEq(html, output)
 	}
 
@@ -62,14 +62,18 @@ internal const class T_Index : EfanRenderer {
 		set { }
 	}
 	
-	override Str _af_render(Obj? _ctx, |->Str|? _bodyFunc) {
+	Obj? _af_eval {
+		get { null }
+		set { _af_code.add(it) }
+	}
+	
+	override Str _af_render(Obj? _ctx, |->|? _bodyFunc) {
 		[Str:Obj] ctx := _ctx
 
 		return EfanRenderCtx.renderEfan(_bodyFunc) |->| {
 			_af_code.add("before\n")
-			renderEfan(ctx["layout"], ctx["layoutCtx"]) |->Str| {
+			_af_eval = renderEfan(ctx["layout"], ctx["layoutCtx"]) {
 				_af_code.add("    body\n")
-				return _af_code.toStr 
 			}
 			_af_code.add("after")
 		}
@@ -81,15 +85,20 @@ internal const class T_Layout : EfanRenderer {
 		get { EfanMetaData() { it.ctxName=""; it.srcLocation=``; it.efanTemplate=""; it.efanSrcCode="" } }
 		set { }
 	}
-	
-	override Str _af_render(Obj? _ctx, |->Str|? _bodyFunc) {
+
+	Obj? _af_eval {
+		get { null }
+		set { _af_code.add(it) }
+	}
+
+	override Str _af_render(Obj? _ctx, |->|? _bodyFunc) {
 		Int ctx := _ctx
 		
 		return EfanRenderCtx.renderEfan(_bodyFunc) |->| {
 			_af_code.add("  <html> ")
 			_af_code.add(ctx)
 			_af_code.add("\n")
-			_af_code.add(renderBody)
+			_af_eval = renderBody
 			_af_code.add("  </html>\n")			
 		}
 	}
@@ -101,12 +110,17 @@ internal const class T_Index2 : EfanRenderer {
 		set { }
 	}
 	
-	override Str _af_render(Obj? _ctx, |->Str|? _bodyFunc) {
+	Obj? _af_eval {
+		get { null }
+		set { _af_code.add(it) }
+	}
+	
+	override Str _af_render(Obj? _ctx, |->|? _bodyFunc) {
 		[Str:Obj] ctx := _ctx
 		
 		return EfanRenderCtx.renderEfan(_bodyFunc) |->| {
 			_af_code.add("before\n")
-			_af_code.add(renderEfan(ctx["layout"], ctx["layoutCtx"]))
+			_af_eval = renderEfan(ctx["layout"], ctx["layoutCtx"], null)
 			_af_code.add("after")
 		}
 	}

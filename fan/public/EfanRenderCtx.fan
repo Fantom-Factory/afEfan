@@ -30,28 +30,29 @@ using afPlastic::SrcCodeSnippet
 
 @NoDoc
 class EfanRenderCtx {
-	StrBuf 			renderBuf
-	|->Str|? 		bodyFunc
+	StrBuf 		renderBuf
+	|->|? 		bodyFunc
 
-	private new make(StrBuf renderBuf, |->Str|? bodyFunc) {
+	private new make(StrBuf renderBuf, |->|? bodyFunc) {
 		this.renderBuf 	= renderBuf
 		this.bodyFunc 	= bodyFunc
 	}
-	
-	static Str renderEfan(|->Str|? bodyFunc, |->| renderFunc) {
-		renderCtx := EfanRenderCtx(StrBuf(), bodyFunc)
-		CallStack.call("efan.renderCtx", renderCtx, renderFunc)
-		return renderCtx.renderBuf.toStr
+
+	static Str renderEfan(|->|? bodyFunc, |->| renderFunc) {
+		codeBuf := StrBuf()
+		CallStack.pushAndRun("efan.renderCtx", EfanRenderCtx(codeBuf, bodyFunc), renderFunc)
+		return codeBuf.toStr
 	}
 
 	static Str renderBody() {
-		renderCtx := EfanRenderCtx(StrBuf(), null)
-		if (renderCtx.bodyFunc != null)
-			CallStack.call("efan.renderCtx", renderCtx, renderCtx.bodyFunc)
-		return renderCtx.renderBuf.toStr
+		bodyFunc := peek.bodyFunc
+		codeBuf := StrBuf()
+		if (bodyFunc != null)
+			CallStack.pushAndRun("efan.renderCtx", EfanRenderCtx(codeBuf, null), bodyFunc)
+		return codeBuf.toStr
 	}
 	
-	static EfanRenderCtx renderCtx() {
-		CallStack.stackable("efan.renderCtx")
+	static EfanRenderCtx peek() {
+		CallStack.peek("efan.renderCtx")
 	}
 }

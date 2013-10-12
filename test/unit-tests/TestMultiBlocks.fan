@@ -7,8 +7,6 @@ internal class TestMultiBlocks : EfanTest {
 		       <% } %>"""
 		// test the code looks pretty
 		code := compiler.parseIntoCode(``, c)
-		Env.cur.err.printLine(code)
-		concurrent::Actor.sleep(20ms)
 		verify( code.contains("\t3.times |i| {"))
 		verify( code.contains("\t\t_af_eval = i+1"))
 	}

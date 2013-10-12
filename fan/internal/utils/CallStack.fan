@@ -12,7 +12,8 @@ internal class CallStack {
 		stack.push(stackable)
 
 		try {
-			func()
+			// TODO: Dodgy Fantom syntax!!! See EfanRenderer.renderEfan()
+			((|Obj?|) func).call(69)
 
 		} finally {
 			stack.pop
@@ -21,11 +22,11 @@ internal class CallStack {
 		}
 	}
 
-	static Void call(Str stackName, Obj stackable, |->| func) {
+	static Void pushAndRun(Str stackName, Obj stackable, |->| func) {
 		get(stackName, true)._call(stackable, func)
 	}
 	
-	static Obj stackable(Str stackName) {
+	static Obj peek(Str stackName) {
 		get(stackName, false).stack.peek
 	}	
 
