@@ -12,6 +12,7 @@ internal class EfanModel : Pusher {
 		code := text.trim
 		if (code.isEmpty) return
 
+		// this also closes eval blocks
 		if (code.startsWith("}")) {
 			indentSize--
 			// guard against crazy code - this indenting logic ain't perfect!
@@ -34,12 +35,14 @@ internal class EfanModel : Pusher {
 		if (eval.isEmpty) return
 		
 		if (eval.contains("\n")) {
-			indent.append("_af_code.add(").endLine
+			indent.append("_af_eval = ")	// no need to end this line
 			appendMulti(eval, lineNo)
-			indent.append(")").endLine
 		} else {
-			indent.append("_af_code.add( ${eval} )").appendLineNo(lineNo).endLine
+			indent.append("_af_eval = ${eval}").appendLineNo(lineNo).endLine
 		}
+		
+		if (eval.endsWith("{"))
+			indentSize++		
 	}
 
 	override Void onComment(Int lineNo, Str text) {
@@ -59,7 +62,10 @@ internal class EfanModel : Pusher {
 		indent.append("_af_code.add(${text.toCode})").appendLineNo(lineNo).endLine
 	}
 
-	override Void onExit(Int lineNo) { }
+	override Void onExit(Int lineNo, BlockType blockType) {
+//		if (blockType == BlockType.eval)
+//			indent.append("*****_af_code.add(_af_line)").appendLineNo(lineNo).endLine
+	}
 
 	Str toFantomCode() {
 		return code.toStr

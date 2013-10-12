@@ -1,3 +1,4 @@
+using concurrent
 
 internal class TestNesting : EfanTest {
 	
@@ -15,6 +16,8 @@ internal class TestNesting : EfanTest {
 		             
 		             after
 		             """
+		Env.cur.err.printLine("[${html}]")
+		Actor.sleep(20ms)
 		verifyEq(html, output)
 	}
 
@@ -27,6 +30,8 @@ internal class TestNesting : EfanTest {
 		                 body
 		               </html>
 		             after"""
+		Env.cur.err.printLine("[${html}]")
+		Actor.sleep(20ms)
 		verifyEq(html, output)
 	}
 
@@ -57,23 +62,17 @@ internal const class T_Index : EfanRenderer {
 		set { }
 	}
 	
-	override Str _af_render(Obj? _ctx, |->|? _bodyFunc) {
+	override Str _af_render(Obj? _ctx, |->Str|? _bodyFunc) {
 		[Str:Obj] ctx := _ctx
 
-//		_af_retVal := (StrBuf?) null
-		_af_renderCtx := afEfan::EfanRenderCtx(this, StrBuf(), _bodyFunc)
-		return EfanRenderCtx.withRenderCtx(_af_renderCtx) |->| {
-//			_af_code  := afEfan::EfanRenderCtx.renderCtx.renderBuf
-//			_af_retVal = _af_code
-			
+		return EfanRenderCtx.renderEfan(_bodyFunc) |->| {
 			_af_code.add("before\n")
-			renderEfan(ctx["layout"], ctx["layoutCtx"]) |->| {
+			renderEfan(ctx["layout"], ctx["layoutCtx"]) |->Str| {
 				_af_code.add("    body\n")
+				return _af_code.toStr 
 			}
 			_af_code.add("after")
 		}
-
-//		return _af_code.toStr
 	}		
 }
 
@@ -83,23 +82,16 @@ internal const class T_Layout : EfanRenderer {
 		set { }
 	}
 	
-	override Str _af_render(Obj? _ctx, |->|? _bodyFunc) {
+	override Str _af_render(Obj? _ctx, |->Str|? _bodyFunc) {
 		Int ctx := _ctx
 		
-//		_af_retVal := (StrBuf?) null
-		_af_renderCtx := EfanRenderCtx(this, StrBuf(), _bodyFunc)
-		return EfanRenderCtx.withRenderCtx(_af_renderCtx) |->| {
-//			_af_code  := afEfan::EfanRenderCtx.renderCtx.renderBuf
-//			_af_retVal = _af_code
-
+		return EfanRenderCtx.renderEfan(_bodyFunc) |->| {
 			_af_code.add("  <html> ")
 			_af_code.add(ctx)
 			_af_code.add("\n")
 			_af_code.add(renderBody)
 			_af_code.add("  </html>\n")			
 		}
-
-//		return _af_code.toStr		
 	}
 }
 
@@ -109,20 +101,13 @@ internal const class T_Index2 : EfanRenderer {
 		set { }
 	}
 	
-	override Str _af_render(Obj? _ctx, |->|? _bodyFunc) {
+	override Str _af_render(Obj? _ctx, |->Str|? _bodyFunc) {
 		[Str:Obj] ctx := _ctx
 		
-//		_af_retVal := (StrBuf?) null
-		_af_renderCtx := EfanRenderCtx(this, StrBuf(), _bodyFunc)
-		return EfanRenderCtx.withRenderCtx(_af_renderCtx) |->| {
-//			_af_code  := afEfan::EfanRenderCtx.renderCtx.renderBuf
-//			_af_retVal = _af_code
-			
+		return EfanRenderCtx.renderEfan(_bodyFunc) |->| {
 			_af_code.add("before\n")
 			_af_code.add(renderEfan(ctx["layout"], ctx["layoutCtx"]))
 			_af_code.add("after")
 		}
-
-//		return _af_code.toStr		
 	}
 }

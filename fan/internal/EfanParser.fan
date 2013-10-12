@@ -135,7 +135,7 @@ internal class ParserData {
 		blockType = BlockType.comment
 	}
 	Void exitingBlock() {
-		pusher.onExit(lineNoToSend)
+		pusher.onExit(lineNoToSend, blockType)
 		lineNoToSend = lineNo
 		blockType = BlockType.text
 	}
@@ -171,5 +171,5 @@ internal mixin Pusher {
 	abstract Void onComment(Int lineNo, Str comment)
 	abstract Void onText(Int lineNo, Str text)
 	abstract Void onEval(Int lineNo, Str text)
-	abstract Void onExit(Int lineNo)
+	abstract Void onExit(Int lineNo, BlockType blockType)
 }

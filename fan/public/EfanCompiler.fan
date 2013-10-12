@@ -71,20 +71,16 @@ const class EfanCompiler {
 		ctxTypeSig	:= (ctxType == null) ? "Obj?" : ctxType.signature
 		renderCode	:= "${ctxTypeSig} ctx := _ctx\n"
 		renderCode	+= "\n"
-//		renderCode	+= "_af_retVal := (StrBuf?) null\n"
-		renderCode	+= "_af_renderCtx := afEfan::EfanRenderCtx(this, StrBuf(), _bodyFunc)\n"
-		renderCode	+= "return afEfan::EfanRenderCtx.withRenderCtx(_af_renderCtx) |->| {\n"
-//		renderCode	+= "\t_af_code  := afEfan::EfanRenderCtx.renderCtx.renderBuf\n"
-//		renderCode	+= "\t_af_retVal = _af_code\n"
+		renderCode	+= "return afEfan::EfanRenderCtx.renderEfan(_bodyFunc) |->| {\n"
 		renderCode	+=    parseIntoCode(srcLocation, efanTemplate)
 		renderCode	+= "}\n"
-//		renderCode	+= "\n"
-//		renderCode	+= "return _af_code.toStr"
 
 		model.extendMixin(EfanRenderer#)
 		model.addField(EfanMetaData#, "_af_efanMetaData")
 		model.overrideField(EfanRenderer#efanMetaData, "_af_efanMetaData", """throw Err("efanMetaData is read only.")""")
 		model.overrideMethod(EfanRenderer#_af_render, renderCode)
+		// we need the special syntax of "_af_eval = XXXX" so we don't have to close brackets
+		model.addField(Obj?#, "_af_eval", """throw Err("_af_eval is write only.")""", "_af_code.add(it)")
 	
 		efanMetaData	:= EfanMetaData {
 			it.srcLocation 	= srcLocation
@@ -94,7 +90,10 @@ const class EfanCompiler {
 			it.efanSrcCode	= model.toFantomCode
 			it.srcCodePadding= plasticCompiler.srcCodePadding
 		}
-
+		
+//		Env.cur.err.printLine(model.toFantomCode)
+//		concurrent::Actor.sleep(20ms)
+		
 		try {
 			renderType	= plasticCompiler.compileModel(model)
 		} catch (PlasticCompilationErr err) {
