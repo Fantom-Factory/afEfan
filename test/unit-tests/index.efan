@@ -1,5 +1,5 @@
 before
-<% renderEfan(ctx["layout"], ctx["layoutCtx"]) { %>
+<%= renderEfan(ctx["layout"], ctx["layoutCtx"]) { %>
     body
 <% } %>
 after

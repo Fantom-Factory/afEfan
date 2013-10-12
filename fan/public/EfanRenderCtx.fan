@@ -30,18 +30,24 @@ using afPlastic::SrcCodeSnippet
 
 @NoDoc
 class EfanRenderCtx {
-			StrBuf 			renderBuf
-	private EfanRenderer	rendering
-	private |EfanRenderer|? bodyFunc
+	StrBuf 			renderBuf
+	|->Str|? 		bodyFunc
 
-	new make(EfanRenderer rendering, StrBuf renderBuf, |EfanRenderer|? bodyFunc) {
-		this.rendering 	= rendering
+	private new make(StrBuf renderBuf, |->Str|? bodyFunc) {
 		this.renderBuf 	= renderBuf
 		this.bodyFunc 	= bodyFunc
 	}
 	
-	static Str withRenderCtx(EfanRenderCtx renderCtx, |->| renderFunc) {
+	static Str renderEfan(|->Str|? bodyFunc, |->| renderFunc) {
+		renderCtx := EfanRenderCtx(StrBuf(), bodyFunc)
 		CallStack.call("efan.renderCtx", renderCtx, renderFunc)
+		return renderCtx.renderBuf.toStr
+	}
+
+	static Str renderBody() {
+		renderCtx := EfanRenderCtx(StrBuf(), null)
+		if (renderCtx.bodyFunc != null)
+			CallStack.call("efan.renderCtx", renderCtx, renderCtx.bodyFunc)
 		return renderCtx.renderBuf.toStr
 	}
 	

@@ -28,7 +28,7 @@ const mixin EfanRenderer {
 	** <% } %>
 	** ...
 	** <pre
-	virtual Str renderEfan(EfanRenderer renderer, Obj? ctx := null, |->|? bodyFunc := null) {
+	virtual Str renderEfan(EfanRenderer renderer, Obj? ctx := null, |->Str|? bodyFunc := null) {
 //		efan := renderer._af_render(ctx, bodyFunc)
 //		_af_code  := afEfan::EfanRenderCtx.renderCtx.renderBuf
 //		_af_code.add(efan)
@@ -52,15 +52,14 @@ const mixin EfanRenderer {
 		// TODO: test compilatoin & runtime Errs produced by body
 		//FIXME: X
 //		EfanRenderStack.renderCtx.body
-		""
+		EfanRenderCtx.renderBody
 	}
 
 	@NoDoc
-	abstract Str _af_render(Obj? _ctx, |->|? _bodyFunc)
+	abstract Str _af_render(Obj? _ctx, |->Str|? _bodyFunc)
 
 	@NoDoc
 	protected StrBuf _af_code() {
 		afEfan::EfanRenderCtx.renderCtx.renderBuf
 	}
-
 }
