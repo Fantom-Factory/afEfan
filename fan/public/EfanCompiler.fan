@@ -73,13 +73,13 @@ const class EfanCompiler {
 		renderCode	+= "\n"
 		renderCode	+= "return afEfan::EfanRenderCtx.renderEfan(_bodyFunc) |->| {\n"
 		renderCode	+=    parseIntoCode(srcLocation, efanTemplate)
-		renderCode	+= "}\n"
+		renderCode	+= "}"
 
 		model.extendMixin(EfanRenderer#)
 		model.addField(EfanMetaData#, "_af_efanMetaData")
 		model.overrideField(EfanRenderer#efanMetaData, "_af_efanMetaData", """throw Err("efanMetaData is read only.")""")
 		model.overrideMethod(EfanRenderer#_af_render, renderCode)
-		// we need the special syntax of "_af_eval = XXXX" so we don't have to close brackets
+		// we need the special syntax of "_af_eval = XXXX" so we don't have to close any brackets
 		model.addField(Obj?#, "_af_eval", """throw Err("_af_eval is write only.")""", "_af_code.add(it)")
 	
 		efanMetaData	:= EfanMetaData {
@@ -90,9 +90,6 @@ const class EfanCompiler {
 			it.efanSrcCode	= model.toFantomCode
 			it.srcCodePadding= plasticCompiler.srcCodePadding
 		}
-		
-//		Env.cur.err.printLine(model.toFantomCode)
-//		concurrent::Actor.sleep(20ms)
 		
 		try {
 			renderType	= plasticCompiler.compileModel(model)
@@ -107,7 +104,7 @@ const class EfanCompiler {
 		return efan
 	}
 
-	** Called by afbedSheetEfan - ensures all given ViewHelper types are valid. 
+	** Called by afBedSheetEfan - ensures all given ViewHelper types are valid. 
 	@NoDoc
 	static Type[] validateViewHelpers(Type[] viewHelpers) {
 		viewHelpers.each {
@@ -124,8 +121,6 @@ const class EfanCompiler {
 	internal Str parseIntoCode(Uri srcLocation, Str efan) {
 		data := EfanModel(efan.size)
 		parser.parse(srcLocation, data, efan)
-		code := data.toFantomCode
-		
-		return code
+		return data.toFantomCode
 	}
 }

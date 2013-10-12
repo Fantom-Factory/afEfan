@@ -28,11 +28,15 @@ const mixin EfanRenderer {
 	** <% } %>
 	** ...
 	** <pre
-	virtual Str renderEfan(EfanRenderer renderer, Obj? ctx := null, |->Str|? bodyFunc := null) {
-//		efan := renderer._af_render(ctx, bodyFunc)
-//		_af_code  := afEfan::EfanRenderCtx.renderCtx.renderBuf
-//		_af_code.add(efan)
-		renderer._af_render(ctx, bodyFunc)
+	virtual Str renderEfan(EfanRenderer renderer, Obj? ctx, |Obj?|? bodyFunc := null) {
+		// TODO: Dodgy Fantom syntax!!!		
+		// if we change "|Obj?|? bodyFunc" to "|->| bodyFunc" then the following: 
+		//    renderEfan(efanRenderer, ctx) { ... }
+		// becomes
+		//    renderEfan(efanRenderer, ctx).with { ... }
+		// ARGH!!! The following works, but I don't want the extra |->| syntax - it looks crap in efan templates!
+		//    renderEfan(efanRenderer, ctx) |->| { ... }
+		renderer._af_render(ctx, (|->|?) bodyFunc)
 	}
 	
 	** Renders the body of the enclosing efan template. Example, a 'layout.html' may be defined as: 
@@ -50,16 +54,22 @@ const mixin EfanRenderer {
 	** <pre
 	virtual Str renderBody() {
 		// TODO: test compilatoin & runtime Errs produced by body
-		//FIXME: X
-//		EfanRenderStack.renderCtx.body
-		EfanRenderCtx.renderBody
+		s:=EfanRenderCtx.renderBody
+		
+		return s
 	}
 
 	@NoDoc
-	abstract Str _af_render(Obj? _ctx, |->Str|? _bodyFunc)
+	abstract Str _af_render(Obj? _ctx, |->|? _bodyFunc)
 
 	@NoDoc
 	protected StrBuf _af_code() {
-		afEfan::EfanRenderCtx.renderCtx.renderBuf
+		EfanRenderCtx.peek.renderBuf
+	}
+	
+	override This with(|This| f) {
+		throw Err("BOOOOOOOM!")
+		echo("ARRRGH!")
+		return this
 	}
 }

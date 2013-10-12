@@ -13,7 +13,7 @@ internal class EfanModel : Pusher {
 		if (code.isEmpty) return
 
 		// this also closes eval blocks
-		if (code.startsWith("}")) {
+		if (code.endsWith("}")) {
 			indentSize--
 			// guard against crazy code - this indenting logic ain't perfect!
 			if (indentSize < 0) 

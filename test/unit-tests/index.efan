@@ -1,5 +1,5 @@
-before
+index-before
 <%= renderEfan(ctx["layout"], ctx["layoutCtx"]) { %>
-    body
+    index-body
 <% } %>
-after
+index-after
