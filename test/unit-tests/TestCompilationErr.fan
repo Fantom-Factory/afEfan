@@ -5,7 +5,6 @@ internal class TestCompilationErr : EfanTest {
 		c :="""<% 3.times |i| { %>
 		       <%= 2+2+2+2+2b+1 %>
 		       <% } %>"""
-
 		try {
 			type := compiler.compile(``, c, null)
 			fail
@@ -13,5 +12,4 @@ internal class TestCompilationErr : EfanTest {
 			verifyEq(err.errLineNo, 2)
 		}
 	}
-
 }

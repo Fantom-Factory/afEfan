@@ -2,7 +2,7 @@ using afPlastic::PlasticCompilationErr
 using afPlastic::PlasticClassModel
 using afPlastic::PlasticCompiler
 
-** Compiles efan templates into `EfanRenderer`s. 
+** Compiles efan templates into `EfanRenderer` classes. 
 ** Call 'render()' to render the efan template into a Str. 
 ** 
 **    template := ...
@@ -71,7 +71,7 @@ const class EfanCompiler {
 		ctxTypeSig	:= (ctxType == null) ? "Obj?" : ctxType.signature
 		renderCode	:= "${ctxTypeSig} ctx := _ctx\n"
 		renderCode	+= "\n"
-		renderCode	+= "return afEfan::EfanRenderCtx.renderEfan(_bodyFunc) |->| {\n"
+		renderCode	+= "return afEfan::EfanRenderCtx.renderEfan(this, _bodyFunc) |->| {\n"
 		renderCode	+=    parseIntoCode(srcLocation, efanTemplate)
 		renderCode	+= "}"
 

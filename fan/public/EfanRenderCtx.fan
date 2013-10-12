@@ -1,58 +1,56 @@
 using concurrent::Actor
 using afPlastic::SrcCodeSnippet
 
-//@NoDoc
-//class EfanRenderStack {
-//
-//	static Void renderWithBuf(EfanRenderer rendering, |EfanRenderer|? bodyFunc, |->| renderFunc) {
-//		
-//		renderCtx := EfanRenderCtx(rendering, StrBuf(), bodyFunc)
-//
-//		try {
-//			CallStack.call("efan.renderCtx", renderCtx, renderFunc)
-//			
-//		} catch (Err err) {
-//			regex 	:= Regex.fromStr("^\\s*?${rendering.typeof.qname}\\._af_render\\s\\(${rendering.typeof.pod.name}:([0-9]+)\\)\$")
-//			codeLineNo := err.traceToStr.splitLines.eachWhile |line -> Int?| {
-//				reggy 	:= regex.matcher(line)
-//				return reggy.find ? reggy.group(1).toInt : null
-//			} ?: throw err
-//
-//			rendering.efanMetaData.throwRuntimeErr(err, codeLineNo)
-//		}
-//	}
-//	
-//	static EfanRenderCtx renderCtx() {
-//		CallStack.stackable("efan.renderCtx")
-//	}
-//}
-
-
 @NoDoc
 class EfanRenderCtx {
-	StrBuf 		renderBuf
-	|->|? 		bodyFunc
+	EfanRenderer	rendering
+	StrBuf 			renderBuf
+	|->|? 			bodyFunc
 
-	private new make(StrBuf renderBuf, |->|? bodyFunc) {
+	private new make(EfanRenderer rendering, StrBuf renderBuf, |->|? bodyFunc) {
+		this.rendering	= rendering
 		this.renderBuf 	= renderBuf
 		this.bodyFunc 	= bodyFunc
 	}
 
-	static Str renderEfan(|->|? bodyFunc, |->| renderFunc) {
+	static Str renderEfan(EfanRenderer rendering, |->|? bodyFunc, |->| renderFunc) {
 		codeBuf := StrBuf()
-		CallStack.pushAndRun("efan.renderCtx", EfanRenderCtx(codeBuf, bodyFunc), renderFunc)
+		call(EfanRenderCtx(rendering, codeBuf, bodyFunc), renderFunc)
 		return codeBuf.toStr
 	}
 
 	static Str renderBody() {
-		bodyFunc := peek.bodyFunc
-		codeBuf := StrBuf()
-		if (bodyFunc != null)
-			CallStack.pushAndRun("efan.renderCtx", EfanRenderCtx(codeBuf, null), bodyFunc)
+		bodyFunc 	:= peek(-1).bodyFunc
+		codeBuf 	:= StrBuf()
+		if (bodyFunc != null) {
+			rendering	:= peek(-2).rendering	// report errors against the parent
+			call(EfanRenderCtx(rendering, codeBuf, null), bodyFunc)
+		}
 		return codeBuf.toStr
 	}
 	
-	static EfanRenderCtx peek() {
-		CallStack.peek("efan.renderCtx")
+	static Void call(EfanRenderCtx renderCtx, |->| renderFunc) {
+		try {
+			CallStack.pushAndRun("efan.renderCtx", renderCtx, renderFunc)
+			
+		} catch (EfanRuntimeErr err) {
+			// TODO: I'm not sure if it's helpful to trace through all templates...? 
+			throw err
+			
+		} catch (Err err) {
+			rType	:= renderCtx.rendering.typeof
+			regex 	:= Regex.fromStr("^\\s*?${rType.qname}\\._af_render\\s\\(${rType.pod.name}:([0-9]+)\\)\$")
+			trace	:= Utils.traceErr(err, 50)
+			codeLineNo := trace.splitLines.eachWhile |line -> Int?| {
+				reggy 	:= regex.matcher(line)
+				return reggy.find ? reggy.group(1).toInt : null
+			} ?: throw err
+
+			renderCtx.rendering.efanMetaData.throwRuntimeErr(err, codeLineNo)
+		}		
+	}
+
+	static EfanRenderCtx peek(Int i := -1) {
+		CallStack.peek("efan.renderCtx", i)
 	}
 }

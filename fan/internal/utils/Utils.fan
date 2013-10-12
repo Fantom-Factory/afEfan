@@ -11,9 +11,9 @@ internal const class Utils {
 		return keyType.fits(Str#) ? Map.make(mapType) { caseInsensitive = true } : Map.make(mapType) { ordered = true }
 	}
 
-//	static Str traceErr(Err err, Int maxDepth := 50) {
-//		b := Buf()	// can't trace to a StrBuf
-//		err.trace(b.out, ["maxDepth":maxDepth])
-//		return b.flip.in.readAllStr
-//	}
+	static Str traceErr(Err err, Int maxDepth := 50) {
+		b := Buf()	// can't trace to a StrBuf
+		err.trace(b.out, ["maxDepth":maxDepth])
+		return b.flip.in.readAllStr
+	}
 }

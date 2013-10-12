@@ -23,12 +23,12 @@ const mixin EfanRenderer {
 	** 
 	** pre>
 	** ...
-	** <% renderEfan(ctx.layout, ctx.layoutCtx) { %>
-	**   ... my main content ...
+	** <%= renderEfan(ctx.layout, ctx.layoutCtx) { %>
+	**   ... my body content ...
 	** <% } %>
 	** ...
 	** <pre
-	virtual Str renderEfan(EfanRenderer renderer, Obj? ctx, |Obj?|? bodyFunc := null) {
+	virtual Str renderEfan(EfanRenderer renderer, Obj? ctx := null, |Obj?|? bodyFunc := null) {
 		// TODO: Dodgy Fantom syntax!!!		
 		// if we change "|Obj?|? bodyFunc" to "|->| bodyFunc" then the following: 
 		//    renderEfan(efanRenderer, ctx) { ... }
@@ -39,7 +39,8 @@ const mixin EfanRenderer {
 		renderer._af_render(ctx, (|->|?) bodyFunc)
 	}
 	
-	** Renders the body of the enclosing efan template. Example, a 'layout.html' may be defined as: 
+	** Renders the body of the enclosing efan template. Example, a simple 'layout.html' may be 
+	** defined as: 
 	** 
 	** pre>
 	** <html>
@@ -47,29 +48,18 @@ const mixin EfanRenderer {
 	**   <title><%= ctx.pageTitle %>
 	** </html>
 	** <body>
-	**     <div class="wotever">
-	**       <% renderBody() %>
-	**     </div>
+	**     <%= renderBody() %>
 	** </html>
 	** <pre
 	virtual Str renderBody() {
-		// TODO: test compilatoin & runtime Errs produced by body
-		s:=EfanRenderCtx.renderBody
-		
-		return s
+		EfanRenderCtx.renderBody
 	}
 
 	@NoDoc
 	abstract Str _af_render(Obj? _ctx, |->|? _bodyFunc)
 
 	@NoDoc
-	protected StrBuf _af_code() {
+	StrBuf _af_code() {
 		EfanRenderCtx.peek.renderBuf
-	}
-	
-	override This with(|This| f) {
-		throw Err("BOOOOOOOM!")
-		echo("ARRRGH!")
-		return this
 	}
 }
