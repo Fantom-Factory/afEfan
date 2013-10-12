@@ -69,17 +69,17 @@ const class EfanCompiler {
  
 		renderType	:= (Type?) null
 		ctxTypeSig	:= (ctxType == null) ? "Obj?" : ctxType.signature
-		renderCode	:= "ctxType := efanMetaData.ctxType\n"
-		renderCode	+= "if (_ctx == null && ctxType != null && !ctxType.isNullable)\n"
-		renderCode	+= "	throw afEfan::EfanErr(\"${ErrMsgs.rendererCtxIsNull} \${ctxType.typeof.signature}\")\n"
-		renderCode	+= "if (_ctx != null && ctxType != null && !_ctx.typeof.fits(ctxType))\n"
-		renderCode	+= "	throw afEfan::EfanErr(\"ctx \${_ctx.typeof.signature} ${ErrMsgs.rendererCtxBadFit(ctxType)}\")\n"
+		renderCode	:= "${ctxTypeSig} ctx := _ctx\n"
 		renderCode	+= "\n"
-		renderCode	+= "${ctxTypeSig} ctx := _ctx\n"
-		renderCode	+= "\n"
-		renderCode	+= "afEfan::EfanRenderCtx.renderWithBuf(this, _af_code, _bodyFunc, _bodyObj) |->| {\n"
-		renderCode	+= parseIntoCode(srcLocation, efanTemplate)
+//		renderCode	+= "_af_retVal := (StrBuf?) null\n"
+		renderCode	+= "_af_renderCtx := afEfan::EfanRenderCtx(this, StrBuf(), _bodyFunc)\n"
+		renderCode	+= "return afEfan::EfanRenderCtx.withRenderCtx(_af_renderCtx) |->| {\n"
+//		renderCode	+= "\t_af_code  := afEfan::EfanRenderCtx.renderCtx.renderBuf\n"
+//		renderCode	+= "\t_af_retVal = _af_code\n"
+		renderCode	+=    parseIntoCode(srcLocation, efanTemplate)
 		renderCode	+= "}\n"
+//		renderCode	+= "\n"
+//		renderCode	+= "return _af_code.toStr"
 
 		model.extendMixin(EfanRenderer#)
 		model.addField(EfanMetaData#, "_af_efanMetaData")
