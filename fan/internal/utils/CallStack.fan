@@ -26,8 +26,8 @@ internal class CallStack {
 		get(stackName, true)._call(stackable, func)
 	}
 	
-	static Obj peek(Str stackName) {
-		get(stackName, false).stack.peek
+	static Obj peek(Str stackName, Int i := -1) {
+		get(stackName, false).stack[i]
 	}	
 
 	private static CallStack get(Str stackName, Bool make := false) {

@@ -139,10 +139,10 @@ Efan templates may be nested inside one another, effectively allowing you to com
 by 2 methods in `EfanRenderer`:
 
   ** Renders the given efan renderer.
-  Void renderEfan(EfanRenderer renderer, Obj? ctx)
+  Str renderEfan(EfanRenderer renderer, Obj? ctx)
 
   ** Renders the body of the outer template.
-  Void renderBody()
+  Str renderBody()
 
 This is best explained in an example. Here we will use the *layout pattern* to place some common HTML into a 'layout.efan' file:
 
@@ -155,7 +155,7 @@ pre>
   <div> header </div>
   <div> menu stuff </div>
 
-  <% renderBody() %>
+  <%= renderBody() %>
 
   <div> footer </div>
 </body>
@@ -164,7 +164,7 @@ pre>
 index.efan:
 pre>
 <html>
-<% renderEfan(ctx.layout, ctx) { %>
+<%= renderEfan(ctx.layout, ctx) { %>
   <div>
     ...my cool page content...
   </div>
@@ -246,9 +246,10 @@ Efan Compilation Err:
 Release Notes [#releaseNotes]
 *****************************
 
-v1.2.2 [#v1.2.2]
+v1.3.0 [#v1.3.0]
 ----------------
- - Chg: Simplified 'EfanRenderCtx' by introducing 'CallStack' class.
+ - Chg: Nested efan templates (and body functions) now return a 'Str', so you MUST use eval tags '<%= renderEfan(...) %>'
+ - Chg: Massivly simplified nested component rendering by introducing a threaded 'CallStack'.
 
 v1.2.0 [#v1.2.0]
 ----------------
