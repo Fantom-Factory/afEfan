@@ -15,7 +15,7 @@ class Build : BuildPod {
 					"repo.private"	: "true"
 				]
 
-		depends = ["sys 1.0", "concurrent 1.0", "afPlastic 1.0+"]
+		depends = ["sys 1.0", "concurrent 1.0", "afPlastic 1.0.3+"]
 		srcDirs = [`test/unit-tests/`, `fan/`, `fan/public/`, `fan/internal/`, `fan/internal/utils/`]
 		resDirs = [`doc/`]
 
