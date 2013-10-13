@@ -54,6 +54,11 @@ Any tag with the prefix '<%' will be converted into Fantom code.
 
   <% echo("Hello!") %>
 
+> **ALIEN-AID:** When casting or assigning classes in efan templates, be sure to use the fully qualified class name (FQCN)
+> including the pod. Example:
+
+> <% concurrent::Actor.sleep(2sec) %>
+
 Passing Data [#ctx]
 ===================
 Tags are nice, but not much use unless you can pass data in. Thankfully, you can!

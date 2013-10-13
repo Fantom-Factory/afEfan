@@ -62,10 +62,7 @@ internal class EfanModel : Pusher {
 		indent.append("_af_code.add(${text.toCode})").appendLineNo(lineNo).endLine
 	}
 
-	override Void onExit(Int lineNo, BlockType blockType) {
-//		if (blockType == BlockType.eval)
-//			indent.append("*****_af_code.add(_af_line)").appendLineNo(lineNo).endLine
-	}
+	override Void onExit(Int lineNo, BlockType blockType) { }
 
 	Str toFantomCode() {
 		return code.toStr

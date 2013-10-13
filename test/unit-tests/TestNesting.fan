@@ -62,6 +62,10 @@ internal const class T_Index : EfanRenderer {
 		set { }
 	}
 	
+	StrBuf _af_code() {
+		EfanRenderCtx.peek.renderBuf
+	}
+	
 	Obj? _af_eval {
 		get { null }
 		set { _af_code.add(it) }
@@ -86,6 +90,10 @@ internal const class T_Layout : EfanRenderer {
 		set { }
 	}
 
+	StrBuf _af_code() {
+		EfanRenderCtx.peek.renderBuf
+	}
+	
 	Obj? _af_eval {
 		get { null }
 		set { _af_code.add(it) }
@@ -108,6 +116,10 @@ internal const class T_Index2 : EfanRenderer {
 	override EfanMetaData efanMetaData {
 		get { EfanMetaData() { it.ctxName=""; it.srcLocation=``; it.efanTemplate=""; it.efanSrcCode="" } }
 		set { }
+	}
+
+	StrBuf _af_code() {
+		EfanRenderCtx.peek.renderBuf
 	}
 	
 	Obj? _af_eval {
