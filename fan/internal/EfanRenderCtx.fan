@@ -7,16 +7,22 @@ class EfanRenderCtx {
 	EfanRenderer	rendering
 	StrBuf 			renderBuf
 	|->|? 			bodyFunc
+	Str				nestedId
 
-	private new make(EfanRenderer rendering, StrBuf renderBuf, |->|? bodyFunc) {
+	private new make(EfanRenderer rendering, StrBuf renderBuf, |->|? bodyFunc, Str nestedId) {
 		this.rendering	= rendering
 		this.renderBuf 	= renderBuf
 		this.bodyFunc 	= bodyFunc
+		this.nestedId	= nestedId
 	}
 
+	// ---- static methods ----
+	
 	static Str renderEfan(EfanRenderer rendering, |->|? bodyFunc, |->| renderFunc) {
-		codeBuf := StrBuf()
-		call(EfanRenderCtx(rendering, codeBuf, bodyFunc), renderFunc)
+		codeBuf   	:= StrBuf()
+		nestedId	:= deeperNestedId(rendering)
+
+		call(EfanRenderCtx(rendering, codeBuf, bodyFunc, nestedId), renderFunc)
 		return codeBuf.toStr
 	}
 
@@ -24,8 +30,10 @@ class EfanRenderCtx {
 		bodyFunc 	:= peek(-1).bodyFunc
 		codeBuf 	:= StrBuf()
 		if (bodyFunc != null) {
-			rendering	:= peek(-2).rendering	// report errors against the parent
-			call(EfanRenderCtx(rendering, codeBuf, null), bodyFunc)
+			// Note we are now rendering the parent (again!)
+			rendering	:= peek(-2).rendering
+			nestedId	:= peek(-2).nestedId
+			call(EfanRenderCtx(rendering, codeBuf, null, nestedId), bodyFunc)
 		}
 		return codeBuf.toStr
 	}
@@ -51,7 +59,16 @@ class EfanRenderCtx {
 		}		
 	}
 
+	// nullable for use in renderEfan() above
 	static EfanRenderCtx peek(Int i := -1) {
 		CallStack.peek("efan.renderCtx", i)
+	}
+	
+	static Str currentNestedId() {
+		((EfanRenderCtx?) CallStack.peekSafe("efan.renderCtx"))?.nestedId ?: ""
+	}
+
+	static Str deeperNestedId(EfanRenderer rendering) {
+		currentNestedId + "." + rendering.id
 	}
 }
