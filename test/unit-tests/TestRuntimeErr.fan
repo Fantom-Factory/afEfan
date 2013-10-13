@@ -21,7 +21,7 @@ internal class TestRuntimeErr : EfanTest {
 		       --
 		       -- padding
 		       --
-		       <%= renderEfan(ctx, null) { %>
+		       <%= ctx.render { %>
 		       --
 		       --
 		       --

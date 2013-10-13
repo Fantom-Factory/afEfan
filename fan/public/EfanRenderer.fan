@@ -5,38 +5,32 @@ const mixin EfanRenderer {
 	** Meta data about the compiled efan templates
 	abstract EfanMetaData efanMetaData
 
-	** The main render method. 
-	** 
-	** Renders the efan template to a Str, passing in the given 'ctx' (which must fit [ctxType]`#ctxType`).
-	virtual Str render(Obj? ctx) {
-		ctxType := efanMetaData.ctxType
-		if (ctx == null && ctxType != null && !ctxType.isNullable)
-			throw EfanErr("${ErrMsgs.rendererCtxIsNull} ${ctxType.typeof.signature}")
-		if (ctx != null && ctxType != null && !ctx.typeof.fits(ctxType))
-			throw EfanErr("ctx ${ctx.typeof.signature} ${ErrMsgs.rendererCtxBadFit(ctxType)}")
-
-		return _af_render(ctx, null)
-	}
-
-	** Renders the given nested efan template. Use when you want to enclose content in an outer efan 
-	** template. The content will be rendered whenever the renderer calls 'renderBody()'. Example:
+	** The main render method. The 'bodyFunc' is executed when 'renderBody()' is called. Use it for
+	** enclosing content in *Layout* templates. Example:
 	** 
 	** pre>
 	** ...
-	** <%= renderEfan(ctx.layout, ctx.layoutCtx) { %>
+	** <%= ctx.layout.render(ctx.layoutCtx) { %>
 	**   ... my body content ...
 	** <% } %>
 	** ...
 	** <pre
-	virtual Str renderEfan(EfanRenderer renderer, Obj? ctx := null, |Obj?|? bodyFunc := null) {
+	** 
+	** The signature for 'bodyFunc' is actually '|->|? bodyFunc' - see source for an explanation of 
+	** why '|Obj?|?' is used.   
+	virtual Str render(Obj? ctx := null, |Obj?|? bodyFunc := null) {
 		// TODO: Dodgy Fantom syntax!!!		
 		// if we change "|Obj?|? bodyFunc" to "|->| bodyFunc" then the following: 
-		//    renderEfan(efanRenderer, ctx) { ... }
-		// becomes
-		//    renderEfan(efanRenderer, ctx).with { ... }
-		// ARGH!!! The following works, but I don't want the extra |->| syntax - it looks crap in efan templates!
-		//    renderEfan(efanRenderer, ctx) |->| { ... }
-		renderer._af_render(ctx, (|->|?) bodyFunc)
+		//    render(ctx) { ... }
+		// is actually executed as:
+		//    render(ctx).with { ... }
+		// ARGH!!! It works if you declare the func properly, as in: 
+		//    render(ctx) |->| { ... }
+		// But then it looks naff, is extra stuff to type, and you get very confusing side effects 
+		// if you forget to type it.
+		// Bizarrely enough, this DOES still work...?
+		//    render() { ... }
+		_af_render(ctx, (|->|?) bodyFunc)
 	}
 	
 	** Renders the body of the enclosing efan template. Example, a simple 'layout.html' may be 
