@@ -49,6 +49,13 @@ const mixin EfanRenderer {
 		EfanRenderCtx.renderBody
 	}
 
+	** A unique ID for the efan template. Defaults to the fully qualified type name.
+	virtual Str id() {
+		// FQCN is pretty yucky, but for unique ids we don't have much to go on!
+		// Thankfully only efanExtra needs it, and it provides its own impl.
+		typeof.qname
+	}
+	
 	** Where the compiled efan template code lives. 
 	@NoDoc
 	abstract Str _af_render(Obj? _ctx, |->|? _bodyFunc)

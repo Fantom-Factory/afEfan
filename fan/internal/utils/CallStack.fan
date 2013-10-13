@@ -30,6 +30,10 @@ internal class CallStack {
 		get(stackName, false).stack[i]
 	}	
 
+	static Obj? peekSafe(Str stackName, Int i := -1) {
+		((CallStack?) Actor.locals.get(stackName))?.stack?.getSafe(i)
+	}	
+
 	private static CallStack get(Str stackName, Bool make := false) {
 		Actor.locals.getOrAdd(stackName) { make ? CallStack(stackName) : throw Err("Could not find a CallStack for '${stackName}' on thread.") }
 	}	
