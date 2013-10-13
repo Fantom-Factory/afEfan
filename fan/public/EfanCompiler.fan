@@ -88,9 +88,10 @@ const class EfanCompiler {
 		model.addField(EfanMetaData#, "_af_efanMetaData")
 		model.overrideField(EfanRenderer#efanMetaData, "_af_efanMetaData", """throw Err("efanMetaData is read only.")""")
 		model.overrideMethod(EfanRenderer#_af_render, renderCode)
+		model.addMethod(StrBuf#, "_af_code", "", "afEfan::EfanRenderCtx.peek.renderBuf") 
 		// we need the special syntax of "_af_eval = XXXX" so we don't have to close any brackets
 		model.addField(Obj?#, "_af_eval", """throw Err("_af_eval is write only.")""", "_af_code.add(it)")
-	
+
 		efanMetaData	:= EfanMetaData {
 			it.srcLocation 	= srcLocation
 			it.ctxName		= ctxVarName

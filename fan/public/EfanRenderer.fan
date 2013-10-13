@@ -49,11 +49,7 @@ const mixin EfanRenderer {
 		EfanRenderCtx.renderBody
 	}
 
+	** Where the compiled efan template code lives. 
 	@NoDoc
 	abstract Str _af_render(Obj? _ctx, |->|? _bodyFunc)
-
-	@NoDoc
-	StrBuf _af_code() {
-		EfanRenderCtx.peek.renderBuf
-	}
 }

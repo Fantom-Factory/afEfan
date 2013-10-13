@@ -1,6 +1,7 @@
 using concurrent::Actor
 using afPlastic::SrcCodeSnippet
 
+** This code could be in EfanRenderer but I want to keep that class as clean as possible.
 @NoDoc
 class EfanRenderCtx {
 	EfanRenderer	rendering
