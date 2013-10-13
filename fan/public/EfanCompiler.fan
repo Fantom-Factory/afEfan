@@ -67,14 +67,23 @@ const class EfanCompiler {
 		if (!model.isConst)
 			throw EfanErr(ErrMsgs.rendererModelMustBeConst(model))
  
+		// check the ctx type here so it also works from renderEfan()  
 		renderType	:= (Type?) null
 		ctxTypeSig	:= (ctxType == null) ? "Obj?" : ctxType.signature
-		renderCode	:= "${ctxTypeSig} ctx := _ctx\n"
+		renderCode	:= "ctxType := efanMetaData.ctxType\n"
+		renderCode	+= "if (_ctx == null && ctxType != null && !ctxType.isNullable)\n"
+		renderCode	+= "	throw afEfan::EfanErr(\"${ErrMsgs.rendererCtxIsNull} \${ctxType.typeof.signature}\")\n"
+		renderCode	+= "if (_ctx != null && ctxType != null && !_ctx.typeof.fits(ctxType))\n"
+		renderCode	+= "	throw afEfan::EfanErr(\"ctx \${_ctx.typeof.signature} ${ErrMsgs.rendererCtxBadFit(ctxType)}\")\n"
+		renderCode	+= "${ctxTypeSig} ctx := _ctx\n"
 		renderCode	+= "\n"
 		renderCode	+= "return afEfan::EfanRenderCtx.renderEfan(this, _bodyFunc) |->| {\n"
 		renderCode	+=    parseIntoCode(srcLocation, efanTemplate)
 		renderCode	+= "}"
 
+		// 'cos it'll be common to want to cast to it - I did! 
+		// I spent half an hour tracking down why my cast didn't work! 
+		model.usingType(EfanRenderer#)	
 		model.extendMixin(EfanRenderer#)
 		model.addField(EfanMetaData#, "_af_efanMetaData")
 		model.overrideField(EfanRenderer#efanMetaData, "_af_efanMetaData", """throw Err("efanMetaData is read only.")""")

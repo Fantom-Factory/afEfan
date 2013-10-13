@@ -72,7 +72,7 @@ internal const class T_Index : EfanRenderer {
 
 		return EfanRenderCtx.renderEfan(this, _bodyFunc) |->| {
 			_af_code.add("before\n")
-			_af_eval = renderEfan(ctx["layout"], ctx["layoutCtx"]) {
+			_af_eval = ((EfanRenderer)ctx["layout"]).render(ctx["layoutCtx"]) {
 				_af_code.add("    body\n")
 			}
 			_af_code.add("after")
@@ -120,7 +120,7 @@ internal const class T_Index2 : EfanRenderer {
 		
 		return EfanRenderCtx.renderEfan(this, _bodyFunc) |->| {
 			_af_code.add("before\n")
-			_af_eval = renderEfan(ctx["layout"], ctx["layoutCtx"], null)
+			_af_eval = ((EfanRenderer)ctx["layout"]).render(ctx["layoutCtx"])
 			_af_code.add("after")
 		}
 	}
