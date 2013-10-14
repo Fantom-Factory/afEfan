@@ -59,7 +59,7 @@ internal class EfanModel : Pusher {
 	
 	override Void onText(Int lineNo, Str text) {
 		if (text.isEmpty) return
-		indent.append("_af_code.add(${text.toCode})").appendLineNo(lineNo).endLine
+		indent.append("_af_code = ${text.toCode}").appendLineNo(lineNo).endLine
 	}
 
 	override Void onExit(Int lineNo, BlockType blockType) { }
