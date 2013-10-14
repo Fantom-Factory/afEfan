@@ -17,7 +17,7 @@ class EfanRenderCtx {
 	}
 
 	// ---- static methods ----
-	
+
 	static Str renderEfan(EfanRenderer rendering, |->|? bodyFunc, |->| renderFunc) {
 		codeBuf   	:= StrBuf()
 		nestedId	:= deeperNestedId(rendering)
@@ -69,6 +69,8 @@ class EfanRenderCtx {
 	}
 
 	static Str deeperNestedId(EfanRenderer rendering) {
-		currentNestedId + "." + rendering.id
+		current	:= currentNestedId
+		nested	:= "(${rendering.id})"
+		return current.isEmpty ? nested : "${current}->${nested}"
 	}
 }
