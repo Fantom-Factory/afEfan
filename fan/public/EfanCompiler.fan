@@ -90,11 +90,13 @@ const class EfanCompiler {
 		model.overrideMethod(EfanRenderer#_af_render, renderCode)
 //		model.addMethod(StrBuf#, "_af_code", "", "afEfan::EfanRenderCtx.peek.renderBuf") 
 
-		model.addField(Obj?#, "_af_code", "throw Err()", """echo("[_af_code] \${afEfan::EfanCtxStack.peek.nestedId} -> \${it.toStr.toCode}");  afEfan::EfanRenderCtx.peek.renderBuf   .add(it)""")
+		model.addField(Obj?#, "_af_code", """throw Err("_af_code is write only.")""", 
+			"""echo("[_af_code] \${afEfan::EfanCtxStack.peek.nestedId} -> \${it.toStr.toCode}");  afEfan::EfanRenderCtx.peek.renderBuf   .add(it)""")
 		
 		// we need the special syntax of "_af_eval = XXXX" so we don't have to close any brackets
 //		model.addField(Obj?#, "_af_eval", """throw Err("_af_eval is write only.")""", "_af_code.add(it)")
-		model.addField(Obj?#, "_af_eval", """throw Err("_af_eval is write only.")""", "_af_code = it")
+		model.addField(Obj?#, "_af_eval", """throw Err("_af_eval is write only.")""", 
+			"""echo("[_af_eval] \${afEfan::EfanCtxStack.peek.nestedId} -> \${it.toStr.toCode}");  afEfan::EfanRenderCtx.peek.renderBuf   .add(it)""")
 
 		efanMetaData	:= EfanMetaData {
 			it.srcLocation 	= srcLocation
