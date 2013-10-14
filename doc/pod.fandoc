@@ -237,7 +237,7 @@ v1.3.0 [#v1.3.0]
 ----------------
  - Chg: Removed 'EfanRenderer.renderEfan(...)'. All template rendering is done via 'EfanRenderer.render(...)'.
  - Chg: Nested efan templates and body functions now return a 'Str', so you MUST use eval tags; '<%= renderBody() %>'
- - Chg: Massivly simplified nested component rendering by introducing a threaded 'CallStack'.
+ - Chg: Massivly simplified nested component rendering by introducing a threaded 'EfanCtxStack'.
  - Chg: Added 'EfanRenderer.id' to make debugging EfanExtra a bit more humane!
 
 v1.2.0 [#v1.2.0]

@@ -16,8 +16,8 @@ internal class TestNesting : EfanTest {
 		             
 		             index-after
 		             """
-//		Env.cur.err.printLine("[${html}]")
-//		Actor.sleep(20ms)
+		Env.cur.err.printLine("[${html}]")
+		Actor.sleep(20ms)
 		verifyEq(html, output)
 	}
 
