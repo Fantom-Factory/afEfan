@@ -33,9 +33,19 @@ class EfanRenderCtx {
 		return codeBuf.toStr
 	}
 	
+
+	// nullable for use in renderEfan() above
+	static EfanRenderCtx peek(Int i := -1) {
+		EfanCtxStack.peek(i).ctx["efan.renderCtx"]
+	}
+	
 	private static Void call(EfanRenderCtx ctx, |->| func) {
 		try {
-			EfanCtxStack.withCtx("efan.renderCtx", ctx.rendering,  ctx, func)
+			EfanCtxStack.withCtx(ctx.rendering) |EfanCtxStackElement element->Obj?| {
+				element.ctx["efan.renderCtx"] = ctx
+				((|Obj?|) func).call(69)
+				return null
+			}
 
 		} catch (EfanRuntimeErr err) {
 			// TODO: I'm not sure if it's helpful to trace through all templates...? 
@@ -52,10 +62,5 @@ class EfanRenderCtx {
 
 			ctx.rendering.efanMetaData.throwRuntimeErr(err, codeLineNo)
 		}		
-	}
-
-	// nullable for use in renderEfan() above
-	static EfanRenderCtx peek(Int i := -1) {
-		EfanCtxStack.peek("efan.renderCtx", i).ctx
 	}
 }
