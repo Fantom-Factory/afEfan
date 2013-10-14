@@ -3,18 +3,18 @@ using concurrent::Actor
 ** Advanced API usage only!
 @NoDoc
 class EfanCtxStack {
-	private Obj[]	stack	:= [,]
+	private EfanCtxStackElement[]	stack	:= EfanCtxStackElement[,]
 		
 	override Str toStr() {
 		str	:= "EfanCtxStack -> ($stack.size)"
 		stack.each { str += "\n  - $it" }
 		return str
 	}
-	
-	static Obj? withCtx(EfanRenderer rendering, |EfanCtxStackElement->Obj?| func) {
+
+	static Obj? withCtx(Str id, |EfanCtxStackElement->Obj?| func) {
 		ctxStack	:= getOrMakeCtxStack(true)
 		currentId	:= ((EfanCtxStackElement?) ctxStack?.stack?.peek)?.nestedId
-		nestedId	:= goDeeper(currentId, rendering)
+		nestedId	:= goDeeper(currentId, id)
 		element		:= EfanCtxStackElement(nestedId)
 
 		ctxStack.stack.push(element)
@@ -28,16 +28,20 @@ class EfanCtxStack {
 		}
 	}
 	
-	static EfanCtxStackElement peek(Int i := -1) {
-		getOrMakeCtxStack?.stack?.getSafe(i) ?: throw Err("Could not find EfanCtxStackElement on thread.")		
+	static EfanCtxStackElement peek() {
+		getOrMakeCtxStack?.stack?.getSafe(-1) ?: throw EfanErr("Could not find EfanCtxStackElement on thread.")		
+	}
+
+	static EfanCtxStackElement peekParent(Str? errMsg := null) {
+		getOrMakeCtxStack?.stack?.getSafe(-2) ?: throw EfanErr(errMsg ?: "Could not a parent of EfanCtxStackElement")
 	}
 
 	private static EfanCtxStack? getOrMakeCtxStack(Bool make := true) {
-		Actor.locals.getOrAdd("efan.renderCtx") { make ? EfanCtxStack() : throw Err("Could not find EfanCtxStack on thread.") }		
+		Actor.locals.getOrAdd("efan.renderCtx") { make ? EfanCtxStack() : throw EfanErr("Could not find EfanCtxStack on thread.") }		
 	}
 
-	private static Str goDeeper(Str? currentId, EfanRenderer rendering) {
-		(currentId == null) ? "(${rendering.id})" : "${currentId}->(${rendering.id})"
+	private static Str goDeeper(Str? currentId, Str id) {
+		(currentId == null) ? "(${id})" : "${currentId}->(${id})"
 	}
 }
 
@@ -49,5 +53,9 @@ class EfanCtxStackElement {
 	new make(Str nestedId) {
 		this.nestedId 	= nestedId 
 		this.ctx		= Str:Obj?[:]
+	}
+	
+	override Str toStr() {
+		nestedId
 	}
 }

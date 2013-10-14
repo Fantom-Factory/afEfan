@@ -56,6 +56,8 @@ const mixin EfanRenderer {
 		typeof.qname
 	}
 	
+	override Str toStr() { id }
+	
 	** Where the compiled efan template code lives. 
 	@NoDoc
 	abstract Str _af_render(Obj? _ctx, |->|? _bodyFunc)

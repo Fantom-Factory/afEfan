@@ -5,54 +5,72 @@ using afPlastic::SrcCodeSnippet
 @NoDoc
 class EfanRenderCtx {
 	EfanRenderer	rendering
-	StrBuf 			renderBuf
 	|->|? 			bodyFunc
+	StrBuf 			efanBuf
+	StrBuf?			bodyBuf
+	Bool			inBody
 
-	private new make(EfanRenderer rendering, StrBuf renderBuf, |->|? bodyFunc) {
+	private new make(EfanRenderer rendering, |->|? bodyFunc) {
 		this.rendering	= rendering
-		this.renderBuf 	= renderBuf
 		this.bodyFunc 	= bodyFunc
+		this.efanBuf	= StrBuf()
+	}
+	
+	StrBuf renderBuf() {
+		inBody ? bodyBuf : efanBuf
 	}
 
 	// ---- static methods ----
 
 	static Str renderEfan(EfanRenderer rendering, |->|? bodyFunc, |->| func) {
-		codeBuf   	:= StrBuf()
-		call(EfanRenderCtx(rendering, codeBuf, bodyFunc), func)
-		return codeBuf.toStr
+		EfanCtxStack.withCtx(rendering.id) |EfanCtxStackElement element->Obj?| {
+			ctx := EfanRenderCtx(rendering, bodyFunc)
+			element.ctx["efan.renderCtx"] = ctx
+			convertErrs(func)
+			return ctx.renderBuf.toStr
+		}
 	}
 
 	static Str renderBody() {
-		bodyFunc 	:= peek(-1).bodyFunc
-		codeBuf 	:= StrBuf()
-		if (bodyFunc != null) {
-			// Note we are now rendering the parent (again!)
-			rendering	:= peek(-2).rendering
-			call(EfanRenderCtx(rendering, codeBuf, null), bodyFunc)
+		bodyFunc := peek.bodyFunc
+		if (bodyFunc == null)
+			return Str.defVal
+		
+		parent		:= EfanCtxStack.peekParent("Could not render body - there is no enclosing template!")
+		
+		return EfanCtxStack.withCtx("Body") |EfanCtxStackElement element->Obj?| {
+			// copy the ctx down from the parent
+			element.ctx	= parent.ctx
+			
+			ctx := (EfanRenderCtx) element.ctx["efan.renderCtx"]
+			try {
+				ctx.bodyBuf = StrBuf()
+				ctx.inBody = true
+				convertErrs(bodyFunc)
+				return ctx.renderBuf.toStr
+				
+			} finally {
+				ctx.inBody = false
+			}			
 		}
-		return codeBuf.toStr
 	}
 	
 
-	// nullable for use in renderEfan() above
-	static EfanRenderCtx peek(Int i := -1) {
-		EfanCtxStack.peek(i).ctx["efan.renderCtx"]
+	static EfanRenderCtx peek() {
+		EfanCtxStack.peek.ctx["efan.renderCtx"]
 	}
 	
-	private static Void call(EfanRenderCtx ctx, |->| func) {
+	private static Void convertErrs(|->| func) {
 		try {
-			EfanCtxStack.withCtx(ctx.rendering) |EfanCtxStackElement element->Obj?| {
-				element.ctx["efan.renderCtx"] = ctx
-				((|Obj?|) func).call(69)
-				return null
-			}
-
+			// TODO: Dodgy fantom Code! See EfanRender.render()
+			((|Obj?|) func).call(69)
+			
 		} catch (EfanRuntimeErr err) {
 			// TODO: I'm not sure if it's helpful to trace through all templates...? 
 			throw err
 
 		} catch (Err err) {
-			rType	:= ctx.rendering.typeof
+			rType	:= peek.rendering.typeof
 			regex 	:= Regex.fromStr("^\\s*?${rType.qname}\\._af_render\\s\\(${rType.pod.name}:([0-9]+)\\)\$")
 			trace	:= Utils.traceErr(err, 50)
 			codeLineNo := trace.splitLines.eachWhile |line -> Int?| {
@@ -60,7 +78,8 @@ class EfanRenderCtx {
 				return reggy.find ? reggy.group(1).toInt : null
 			} ?: throw err
 
-			ctx.rendering.efanMetaData.throwRuntimeErr(err, codeLineNo)
+			peek.rendering.efanMetaData.throwRuntimeErr(err, codeLineNo)
+			throw Err("WTF?")
 		}		
 	}
 }
