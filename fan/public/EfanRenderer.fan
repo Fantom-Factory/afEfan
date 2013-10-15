@@ -16,10 +16,16 @@ const mixin EfanRenderer {
 	** ...
 	** <pre
 	** 
+	** 'ctx' must be provided. This prevents you from accidently passing in 'bodyFunc' as the 'ctx'.
+	** Example: 
+	** 
+	**   layout.render() { ... } - WRONG!
+	**   layout.render(null) { ... } - CORRECT!
+	** 
 	** The signature for 'bodyFunc' is actually '|->|? bodyFunc' - see source for an explanation of 
-	** why '|Obj?|?' is used.   
-	virtual Str render(Obj? ctx := null, |Obj?|? bodyFunc := null) {
-		// TODO: Dodgy Fantom syntax!!!		
+	** why '|Obj?|?' is used.
+	virtual Str render(Obj? ctx, |Obj?|? bodyFunc := null) {
+		// TODO: Dodgy Fantom Syntax!!!		
 		// if we change "|Obj?|? bodyFunc" to "|->| bodyFunc" then the following: 
 		//    render(ctx) { ... }
 		// is actually executed as:
@@ -30,7 +36,9 @@ const mixin EfanRenderer {
 		// if you forget to type it.
 		// Bizarrely enough, this DOES still work...?
 		//    render() { ... }
-		_af_render(ctx, (|->|?) bodyFunc)
+		EfanRenderCtx.renderEfan(this, (|->|?) bodyFunc) |->| {
+			_af_render(ctx)
+		}
 	}
 	
 	** Renders the body of the enclosing efan template. Example, a simple 'layout.html' may be 
@@ -56,9 +64,10 @@ const mixin EfanRenderer {
 		typeof.qname
 	}
 	
+	** Returns id()
 	override Str toStr() { id }
 	
 	** Where the compiled efan template code lives. 
 	@NoDoc
-	abstract Str _af_render(Obj? _ctx, |->|? _bodyFunc)
+	abstract Void _af_render(Obj? _ctx)
 }
