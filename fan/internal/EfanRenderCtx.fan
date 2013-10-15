@@ -32,7 +32,8 @@ class EfanRenderCtx {
 	}
 
 	static Str renderBody() {
-		bodyFunc := peek.bodyFunc
+		p:=peek
+		bodyFunc := p.bodyFunc
 		if (bodyFunc == null)
 			return Str.defVal
 		
@@ -54,7 +55,6 @@ class EfanRenderCtx {
 			}			
 		}
 	}
-	
 
 	static EfanRenderCtx peek() {
 		EfanCtxStack.peek.ctx["efan.renderCtx"]
@@ -62,7 +62,7 @@ class EfanRenderCtx {
 	
 	private static Void convertErrs(|->| func) {
 		try {
-			// TODO: Dodgy fantom Code! See EfanRender.render()
+			// TODO: Dodgy Fantom Syntax! See EfanRender.render()
 			((|Obj?|) func).call(69)
 			
 		} catch (EfanRuntimeErr err) {

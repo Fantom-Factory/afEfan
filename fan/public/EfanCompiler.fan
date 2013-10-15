@@ -38,25 +38,18 @@ const class EfanCompiler {
 	}
 
 	** Standard compilation usage; compiles a new renderer from the given efanTemplate. 
+	** The compiled renderer extends the given view helper mixins.
 	** 
 	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
 	** 'srcLocation' is only used for reporting Err msgs.
-	EfanRenderer compile(Uri srcLocation, Str efanTemplate, Type? ctxType := null) {
-		model	:= PlasticClassModel(rendererClassName, true)
-		return compileWithModel(srcLocation, efanTemplate, ctxType, model)
-	}
-
-	** Intermediate compilation usage; the compiled renderer extends the given view helper mixins.
-	** 
-	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
-	** 'srcLocation' is only used for reporting Err msgs.
-	EfanRenderer compileWithHelpers(Uri srcLocation, Str efanTemplate, Type? ctxType := null, Type[] viewHelpers := Type#.emptyList) {
+	EfanRenderer compile(Uri srcLocation, Str efanTemplate, Type? ctxType := null, Type[] viewHelpers := Type#.emptyList) {
 		model	:= PlasticClassModel(rendererClassName, true)
 		viewHelpers.each { model.extendMixin(it) }
 		return compileWithModel(srcLocation, efanTemplate, ctxType, model)
 	}
 
-	** Advanced compiler usage; the efan render methods are added to the given afPlastic model.
+	** Advanced compiler usage; the efan render methods are added to the given 
+	** [afPlastic]`http://repo.status302.com/doc/afPlastic/#overview` model.
 	** 
 	** The (optional) 'makeFunc' is used to create an 'EfanRenderer' instance from the supplied Type
 	** and meta data. 
@@ -77,9 +70,7 @@ const class EfanCompiler {
 		renderCode	+= "	throw afEfan::EfanErr(\"ctx \${_ctx.typeof.signature} ${ErrMsgs.rendererCtxBadFit(ctxType)}\")\n"
 		renderCode	+= "${ctxTypeSig} ctx := _ctx\n"
 		renderCode	+= "\n"
-		renderCode	+= "return afEfan::EfanRenderCtx.renderEfan(this, _bodyFunc) |->| {\n"
-		renderCode	+=    parseIntoCode(srcLocation, efanTemplate)
-		renderCode	+= "}"
+		renderCode	+=  parseIntoCode(srcLocation, efanTemplate)
 
 		// 'cos it'll be common to want to cast to it - I did! 
 		// I spent half an hour tracking down why my cast didn't work! 
@@ -90,13 +81,19 @@ const class EfanCompiler {
 		model.overrideMethod(EfanRenderer#_af_render, renderCode)
 //		model.addMethod(StrBuf#, "_af_code", "", "afEfan::EfanRenderCtx.peek.renderBuf") 
 
+		model.addField(Log#, "_af_log").withInitValue("afEfan::EfanRenderer#.pod.log")
+		
 		model.addField(Obj?#, "_af_code", """throw Err("_af_code is write only.")""", 
-			"""echo("[_af_code] \${afEfan::EfanCtxStack.peek.nestedId} -> \${it.toStr.toCode}");  afEfan::EfanRenderCtx.peek.renderBuf   .add(it)""")
+			"""if (_af_log.isDebug)
+			   	_af_log.debug("[_af_code] \${afEfan::EfanCtxStack.peek.nestedId} -> \${it.toStr.toCode}")
+			   afEfan::EfanRenderCtx.peek.renderBuf.add(it)""")
 		
 		// we need the special syntax of "_af_eval = XXXX" so we don't have to close any brackets
 //		model.addField(Obj?#, "_af_eval", """throw Err("_af_eval is write only.")""", "_af_code.add(it)")
 		model.addField(Obj?#, "_af_eval", """throw Err("_af_eval is write only.")""", 
-			"""echo("[_af_eval] \${afEfan::EfanCtxStack.peek.nestedId} -> \${it.toStr.toCode}");  afEfan::EfanRenderCtx.peek.renderBuf   .add(it)""")
+			"""if (_af_log.isDebug)
+			   	_af_log.debug("[_af_eval] \${afEfan::EfanCtxStack.peek.nestedId} -> \${it.toStr.toCode}")
+			   afEfan::EfanRenderCtx.peek.renderBuf.add(it)""")
 
 		efanMetaData	:= EfanMetaData {
 			it.srcLocation 	= srcLocation

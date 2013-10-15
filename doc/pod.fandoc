@@ -1,12 +1,15 @@
 Overview [#overview]
 ********************
-afEfan is a [Fantom]`http://fantom.org/` library for rendering Embedded Fantom (efan) templates.
+'afEfan' is a library for rendering Embedded Fantom (efan) templates.
 
 Much like 'EJS' for Javascript, 'ERB' for Ruby and 'JSP' for Java, efan lets you embed snippets of Fantom code inside textual
 templates.
 
 Efan aims to hit the middle ground between programmatically rendering markup with `web::WebOutStream` and rendering
 logicless templates such as [Mustache]`https://bitbucket.org/xored/mustache/`.
+
+> **ALIEN-AID:** If rendering HTML, use [afSlim]`http://repo.status302.com/doc/afSlim/#overview` !!!
+> The concise and lightweight template syntax makes generating HTML easy!
 
 
 
@@ -36,39 +39,37 @@ Tags [#tags]
 
 Efan supports the following tags:
 
-Eval Tags [#eval]
+Eval Tags [#evalTags]
 =================
 Any tag with the prefix '<%=' will evaluate the fantom expression and write it out as a Str.
 
   Hello, <%= "Emma".upper %>!
 
-Comment Tags [#comment]
+Comment Tags [#commentTags]
 =======================
 Any tag with the prefix '<%#' is a comment and will be left out of the resulting template.
 
   <%# This is just a comment %>
 
-Fantom Code Tags [#fantomCode]
-==============================
+Code Tags [#codeTags]
+=======================
 Any tag with the prefix '<%' will be converted into Fantom code.
 
   <% echo("Hello!") %>
 
-> **ALIEN-AID:** When casting or assigning classes in efan templates, be sure to use the fully qualified class name (FQCN)
+> **ALIEN-AID:** When casting or using static methods in efan templates, be sure to use the fully qualified class name (FQCN)
 > including the pod. Example:
 
 > <% concurrent::Actor.sleep(2sec) %>
 
-Passing Data [#ctx]
-===================
-Tags are nice, but not much use unless you can pass data in. Thankfully, you can!
-
-Each render method takes an argument called 'ctx' which you can reference in your template. 'ctx' is typed to whatever Obj
-you pass in, so you don't need to cast it. Examples:
+Template Context [#ctx]
+=======================
+Each template render method takes an argument called 'ctx' which you can reference in your template.
+'ctx' is typed to whatever Obj you pass in, so you don't need to cast it. Examples:
 
 Using maps:
 pre>
-  ctx := ["name":"Emma"]
+  ctx := ["name":"Emma"]  // ctx is a map
 
   template := "Hello <%= ctx["name"] %>!"
 
@@ -84,7 +85,7 @@ pre>
 
   ...
 
-  ctx      := Entity("Emma")
+  ctx      := Entity("Emma")  // ctx is an Entity
 
   template := "Hello <%= ctx.name %>!"
 
@@ -95,7 +96,7 @@ pre>
 
 View Helpers [#viewHelpers]
 ***************************
-Efan lets you provide view helpers for common tasks. View helpers are 'mixins' that your efan template can extend, giving your
+Efan lets you provide view helpers for common tasks. View helpers are 'mixins' that your efan template will extend, giving your
 templates access to commonly used methods. Example, for escaping XML:
 
 pre>
@@ -125,7 +126,7 @@ pre>
 Layout Pattern / Nesting Templates [#nestingTemplates]
 ******************************************************
 Efan templates may be nested inside one another, effectively allowing you to componentise your templates. This is accomplished
-by passing in body functions to the efan 'render()' method and calling 'renderBody()' to invoke it.
+by passing body functions in to the efan 'render()' method and calling 'renderBody()' to invoke it.
 
 
 This is best explained in an example. Here we will use the *layout pattern* to place some common HTML into a 'layout.efan' file:
@@ -133,12 +134,10 @@ This is best explained in an example. Here we will use the *layout pattern* to p
 layout.efan:
 pre>
 <head>
-  <title><%= ctx.pageTitle %></title>
+  <title><%= ctx %></title>
 </head>
 <body>
-
   <%= renderBody() %>
-
 </body>
 <pre
 
@@ -159,10 +158,8 @@ using afEfan
 
 class Index {
   Str renderIndex() {
-    compiler  := EfanCompiler()
-
-    index     := compiler.compile(`index.efan`,  `index.efan`.toFile.readAllStr,  EfanRenderer#)
-    layout    := compiler.compile(`layout.efan`, `layout.efan`.toFile.readAllStr, Str#)
+    index     := efan().compileFromFile(`index.efan` .toFile, EfanRenderer#)
+    layout    := efan().compileFromFile(`layout.efan`.toFile, Str#)
 
     return index.render(layout)
   }
@@ -235,6 +232,7 @@ Release Notes [#releaseNotes]
 
 v1.3.0 [#v1.3.0]
 ----------------
+ - Chg: Rejigged the public efan API.
  - Chg: Removed 'EfanRenderer.renderEfan(...)'. All template rendering is done via 'EfanRenderer.render(...)'.
  - Chg: Nested efan templates and body functions now return a 'Str', so you MUST use eval tags; '<%= renderBody() %>'
  - Chg: Massivly simplified nested component rendering by introducing a threaded 'EfanCtxStack'.

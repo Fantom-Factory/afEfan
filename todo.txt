@@ -1,5 +1,5 @@
 
-For v1.2.2
+For v1.3.2
 ----------
 Check for render recursion
 

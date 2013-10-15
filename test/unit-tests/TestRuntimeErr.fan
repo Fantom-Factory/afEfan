@@ -21,7 +21,7 @@ internal class TestRuntimeErr : EfanTest {
 		       --
 		       -- padding
 		       --
-		       <%= ctx.render { %>
+		       <%= ctx.render(null) { %>
 		       --
 		       --
 		       --
