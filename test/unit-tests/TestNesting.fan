@@ -58,7 +58,7 @@ internal class TestNesting : EfanTest {
 
 internal const class T_Index : EfanRenderer {
 	override EfanMetaData efanMetaData {
-		get { EfanMetaData() { it.ctxName=""; it.srcLocation=``; it.efanTemplate=""; it.efanSrcCode="" } }
+		get { EfanMetaData() { it.ctxName=""; it.srcLocation=``; it.efanTemplate=""; it.efanSrcCode=""; it.templateId="" } }
 		set { }
 	}
 
@@ -85,7 +85,7 @@ internal const class T_Index : EfanRenderer {
 
 internal const class T_Layout : EfanRenderer {
 	override EfanMetaData efanMetaData {
-		get { EfanMetaData() { it.ctxName=""; it.srcLocation=``; it.efanTemplate=""; it.efanSrcCode="" } }
+		get { EfanMetaData() { it.ctxName=""; it.srcLocation=``; it.efanTemplate=""; it.efanSrcCode=""; it.templateId="" } }
 		set { }
 	}
 
@@ -112,7 +112,7 @@ internal const class T_Layout : EfanRenderer {
 
 internal const class T_Index2 : EfanRenderer {
 	override EfanMetaData efanMetaData {
-		get { EfanMetaData() { it.ctxName=""; it.srcLocation=``; it.efanTemplate=""; it.efanSrcCode="" } }
+		get { EfanMetaData() { it.ctxName=""; it.srcLocation=``; it.efanTemplate=""; it.efanSrcCode=""; it.templateId="" } }
 		set { }
 	}
 
