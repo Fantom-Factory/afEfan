@@ -25,7 +25,7 @@ const class EfanMetaData {
 	
 	internal const Int srcCodePadding
 
-	internal new make(|This|in) { in(this) }
+	internal new make(|This|? in := null) { in?.call(this) }
 
 	internal Void throwCompilationErr(Err cause, Int srcCodeLineNo) {
 		templateLineNo	:= findTemplateLineNo(srcCodeLineNo) ?: throw cause
