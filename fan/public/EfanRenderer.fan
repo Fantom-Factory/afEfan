@@ -56,16 +56,9 @@ const mixin EfanRenderer {
 	virtual Str renderBody() {
 		EfanRenderCtx.renderBody
 	}
-
-	** A unique ID for the efan template. Defaults to the fully qualified type name.
-	virtual Str id() {
-		// FQCN is pretty yucky, but for unique ids we don't have much to go on!
-		// Thankfully only efanExtra needs it, and it provides its own impl.
-		typeof.qname
-	}
 	
-	** Returns id()
-	override Str toStr() { id }
+	** Returns efanMetaData.templateId()
+	override Str toStr() { efanMetaData.templateId }
 	
 	** Where the compiled efan template code lives. 
 	@NoDoc

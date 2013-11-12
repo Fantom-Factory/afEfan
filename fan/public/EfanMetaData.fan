@@ -20,6 +20,9 @@ const class EfanMetaData {
 	** The generated efan fantom code (for the inquisitive).
 	const Str efanSrcCode
 
+	** A unique ID for the efan template. Defaults to the fully qualified type name.
+	const Str templateId
+	
 	internal const Int srcCodePadding
 
 	internal new make(|This|in) { in(this) }
