@@ -95,6 +95,7 @@ const class EfanCompiler {
 			   	_af_log.debug("[_af_eval] \${afEfan::EfanCtxStack.peek.nestedId} -> \${it.toStr.toCode}")
 			   afEfan::EfanRenderCtx.peek.renderBuf.add(it)""")
 
+		podName	:= plasticCompiler.generatePodName
 		efanMetaData	:= EfanMetaData {
 			it.srcLocation 	= srcLocation
 			it.ctxName		= ctxVarName
@@ -102,10 +103,13 @@ const class EfanCompiler {
 			it.efanTemplate	= efanTemplate
 			it.efanSrcCode	= model.toFantomCode
 			it.srcCodePadding= plasticCompiler.srcCodePadding
+			// FQCN is pretty yucky, but for unique ids we don't have much to go on!
+			// Thankfully only efanExtra needs it, and it provides its own impl.
+			it.templateId	= "${podName}::${model.className}"
 		}
-		
+
 		try {
-			renderType	= plasticCompiler.compileModel(model)
+			renderType	= plasticCompiler.compileModel(model, podName)
 		} catch (PlasticCompilationErr err) {
 			efanMetaData.throwCompilationErr(err, err.errLineNo)
 		}

@@ -23,7 +23,7 @@ class EfanRenderCtx {
 	// ---- static methods ----
 
 	static Str renderEfan(EfanRenderer rendering, |->|? bodyFunc, |->| func) {
-		EfanCtxStack.withCtx(rendering.id) |EfanCtxStackElement element->Obj?| {
+		EfanCtxStack.withCtx(rendering.efanMetaData.templateId) |EfanCtxStackElement element->Obj?| {
 			ctx := EfanRenderCtx(rendering, bodyFunc)
 			element.ctx["efan.renderCtx"] = ctx
 			convertErrs(func)
