@@ -233,6 +233,7 @@ Release Notes [#releaseNotes]
 v1.3.2 [#v1.3.2]
 ----------------
  - Chg: Moved 'EfanRenderer.id' -> 'EfanMetaData.templateId'
+ - Bug: Non ASCII templates could not be compiled.
 
 v1.3.0 [#v1.3.0]
 ----------------

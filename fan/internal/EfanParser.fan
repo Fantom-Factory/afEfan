@@ -88,11 +88,11 @@ internal const class EfanParser {
 			return false
 
 		peek := buf.readChars(tag.size)
-		
 		if (peek == tag) {
 			return true
 		} else {
-			buf.seek(buf.pos - tag.size)
+			// BugFix: buf.seek doesn't take into account char encoding
+			peek.eachr { buf.unreadChar(it) }
 			return false
 		}
 	}
