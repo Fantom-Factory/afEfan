@@ -18,6 +18,12 @@ const class EfanParserErr : EfanErr, SrcCodeErr {
 		this.linesOfPadding = linesOfPadding
 	}
 	
+	** Creates a new 'EfanParserErr', appending the given msg to end of the err msg.
+	@NoDoc
+	EfanParserErr withXtraMsg(Str xtraMsg) {
+		EfanParserErr(srcCode, errLineNo, this.msg + xtraMsg, linesOfPadding)
+	}
+
 	override Str toStr() {
 		print(msg, linesOfPadding)
 	}
@@ -33,6 +39,12 @@ const class EfanCompilationErr : EfanErr, SrcCodeErr {
 		this.srcCode = srcCode
 		this.errLineNo = errLineNo
 		this.linesOfPadding = linesOfPadding
+	}
+	
+	** Creates a new 'EfanCompilationErr', appending the given msg to end of the err msg.
+	@NoDoc
+	EfanCompilationErr withXtraMsg(Str xtraMsg) {
+		EfanCompilationErr(srcCode, errLineNo, this.msg + xtraMsg, linesOfPadding, cause)
 	}
 	
 	override Str toStr() {
@@ -52,6 +64,12 @@ const class EfanRuntimeErr : EfanErr, SrcCodeErr {
 		this.linesOfPadding = linesOfPadding
 	}
 	
+	** Creates a new 'EfanRuntimeErr', appending the given msg to end of the err msg.
+	@NoDoc
+	EfanRuntimeErr withXtraMsg(Str xtraMsg) {
+		EfanRuntimeErr(srcCode, errLineNo, this.msg + xtraMsg, linesOfPadding, cause)
+	}
+
 	override Str toStr() {
 		print(msg, linesOfPadding)
 	}
