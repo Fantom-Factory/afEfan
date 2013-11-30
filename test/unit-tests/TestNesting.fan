@@ -67,16 +67,11 @@ internal const class T_Index : EfanRenderer {
 		set { EfanRenderCtx.peek.renderBuf.add(it) }
 	}
 	
-	Obj? _af_eval {
-		get { null }
-		set { EfanRenderCtx.peek.renderBuf.add(it) }
-	}
-	
 	override Void _af_render(Obj? _ctx) {
 		[Str:Obj] ctx := _ctx
 
 		_af_code = "before\n"
-		_af_eval = ((EfanRenderer)ctx["layout"]).render(ctx["layoutCtx"]) {
+		_af_code = ((EfanRenderer)ctx["layout"]).render(ctx["layoutCtx"]) {
 			_af_code = "    body\n"
 		}
 		_af_code = "after"
@@ -94,18 +89,13 @@ internal const class T_Layout : EfanRenderer {
 		set { EfanRenderCtx.peek.renderBuf.add(it) }
 	}
 	
-	Obj? _af_eval {
-		get { null }
-		set { EfanRenderCtx.peek.renderBuf.add(it) }
-	}
-
 	override Void _af_render(Obj? _ctx) {
 		Int ctx := _ctx
 		
 		_af_code = "  <html> "
 		_af_code = ctx
 		_af_code = "\n"
-		_af_eval = renderBody
+		_af_code = renderBody
 		_af_code = "  </html>\n"		
 	}
 }
@@ -121,16 +111,11 @@ internal const class T_Index2 : EfanRenderer {
 		set { EfanRenderCtx.peek.renderBuf.add(it) }
 	}
 	
-	Obj? _af_eval {
-		get { null }
-		set { EfanRenderCtx.peek.renderBuf.add(it) }
-	}
-	
 	override Void _af_render(Obj? _ctx) {
 		[Str:Obj] ctx := _ctx
 		
 		_af_code = "before\n"
-		_af_eval = ((EfanRenderer)ctx["layout"]).render(ctx["layoutCtx"])
+		_af_code = ((EfanRenderer)ctx["layout"]).render(ctx["layoutCtx"])
 		_af_code = "after"
 	}
 }
