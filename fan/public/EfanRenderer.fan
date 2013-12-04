@@ -25,6 +25,10 @@ const mixin EfanRenderer {
 	** The signature for 'bodyFunc' is actually '|->|? bodyFunc' - see source for an explanation of 
 	** why '|Obj?|?' is used.
 	virtual Str render(Obj? ctx, |Obj?|? bodyFunc := null) {
+		
+		// much better than the default capacity of 16 bytes!
+		renderBuf := StrBuf(efanMetaData.efanTemplate.size)
+		
 		// TODO: Dodgy Fantom Syntax!!!		
 		// if we change "|Obj?|? bodyFunc" to "|->| bodyFunc" then the following: 
 		//    render(ctx) { ... }
@@ -36,9 +40,10 @@ const mixin EfanRenderer {
 		// if you forget to type it.
 		// Bizarrely enough, this DOES still work...?
 		//    render() { ... }
-		EfanRenderCtx.renderEfan(this, (|->|?) bodyFunc) |->| {
+		EfanRenderCtx.renderEfan(renderBuf, this, (|->|?) bodyFunc) |->| {
 			_af_render(ctx)
 		}
+		return renderBuf.toStr
 	}
 	
 	** Renders the body of the enclosing efan template. Example, a simple 'layout.html' may be 
@@ -54,7 +59,9 @@ const mixin EfanRenderer {
 	** </html>
 	** <pre
 	virtual Str renderBody() {
-		EfanRenderCtx.renderBody
+		renderBuf := StrBuf(efanMetaData.efanTemplate.size)
+		EfanRenderCtx.renderBody(renderBuf)
+		return renderBuf.toStr
 	}
 	
 	** Returns efanMetaData.templateId()

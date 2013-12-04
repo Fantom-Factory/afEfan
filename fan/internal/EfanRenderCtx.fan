@@ -10,45 +10,43 @@ class EfanRenderCtx {
 	StrBuf?			bodyBuf
 	Bool			inBody
 
-	private new make(EfanRenderer rendering, |->|? bodyFunc) {
+	private new make(StrBuf renderBuf, EfanRenderer rendering, |->|? bodyFunc) {
 		this.rendering	= rendering
 		this.bodyFunc 	= bodyFunc
-		this.efanBuf	= StrBuf()
+		this.efanBuf	= renderBuf
 	}
 	
+	** As used by _af_code
 	StrBuf renderBuf() {
 		inBody ? bodyBuf : efanBuf
 	}
 
 	// ---- static methods ----
 
-	static Str renderEfan(EfanRenderer rendering, |->|? bodyFunc, |->| func) {
-		EfanCtxStack.withCtx(rendering.efanMetaData.templateId) |EfanCtxStackElement element->Obj?| {
-			ctx := EfanRenderCtx(rendering, bodyFunc)
+	static Void renderEfan(StrBuf renderBuf, EfanRenderer rendering, |->|? bodyFunc, |->| func) {
+		EfanCtxStack.withCtx(rendering.efanMetaData.templateId) |EfanCtxStackElement element| {
+			ctx := EfanRenderCtx(renderBuf, rendering, bodyFunc)
 			element.ctx["efan.renderCtx"] = ctx
 			convertErrs(func)
-			return ctx.renderBuf.toStr
 		}
 	}
 
-	static Str renderBody() {
-		p:=peek
-		bodyFunc := p.bodyFunc
+	static Void renderBody(StrBuf renderBuf) {
+		bodyFunc := peek.bodyFunc
 		if (bodyFunc == null)
-			return Str.defVal
+			return
 		
-		parent		:= EfanCtxStack.peekParent("Could not render body - there is no enclosing template!")
+		parent := EfanCtxStack.peekParent("Could not render body - there is no enclosing template!")
 		
-		return EfanCtxStack.withCtx("Body") |EfanCtxStackElement element->Obj?| {
+		EfanCtxStack.withCtx("Body") |EfanCtxStackElement element| {
 			// copy the ctx down from the parent
 			element.ctx	= parent.ctx
 			
 			ctx := (EfanRenderCtx) element.ctx["efan.renderCtx"]
 			try {
-				ctx.bodyBuf = StrBuf()
+				ctx.bodyBuf = renderBuf
 				ctx.inBody = true
 				convertErrs(bodyFunc)
-				return ctx.renderBuf.toStr
 				
 			} finally {
 				ctx.inBody = false
@@ -63,6 +61,7 @@ class EfanRenderCtx {
 	private static Void convertErrs(|->| func) {
 		try {
 			// TODO: Dodgy Fantom Syntax! See EfanRender.render()
+			// currently, there is no 'it' so we just pass in a number
 			((|Obj?|) func).call(69)
 			
 		} catch (EfanRuntimeErr err) {
@@ -80,6 +79,6 @@ class EfanRenderCtx {
 
 			peek.rendering.efanMetaData.throwRuntimeErr(err, codeLineNo)
 			throw Err("WTF?")
-		}		
+		}
 	}
 }
