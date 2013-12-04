@@ -232,7 +232,8 @@ Release Notes [#releaseNotes]
 
 v1.3.4 [#v1.3.4]
 ----------------
- - Chg: Added 'withXtraMsg()' to EfanErrs to allow Err msgs to be appended.
+ - Chg: Added 'withXtraMsg()' to EfanErrs so Err msgs can be appended to.
+ - Chg: Internal API changes for 'afEfanXtra'.
 
 v1.3.2 [#v1.3.2]
 ----------------

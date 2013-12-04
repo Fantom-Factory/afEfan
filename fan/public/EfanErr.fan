@@ -17,7 +17,7 @@ const class EfanParserErr : EfanErr, SrcCodeErr {
 		this.errLineNo = errLineNo
 		this.linesOfPadding = linesOfPadding
 	}
-	
+ 
 	** Creates a new 'EfanParserErr', appending the given msg to end of the err msg.
 	@NoDoc
 	EfanParserErr withXtraMsg(Str xtraMsg) {
