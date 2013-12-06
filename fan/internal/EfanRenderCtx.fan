@@ -4,13 +4,13 @@ using afPlastic::SrcCodeSnippet
 ** This code could be in EfanRenderer but I want to keep that class as clean as possible.
 @NoDoc
 class EfanRenderCtx {
-	EfanRenderer	rendering
+	BaseEfanImpl	rendering
 	|->|? 			bodyFunc
 	StrBuf 			efanBuf
 	StrBuf?			bodyBuf
 	Bool			inBody
 
-	private new make(StrBuf renderBuf, EfanRenderer rendering, |->|? bodyFunc) {
+	private new make(StrBuf renderBuf, BaseEfanImpl rendering, |->|? bodyFunc) {
 		this.rendering	= rendering
 		this.bodyFunc 	= bodyFunc
 		this.efanBuf	= renderBuf
@@ -23,7 +23,7 @@ class EfanRenderCtx {
 
 	// ---- static methods ----
 
-	static Void renderEfan(StrBuf renderBuf, EfanRenderer rendering, |->|? bodyFunc, |->| func) {
+	static Void renderEfan(StrBuf renderBuf, BaseEfanImpl rendering, |->|? bodyFunc, |->| func) {
 		EfanCtxStack.withCtx(rendering.efanMetaData.templateId) |EfanCtxStackElement element| {
 			ctx := EfanRenderCtx(renderBuf, rendering, bodyFunc)
 			element.ctx["efan.renderCtx"] = ctx
