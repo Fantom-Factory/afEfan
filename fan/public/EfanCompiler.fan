@@ -44,6 +44,7 @@ const class EfanCompiler {
 	** 'srcLocation' is only used for reporting Err msgs.
 	EfanRenderer compile(Uri srcLocation, Str efanTemplate, Type? ctxType := null, Type[] viewHelpers := Type#.emptyList) {
 		model	:= PlasticClassModel(rendererClassName, true)
+		model.extendMixin(EfanRenderer#)
 		viewHelpers.each { model.extendMixin(it) }
 		return compileWithModel(srcLocation, efanTemplate, ctxType, model)
 	}
@@ -56,7 +57,7 @@ const class EfanCompiler {
 	** 
 	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
 	** 'srcLocation' is only used for reporting Err msgs.
-	EfanRenderer compileWithModel(Uri srcLocation, Str efanTemplate, Type? ctxType, PlasticClassModel model, |Type, EfanMetaData->EfanRenderer|? makeFunc := null) {
+	Obj compileWithModel(Uri srcLocation, Str efanTemplate, Type? ctxType, PlasticClassModel model, |Type, EfanMetaData->BaseEfanImpl|? makeFunc := null) {
 		if (!model.isConst)
 			throw EfanErr(ErrMsgs.rendererModelMustBeConst(model))
  
@@ -75,10 +76,10 @@ const class EfanCompiler {
 		// 'cos it'll be common to want to cast to it - I did! 
 		// I spent half an hour tracking down why my cast didn't work! 
 		model.usingType(EfanRenderer#)	
-		model.extendMixin(EfanRenderer#)
+		model.extendMixin(BaseEfanImpl#)
 		model.addField(EfanMetaData#, "_af_efanMetaData")
-		model.overrideField(EfanRenderer#efanMetaData, "_af_efanMetaData", """throw Err("efanMetaData is read only.")""")
-		model.overrideMethod(EfanRenderer#_af_render, renderCode)
+		model.overrideField(BaseEfanImpl#efanMetaData, "_af_efanMetaData", """throw Err("efanMetaData is read only.")""")
+		model.overrideMethod(BaseEfanImpl#_af_render, renderCode)
 //		model.addMethod(StrBuf#, "_af_code", "", "afEfan::EfanRenderCtx.peek.renderBuf") 
 
 		model.addField(Log#, "_af_log").withInitValue("afEfan::EfanRenderer#.pod.log")
