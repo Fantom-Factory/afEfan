@@ -23,11 +23,11 @@ class EfanRenderCtx {
 
 	// ---- static methods ----
 
-	static Void renderEfan(StrBuf renderBuf, BaseEfanImpl rendering, |->|? bodyFunc, |->| func) {
-		EfanCtxStack.withCtx(rendering.efanMetaData.templateId) |EfanCtxStackElement element| {
+	static Obj? renderEfan(StrBuf renderBuf, BaseEfanImpl rendering, |->|? bodyFunc, |Obj?->Obj?| func) {
+		EfanCtxStack.withCtx(rendering.efanMetaData.templateId) |EfanCtxStackElement element->Obj?| {
 			ctx := EfanRenderCtx(renderBuf, rendering, bodyFunc)
 			element.ctx["efan.renderCtx"] = ctx
-			convertErrs(func)
+			return convertErrs(func)
 		}
 	}
 
@@ -58,11 +58,11 @@ class EfanRenderCtx {
 		EfanCtxStack.peek.ctx["efan.renderCtx"]
 	}
 	
-	private static Void convertErrs(|->| func) {
+	private static Obj? convertErrs(|Obj?->Obj?| func) {
 		try {
 			// TODO: Dodgy Fantom Syntax! See EfanRender.render()
 			// currently, there is no 'it' so we just pass in a number
-			((|Obj?|) func).call(69)
+			return ((|Obj?->Obj?|) func).call(69)
 			
 		} catch (EfanRuntimeErr err) {
 			// TODO: I'm not sure if it's helpful to trace through all templates...? 
