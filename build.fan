@@ -1,4 +1,4 @@
-using build::BuildPod
+using build
 
 class Build : BuildPod {
 
@@ -25,5 +25,13 @@ class Build : BuildPod {
 		// exclude test code when building the pod - this means we can have public test classes!
 //		srcDirs = srcDirs.exclude { it.toStr.startsWith("test/") }
 //		resDirs = resDirs.exclude { it.toStr.startsWith("test/") }
+	}
+	
+	@Target { help = "install src" }
+	Void installSrc() {
+		destDir := Env.cur.homeDir.plus(`src/${podName}/`)
+		destDir.delete
+		destDir.create		
+		`fan/`.toFile.copyInto(destDir)
 	}
 }
