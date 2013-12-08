@@ -64,6 +64,9 @@ class EfanRenderCtx {
 			// currently, there is no 'it' so we just pass in a number
 			return ((|Obj?->Obj?|) func).call(69)
 			
+		} catch (EfanCompilationErr err) {
+			throw err
+
 		} catch (EfanRuntimeErr err) {
 			// TODO: I'm not sure if it's helpful to trace through all templates...? 
 			throw err
