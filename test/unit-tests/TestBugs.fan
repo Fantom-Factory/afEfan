@@ -7,4 +7,15 @@ internal class TestBugs : EfanTest {
 		text := efan.renderFromStr(temp, null)
 		verify(text.contains("Gracián"))
 	}
+
+	Void testDebugNull() {
+		// Yes! Debugging caused an Err! Brilliant!
+		typeof.pod.log.level = LogLevel.debug
+		
+		temp := """ctx = <%= ctx %>"""
+		text := efan.renderFromStr(temp, null)
+		verifyEq(text, "ctx = null")
+		
+		typeof.pod.log.level = LogLevel.info
+	}
 }
