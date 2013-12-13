@@ -87,7 +87,7 @@ const class EfanCompiler {
 		// we need the special syntax of "_af_code = XXXX" so we don't have to close any brackets with eval expressions
 		model.addField(Obj?#, "_af_code", """throw Err("_af_code is write only.")""", 
 			"""if (_af_log.isDebug)
-			   	_af_log.debug("[_af_code] \${afEfan::EfanCtxStack.peek.nestedId} -> \${it.toStr.toCode}")
+			   	_af_log.debug("[_af_code] \${afEfan::EfanCtxStack.peek.nestedId} -> \${it?.toStr?.toCode}")
 			   afEfan::EfanRenderCtx.peek.renderBuf.add(it)""")
 		
 		podName	:= plasticCompiler.generatePodName

@@ -230,6 +230,10 @@ pre>
 Release Notes [#releaseNotes]
 *****************************
 
+v1.3.6 [#v1.3.6]
+----------------
+ - Bug: Rendering 'null' values with debug logging turned on could cause NPEs.
+
 v1.3.4 [#v1.3.4]
 ----------------
  - Chg: Added 'withXtraMsg()' to EfanErrs so Err msgs can be appended to.
