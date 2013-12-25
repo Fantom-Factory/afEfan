@@ -1,6 +1,6 @@
 Overview [#overview]
 ********************
-'afEfan' is a library for rendering Embedded Fantom (efan) templates.
+'efan' is a library for rendering Embedded Fantom (efan) templates.
 
 Much like 'EJS' for Javascript, 'ERB' for Ruby and 'JSP' for Java, efan lets you embed snippets of Fantom code inside textual
 templates.
