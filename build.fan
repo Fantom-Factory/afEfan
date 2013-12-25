@@ -10,7 +10,7 @@ class Build : BuildPod {
 		meta	= [	"org.name"		: "Alien-Factory",
 					"org.uri"		: "http://www.alienfactory.co.uk/",
 					"vcs.uri"		: "https://bitbucket.org/AlienFactory/afefan",
-					"proj.name"		: "AF-Efan",
+					"proj.name"		: "efan",
 					"license.name"	: "BSD 2-Clause License",
 					"repo.private"	: "true"
 				]
@@ -27,11 +27,17 @@ class Build : BuildPod {
 //		resDirs = resDirs.exclude { it.toStr.startsWith("test/") }
 	}
 	
-	@Target { help = "install src" }
-	Void installSrc() {
+	@Target { help = "Compile to pod file and associated natives" }
+	override Void compile() {
+		super.compile
+		
 		destDir := Env.cur.homeDir.plus(`src/${podName}/`)
 		destDir.delete
 		destDir.create		
 		`fan/`.toFile.copyInto(destDir)
-	}
+		
+		log.indent
+		log.info("Copied `fan/` to ${destDir.normalize}")
+		log.unindent
+	}	
 }
