@@ -1,14 +1,19 @@
 
 For v1.3.8
 ----------
-<%! using webmod %>
 
 
 
 Future:
 -------
 Trim before / after whitespace on all tags except <%= ... %>.
- - Complicated to do in parser.  
+ - It's complicated to do in parser and prone to error
+ - Can get around it by using <%# \n %> tags anyway
+ 
+Rename BaseEfanImpl -> BaseEfanRenderer (any better names?)
+ - have EfanRenderer extend BaseEfanRenderer
+ - update efanXtra
+
 
 
 Bad Idea:

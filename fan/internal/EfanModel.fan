@@ -3,10 +3,11 @@ using afPlastic::SrcCodeSnippet
 internal class EfanModel : Pusher {
 	
 	StrBuf 	code
-	Int		indentSize	:= 1
-	Str[]	usings		:= [,]
-	SrcCodeSnippet snippet
-	Int		linesOfPadding
+	Str[]	usings	:= [,]
+	
+	private Int				indentSize	:= 1
+	private SrcCodeSnippet	snippet
+	private Int				linesOfPadding
 	
 	new make(SrcCodeSnippet snippet, Int linesOfPadding, Int bufSize) {
 		this.code 			= StrBuf(bufSize)
@@ -31,7 +32,7 @@ internal class EfanModel : Pusher {
 		} else {
 			indent.append(code).appendLineNo(lineNo).endLine
 		}
-		
+
 		if (code.endsWith("{"))
 			indentSize++
 	}
