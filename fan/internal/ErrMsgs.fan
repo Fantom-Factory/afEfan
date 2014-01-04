@@ -30,4 +30,8 @@ internal class ErrMsgs {
 		"afPlastic model for '${model.className}' must be const"
 	}
 
+	static Str unknownInstruction(Str instruction) {
+		"Unknown processing instruction: ${instruction}"
+	}
+
 }

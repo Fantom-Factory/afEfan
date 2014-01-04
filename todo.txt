@@ -7,11 +7,8 @@ For v1.3.8
 
 Future:
 -------
-
-Multiple ctx args 
- - optionally give mixin render mixin method? 
-  - use a map [Str:Type] ?
-
+Trim before / after whitespace on all tags except <%= ... %>.
+ - Complicated to do in parser.  
 
 
 Bad Idea:

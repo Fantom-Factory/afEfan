@@ -8,7 +8,8 @@ templates.
 'efan' aims to hit the middle ground between programmatically rendering markup with `web::WebOutStream` and rendering
 logicless templates such as [Mustache]`https://bitbucket.org/xored/mustache/`.
 
-> **ALIEN-AID:** Create powerful re-usable components with [efanXtra]`http://www.fantomfactory.org/pods/afEfanXtra` !!!
+> **ALIEN-AID:** Create powerful re-usable components with [efanXtra]`http://www.fantomfactory.org/pods/afEfanXtra` and
+> [Ioc]`http://www.fantomfactory.org/pods/afIoc` !!!
 
 > **ALIEN-AID:** If rendering HTML, use [afSlim]`http://repo.status302.com/doc/afSlim/#overview` !!!
 > The concise and lightweight template syntax makes generating HTML easy!
@@ -59,20 +60,21 @@ Any tag with the prefix '<%' will be converted into Fantom code.
 
   <% echo("Hello!") %>
 
-> **ALIEN-AID:** When casting or using static methods in efan templates, be sure to use the fully qualified class name (FQCN)
-> including the pod. Example:
+Instruction Tags [#instructionTags]
+===================================
+The content of any tag with the prefix '<%?' is taken to be a Fantom 'using' instruction.
 
-> <% concurrent::Actor.sleep(2sec) %>
+    <%? using concurrent::Actor %>
 
-Escape Tags [#escapeTags]
-=========================
-Any efan tags can be escaped by adding an extra '%' character:
+Escaping Tags [#escapingTags]
+===========================
+All efan tags can be escaped by adding an extra '%' character to the start and end tags. Example:
 
-  This is how you <%%# escape %%> efan tags.
+  This is how you <%%= escape %%> efan tags.
 
-Would print:
+prints:
 
-  This is how you <%# escape %> efan tags.
+  This is how you <%= escape %> efan tags.
 
 
 
@@ -106,6 +108,14 @@ pre>
   Efan().renderFromStr(template, ctx)
 <pre
 
+
+> **ALIEN-AID:** All classes not in 'sys' either need to be imported with '<%? using %>' statements or referenced by their fully qualified class name (FQCN), example:
+
+> <% concurrent::Actor.sleep(2sec) %>
+
+> <%? using concurrent %><% Actor.sleep(2sec) %>
+
+> This includes classes in your application too!
 
 
 View Helpers [#viewHelpers]
@@ -246,7 +256,8 @@ Release Notes [#releaseNotes]
 
 v1.3.6 [#v1.3.6]
 ----------------
- - New: efan tags can be escaped with '<%% %%>' notation.
+ - New: 'using' statements can be added with '<%? using ... %>' notation
+ - New: efan tags can be escaped with '<%% ... %%>' notation.
  - Bug: Rendering 'null' values with debug logging turned on could cause NPEs.
 
 v1.3.4 [#v1.3.4]
