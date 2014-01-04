@@ -21,42 +21,6 @@ internal class TestEfanBasics : EfanTest {
 		verifyEq(text, "Hel BIGBOY lo!")
 	}
 
-	Void testFanCodeInBlockNotAllowedBlock() {
-		verifyEfanErrMsg(ErrMsgs.parserBlockInBlockNotAllowed(BlockType.fanCode, BlockType.fanCode)) {
-			text := efan.renderFromStr("Hel<% wot<%ever%> %>lo!", null)
-		}
-		verifyEfanErrMsg(ErrMsgs.parserBlockInBlockNotAllowed(BlockType.eval, BlockType.fanCode)) {
-			text := efan.renderFromStr("Hel<%= wot<%ever%> %>lo!", null)
-		}
-		verifyEfanErrMsg(ErrMsgs.parserBlockInBlockNotAllowed(BlockType.comment, BlockType.fanCode)) {
-			text := efan.renderFromStr("Hel<%# wot<%ever%> %>lo!", null)
-		}
-	}
-
-	Void testEvalInBlockNotAllowedBlock() {
-		verifyEfanErrMsg(ErrMsgs.parserBlockInBlockNotAllowed(BlockType.fanCode, BlockType.eval)) {
-			text := efan.renderFromStr("Hel<% wot<%=ever%> %>lo!", null)
-		}
-		verifyEfanErrMsg(ErrMsgs.parserBlockInBlockNotAllowed(BlockType.eval, BlockType.eval)) {
-			text := efan.renderFromStr("Hel<%= wot<%=ever%> %>lo!", null)
-		}
-		verifyEfanErrMsg(ErrMsgs.parserBlockInBlockNotAllowed(BlockType.comment, BlockType.eval)) {
-			text := efan.renderFromStr("Hel<%# wot<%=ever%> %>lo!", null)
-		}
-	}
-
-	Void testCommentInBlockNotAllowedBlock() {
-		verifyEfanErrMsg(ErrMsgs.parserBlockInBlockNotAllowed(BlockType.fanCode, BlockType.comment)) {
-			text := efan.renderFromStr("Hel<% wot<%#ever%> %>lo!", null)
-		}
-		verifyEfanErrMsg(ErrMsgs.parserBlockInBlockNotAllowed(BlockType.eval, BlockType.comment)) {
-			text := efan.renderFromStr("Hel<%= wot<%#ever%> %>lo!", null)
-		}
-		verifyEfanErrMsg(ErrMsgs.parserBlockInBlockNotAllowed(BlockType.comment, BlockType.comment)) {
-			text := efan.renderFromStr("Hel<%# wot<%#ever%> %>lo!", null)
-		}
-	}
-
 	Void testEfanCanNotEndMidBlock() {
 		verifyEfanErrMsg(ErrMsgs.parserBlockNotClosed(BlockType.fanCode)) {
 			text := efan.renderFromStr("Hel<% lo!", null)

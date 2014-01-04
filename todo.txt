@@ -1,14 +1,21 @@
 
-For v1.3.2
+For v1.3.8
 ----------
-Check for render recursion
+<%! using webmod %>
 
 
 
 Future:
 -------
-<%! using webmod %>
 
 Multiple ctx args 
  - optionally give mixin render mixin method? 
   - use a map [Str:Type] ?
+
+
+
+Bad Idea:
+---------
+Check for render recursion
+ - Is possible using efanXtra
+  
