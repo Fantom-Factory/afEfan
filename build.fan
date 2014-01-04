@@ -22,7 +22,6 @@ class Build : BuildPod {
 
 		docApi = true
 		docSrc = true
-
 	}
 	
 	@Target { help = "Compile to pod file and associated natives" }

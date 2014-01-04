@@ -13,7 +13,7 @@ Trim before / after whitespace on all tags except <%= ... %>.
 Rename BaseEfanImpl -> BaseEfanRenderer (any better names?)
  - have EfanRenderer extend BaseEfanRenderer
  - update efanXtra
-
+ - have compiler.compileWithModel() return BaseEfanRenderer 
 
 
 Bad Idea:
