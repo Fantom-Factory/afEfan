@@ -2,7 +2,7 @@ Overview [#overview]
 ********************
 'efan' is a library for rendering Embedded Fantom (efan) templates.
 
-Much like 'EJS' for Javascript, 'ERB' for Ruby and 'JSP' for Java, efan lets you embed snippets of Fantom code inside textual
+Much like 'EJS' for Javascript, 'ERB' for Ruby and 'JSP' for Java, 'efan' lets you embed snippets of Fantom code inside textual
 templates.
 
 'efan' aims to hit the middle ground between programmatically rendering markup with `web::WebOutStream` and rendering
@@ -16,9 +16,23 @@ logicless templates such as [Mustache]`https://bitbucket.org/xored/mustache/`.
 
 
 
+Install [#install]
+******************
+Install 'efan' with the [Fantom Respository Manager]`http://fantom.org/doc/docFanr/Tool.html#install`:
+
+  C:\> fanr install -r http://repo.status302.com/fanr/ afEfan
+
+Or to install manually, download the pod from [Status302]`http://repo.status302.com/browse/afEfan` and copy it to '%FAN_HOME%/lib/fan/'.
+
+To use in a Fantom project, add a dependency to its 'build.fan':
+
+  depends = ["sys 1.0", ..., "afEfan 1.3+"]
+
+
+
 Quick Start [#quickStart]
 *************************
-xmas.efan:
+1). Create a text file called 'xmas.efan':
 pre>
   <% ctx.times |i| { %>
     Ho!
@@ -26,20 +40,28 @@ pre>
   Merry Christmas!
 <pre
 
-Fantom code:
+2). Create a text file called 'Example.fan':
 pre>
-  template := `xmas.efan`.toFile.readAllStr
+using afEfan
 
-  Efan().renderFromFile(template, 3)   // --> Ho! Ho! Ho! Merry Christmas!
+class Example {
+    Void main() {
+        template := `xmas.efan`.toFile.readAllStr
+
+        text := Efan().renderFromFile(template, 3)  // --> Ho! Ho! Ho! Merry Christmas!
+        echo(text)
+    }
+}
 <pre
 
-
+3). Run 'Example.fan' as a Fantom script from the command line:
+pre>
+C:\> fan Example.fan
+Ho! Ho! Ho! Merry Christmas!
+<pre
 
 Tags [#tags]
 ************
-> **ALIEN-AID:** efan believes templates are sacred! It preserves all formatting and all whitespace **not** contained in
-> '<% ... %>' tags. Even DOS / UNIX line-endings are preserved!
-
 Efan supports the following tags:
 
 Eval Tags [#evalTags]
@@ -75,6 +97,9 @@ All efan tags can be escaped by adding an extra '%' character to the start and e
 prints:
 
   This is how you <%= escape %> efan tags.
+
+> **ALIEN-AID:** efan believes templates are sacred! It preserves all formatting and all whitespace **not** contained in
+> '<% ... %>' tags. Even DOS / UNIX line-endings are preserved!
 
 
 
