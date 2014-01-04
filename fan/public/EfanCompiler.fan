@@ -58,7 +58,7 @@ const class EfanCompiler {
 	** 
 	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
 	** 'srcLocation' is only used for reporting Err msgs.
-	BaseEfanImpl compileWithModel(Uri srcLocation, Str efanTemplate, Type? ctxType, PlasticClassModel model, |Type, EfanMetaData->BaseEfanImpl|? makeFunc := null) {
+	Obj compileWithModel(Uri srcLocation, Str efanTemplate, Type? ctxType, PlasticClassModel model, |Type, EfanMetaData->BaseEfanImpl|? makeFunc := null) {
 		if (!model.isConst)
 			throw EfanErr(ErrMsgs.rendererModelMustBeConst(model))
  
