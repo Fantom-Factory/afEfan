@@ -1,47 +1,64 @@
 using concurrent
 
 ** I've recently become a fan of threaded stacks - they get me outa a whole lot of trouble!
-internal const class ThreadStack {
+internal class ThreadStack {
 
-//	private EfanCtxStackElement[]	stack	:= EfanCtxStackElement[,]
-//		
-//	override Str toStr() {
-//		str	:= "EfanCtxStack -> ($stack.size)"
-//		stack.each { str += "\n  - $it" }
-//		return str
-//	}
-//
-// Obj getSafe(Int index) {...]
+	private Str		stackId
+	private Obj[]	stack	:= [,]
+		
 
-	** staic use only
-	private new make() { }
+	** static use only
+	private new make(Str stackId) {
+		this.stackId = stackId
+	}
+
+	private Obj get(Int index, Bool checked := true) {
+		if (checked && stack.isEmpty)
+			throw Err("ThreadStack with id '$stackId' is empty")
+		if (checked && stack.getSafe(index) == null)
+			throw Err("ThreadStack with id '$stackId' only has ${stack.size} elements")
+		return stack.getSafe(index)
+	}
 	
-	static Obj? push(Str stackId, Obj stackObj, |Obj->Obj?| func) {
+	override Str toStr() {
+		str	:= "ThreadStack '${stackId}' is ($stack.size) deep:"
+		stack.each { str += "\n  - $it" }
+		return str
+	}
+
+	
+	// ---- public static methods --------------------------------------------------------------------------------------
+	
+	static Obj? pushAndRun(Str stackId, Obj stackObj, |Obj->Obj?| func) {
 		threadStack	:= getOrMakeStack(stackId)
-		threadStack.push(stackObj)
+		threadStack.stack.push(stackObj)
 		try {
 			return func.call(stackObj)
 			
 		} finally {
-			threadStack.pop
-			if (threadStack.isEmpty)
+			threadStack.stack.pop
+			if (threadStack.stack.isEmpty)
 				Actor.locals.remove(stackId)			
 		}
 	}
 
 	static Obj? peek(Str stackId, Bool checked := true) {
-		getStack(stackId, checked)?.getSafe(-1) ?: (checked ? throw EfanErr("ThreadStack with id '$stackId' was empty") : null)
+		getStack(stackId, checked)?.get(-1, checked)
 	}
 
 	static Obj? peekParent(Str stackId, Bool checked := true) {
-		getStack(stackId, checked)?.getSafe(-2) ?: (checked ? throw EfanErr("ThreadStack with id '$stackId' was only has ${getStack(stackId, checked)?.size} elements") : null)	// if null && checked, getStack() will throw err 
+		getStack(stackId, checked)?.get(-2, checked) 
 	}
 
-	private static Obj[]? getStack(Str stackId, Bool checked) {
-		Actor.locals.get(stackId) ?: (checked ? throw EfanErr("Could not find ThreadStack on thread with id '$stackId'") : null)		
+	static Obj[]? elements(Str stackId, Bool checked := true) {
+		getStack(stackId, checked)?.stack
 	}
 
-	private static Obj[] getOrMakeStack(Str stackId) {
-		Actor.locals.getOrAdd(stackId) { Obj[,] }
+	private static ThreadStack? getStack(Str stackId, Bool checked) {
+		Actor.locals.get(stackId) ?: (checked ? throw Err("Could not find ThreadStack in Actor.locals() with id '$stackId'") : null)		
+	}
+
+	private static ThreadStack getOrMakeStack(Str stackId) {
+		Actor.locals.getOrAdd(stackId) { ThreadStack(stackId) }
 	}
 }

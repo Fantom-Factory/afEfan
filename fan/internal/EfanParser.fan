@@ -6,6 +6,8 @@ internal const class EfanParser {
 	private const PlasticCompiler	plasticCompiler
 	
 	// don't contribute these, as currently, there are a lot of assumptions around <%# starting with <%
+	private static const Str tokenEscapeStart	:= "<%%"
+	private static const Str tokenEscapeEnd		:= "%%>"
 	private static const Str tokenFanCodeStart	:= "<%"
 	private static const Str tokenCommentStart	:= "<%#"
 	private static const Str tokenEvalStart		:= "<%="
@@ -15,32 +17,43 @@ internal const class EfanParser {
 	new make(PlasticCompiler plasticCompiler) {
 		this.plasticCompiler = plasticCompiler
 	}
-	
+
 	Void parse(Uri srcLocation, Pusher pusher, Str efanCode) {
 		efanIn	:= efanCode.toBuf
 		
 		buf		:= StrBuf(100)	// 100 being an average line length; it's better than 16 anyhow!
 		data	:= ParserData() { it.buf = buf; it.pusher = pusher; it.efanCode = efanCode; it.srcLocation = srcLocation; it.srcCodePadding = plasticCompiler.srcCodePadding }
 		while (efanIn.more) {
-			if (peekEq(efanIn, tokenCommentStart)) {
+			// escape chars can be in both text and blocks
+			if (peekEq(efanIn, tokenEscapeStart)) {
+				buf.addChar('<').addChar('%')
+				continue
+			}
+
+			if (peekEq(efanIn, tokenEscapeEnd)) {
+				buf.addChar('%').addChar('>')
+				continue
+			}
+
+			if (data.inText && peekEq(efanIn, tokenCommentStart)) {
 				data.push
 				data.enteringComment
 				continue
 			}
 
-			if (peekEq(efanIn, tokenEvalStart)) {
+			if (data.inText && peekEq(efanIn, tokenEvalStart)) {
 				data.push
 				data.enteringEval
 				continue
 			}
 
-			if (peekEq(efanIn, tokenFanCodeStart)) {
+			if (data.inText && peekEq(efanIn, tokenFanCodeStart)) {
 				data.push
 				data.enteringFanCode
 				continue
 			}
 
-			if (peekEq(efanIn, tokenEnd)) {
+			if (data.inBlock && peekEq(efanIn, tokenEnd)) {
 				data.push
 				data.exitingBlock
 				continue
@@ -111,27 +124,12 @@ internal class ParserData {
 	new make(|This|in) { in(this) }
 	
 	Void enteringFanCode() {
-		if (inBlock) {
-			errMsg	:= ErrMsgs.parserBlockInBlockNotAllowed(blockType, BlockType.fanCode)
-			srcCode	:= SrcCodeSnippet(srcLocation, efanCode)
-			throw EfanParserErr(srcCode, lineNo, errMsg, srcCodePadding)
-		}
 		blockType = BlockType.fanCode
 	}
 	Void enteringEval() {
-		if (inBlock) {
-			errMsg	:= ErrMsgs.parserBlockInBlockNotAllowed(blockType, BlockType.eval)
-			srcCode	:= SrcCodeSnippet(srcLocation, efanCode)
-			throw EfanParserErr(srcCode, lineNo, errMsg, srcCodePadding)
-		}
 		blockType = BlockType.eval
 	}
 	Void enteringComment() {
-		if (inBlock) {
-			errMsg	:= ErrMsgs.parserBlockInBlockNotAllowed(blockType, BlockType.comment)
-			srcCode	:= SrcCodeSnippet(srcLocation, efanCode)
-			throw EfanParserErr(srcCode, lineNo, errMsg, srcCodePadding)
-		}
 		blockType = BlockType.comment
 	}
 	Void exitingBlock() {

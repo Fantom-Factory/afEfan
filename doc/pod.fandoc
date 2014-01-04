@@ -5,8 +5,10 @@ Overview [#overview]
 Much like 'EJS' for Javascript, 'ERB' for Ruby and 'JSP' for Java, efan lets you embed snippets of Fantom code inside textual
 templates.
 
-'afEfan' aims to hit the middle ground between programmatically rendering markup with `web::WebOutStream` and rendering
+'efan' aims to hit the middle ground between programmatically rendering markup with `web::WebOutStream` and rendering
 logicless templates such as [Mustache]`https://bitbucket.org/xored/mustache/`.
+
+> **ALIEN-AID:** Create powerful re-usable components with [efanXtra]`http://www.fantomfactory.org/pods/afEfanXtra` !!!
 
 > **ALIEN-AID:** If rendering HTML, use [afSlim]`http://repo.status302.com/doc/afSlim/#overview` !!!
 > The concise and lightweight template syntax makes generating HTML easy!
@@ -40,19 +42,19 @@ Tags [#tags]
 Efan supports the following tags:
 
 Eval Tags [#evalTags]
-=================
+=====================
 Any tag with the prefix '<%=' will evaluate the fantom expression and write it out as a Str.
 
   Hello, <%= "Emma".upper %>!
 
 Comment Tags [#commentTags]
-=======================
+===========================
 Any tag with the prefix '<%#' is a comment and will be left out of the resulting template.
 
   <%# This is just a comment %>
 
 Code Tags [#codeTags]
-=======================
+=====================
 Any tag with the prefix '<%' will be converted into Fantom code.
 
   <% echo("Hello!") %>
@@ -62,8 +64,20 @@ Any tag with the prefix '<%' will be converted into Fantom code.
 
 > <% concurrent::Actor.sleep(2sec) %>
 
+Escape Tags [#escapeTags]
+=========================
+Any efan tags can be escaped by adding an extra '%' character:
+
+  This is how you <%%# escape %%> efan tags.
+
+Would print:
+
+  This is how you <%# escape %> efan tags.
+
+
+
 Template Context [#ctx]
-=======================
+***********************
 Each template render method takes an argument called 'ctx' which you can reference in your template.
 'ctx' is typed to whatever Obj you pass in, so you don't need to cast it. Examples:
 
@@ -232,6 +246,7 @@ Release Notes [#releaseNotes]
 
 v1.3.6 [#v1.3.6]
 ----------------
+ - New: efan tags can be escaped with '<%% %%>' notation.
  - Bug: Rendering 'null' values with debug logging turned on could cause NPEs.
 
 v1.3.4 [#v1.3.4]
@@ -266,7 +281,7 @@ v1.2.0 [#v1.2.0]
 v1.1.0 [#v1.1.0]
 ----------------
  - New: Added 'EfanRenderCtx' to ease efan extensions.
- - Chg: Updated to use [afPlastic]`http://repo.status302.com/doc/afPlastic/#overview`.
+ - Chg: Updated to use [Plastic]`http://repo.status302.com/doc/afPlastic/#overview`.
  - Chg: `EfanCompiler` now returns the rendering type, not an 'EfanRenderer' instance.
  - Chg: `EfanRenderer` is now a mixin and is implemented by the rendering type.
  - Chg: 'renderEfan()' and 'renderBody()' are now methods on `EfanRenderer`.
@@ -275,9 +290,9 @@ v1.0.0 [#v1.0.0]
 ----------------
  - New: Efan templates may now be nested and can optionally render their body!
  - Chg: `EfanCompiler` wraps the generated renderer in a sane 'const' `EfanRenderer` wrapper.
- - Chg: Removed dependency on [afBedSheet]`http://repo.status302.com/doc/afBedSheet/#overview` - see
+ - Chg: Removed dependency on [BedSheet]`http://repo.status302.com/doc/afBedSheet/#overview` - see
  [afBedSheetEfan]`http://repo.status302.com/doc/afBedSheetEfan/#overview` for BedSheet integration.
- - Chg: Removed dependency on [afIoc]`http://repo.status302.com/doc/afIoc/#overview`, all 'afPlastic' has been copied in to efan.
+ - Chg: Removed dependency on [Ioc]`http://www.fantomfactory.org/pods/afIoc`, all 'afPlastic' has been copied in to efan.
  - Chg: Updated docs.
 
 v0.0.4 [#v0.0.4]

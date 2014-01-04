@@ -9,7 +9,7 @@ class EfanCtxStack {
 		currentId	:= ((EfanCtxStackElement?) ThreadStack.peek(stackId, false))?.nestedId
 		nestedId	:= goDeeper(currentId, id)
 		element		:= EfanCtxStackElement(nestedId)
-		return ThreadStack.push(stackId, element, func)
+		return ThreadStack.pushAndRun(stackId, element, func)
 	}
 	
 	static EfanCtxStackElement peek() {
