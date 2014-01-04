@@ -1,9 +1,10 @@
 using afPlastic::PlasticCompilationErr
 using afPlastic::PlasticClassModel
 using afPlastic::PlasticCompiler
+using afPlastic::SrcCodeSnippet
 
 ** Compiles efan templates into `EfanRenderer` classes. 
-** Call 'render()' to render the efan template into a Str. 
+** Call 'render()' on the returned objects to render the efan template into a Str. 
 ** 
 **    template := ...
 **    renderer := EfanCompiler().compile(`index.efan`, template)
@@ -37,7 +38,7 @@ const class EfanCompiler {
 		this.parser				= EfanParser(plasticCompiler)
 	}
 
-	** Standard compilation usage; compiles a new renderer from the given efanTemplate. 
+	** Standard compilation usage; compiles and instantiates a new renderer from the given efanTemplate. 
 	** The compiled renderer extends the given view helper mixins.
 	** 
 	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
@@ -46,21 +47,23 @@ const class EfanCompiler {
 		model	:= PlasticClassModel(rendererClassName, true)
 		model.extendMixin(EfanRenderer#)
 		viewHelpers.each { model.extendMixin(it) }
-		return compileWithModel(srcLocation, efanTemplate, ctxType, model)
+		return (EfanRenderer) compileWithModel(srcLocation, efanTemplate, ctxType, model)
 	}
 
-	** Advanced compiler usage; the efan render methods are added to the given 
-	** [afPlastic]`http://repo.status302.com/doc/afPlastic/#overview` model.
+	** Advanced compiler usage; compiles and instantiates a new renderer from the given  
+	** [Plastic]`http://repo.status302.com/doc/afPlastic/#overview` model.
 	** 
 	** The (optional) 'makeFunc' is used to create an 'EfanRenderer' instance from the supplied Type
 	** and meta data. 
 	** 
 	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
 	** 'srcLocation' is only used for reporting Err msgs.
-	Obj compileWithModel(Uri srcLocation, Str efanTemplate, Type? ctxType, PlasticClassModel model, |Type, EfanMetaData->BaseEfanImpl|? makeFunc := null) {
+	BaseEfanImpl compileWithModel(Uri srcLocation, Str efanTemplate, Type? ctxType, PlasticClassModel model, |Type, EfanMetaData->BaseEfanImpl|? makeFunc := null) {
 		if (!model.isConst)
 			throw EfanErr(ErrMsgs.rendererModelMustBeConst(model))
  
+		efanModel	:= parseIntoModel(srcLocation, efanTemplate)
+
 		// check the ctx type here so it also works from renderEfan()  
 		renderType	:= (Type?) null
 		ctxTypeSig	:= (ctxType == null) ? "Obj?" : ctxType.signature
@@ -71,11 +74,13 @@ const class EfanCompiler {
 		renderCode	+= "	throw afEfan::EfanErr(\"ctx \${_ctx.typeof.signature} ${ErrMsgs.rendererCtxBadFit(ctxType)}\")\n"
 		renderCode	+= "${ctxTypeSig} ctx := _ctx\n"
 		renderCode	+= "\n"
-		renderCode	+=  parseIntoCode(srcLocation, efanTemplate)
+		renderCode	+=  efanModel.code
 
 		// 'cos it'll be common to want to cast to it - I did! 
 		// I spent half an hour tracking down why my cast didn't work! 
-		model.usingType(EfanRenderer#)	
+		model.usingType(EfanRenderer#)
+		efanModel.usings.each { model.usingStr(it) }
+		
 		model.extendMixin(BaseEfanImpl#)
 		model.addField(EfanMetaData#, "_af_efanMetaData")
 		model.overrideField(BaseEfanImpl#efanMetaData, "_af_efanMetaData", """throw Err("efanMetaData is read only.")""")
@@ -130,9 +135,14 @@ const class EfanCompiler {
 		return viewHelpers
 	}
 	
-	internal Str parseIntoCode(Uri srcLocation, Str efan) {
-		data := EfanModel(efan.size)
+	private EfanModel parseIntoModel(Uri srcLocation, Str efan) {
+		data := EfanModel(SrcCodeSnippet(srcLocation, efan), plasticCompiler.srcCodePadding, efan.size)
 		parser.parse(srcLocation, data, efan)
-		return data.toFantomCode
+		return data
+	}
+
+	** used in testing
+	internal Str parseIntoCode(Uri srcLocation, Str efan) {
+		parseIntoModel(srcLocation, efan).toFantomCode
 	}
 }

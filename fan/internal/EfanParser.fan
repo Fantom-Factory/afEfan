@@ -6,12 +6,13 @@ internal const class EfanParser {
 	private const PlasticCompiler	plasticCompiler
 	
 	// don't contribute these, as currently, there are a lot of assumptions around <%# starting with <%
-	private static const Str tokenEscapeStart	:= "<%%"
-	private static const Str tokenEscapeEnd		:= "%%>"
-	private static const Str tokenFanCodeStart	:= "<%"
-	private static const Str tokenCommentStart	:= "<%#"
-	private static const Str tokenEvalStart		:= "<%="
-	private static const Str tokenEnd			:= "%>"
+	private static const Str tokenEscapeStart		:= "<%%"
+	private static const Str tokenEscapeEnd			:= "%%>"
+	private static const Str tokenFanCodeStart		:= "<%"
+	private static const Str tokenCommentStart		:= "<%#"
+	private static const Str tokenEvalStart			:= "<%="
+	private static const Str tokenInstructionStart	:= "<%?"
+	private static const Str tokenEnd				:= "%>"
 	
 	** We pass the PlasticCompiler in so we always get the latest srcCodePadding
 	new make(PlasticCompiler plasticCompiler) {
@@ -44,6 +45,12 @@ internal const class EfanParser {
 			if (data.inText && peekEq(efanIn, tokenEvalStart)) {
 				data.push
 				data.enteringEval
+				continue
+			}
+
+			if (data.inText && peekEq(efanIn, tokenInstructionStart)) {
+				data.push
+				data.enteringInstruction
 				continue
 			}
 
@@ -132,6 +139,9 @@ internal class ParserData {
 	Void enteringComment() {
 		blockType = BlockType.comment
 	}
+	Void enteringInstruction() {
+		blockType = BlockType.instruction
+	}
 	Void exitingBlock() {
 		pusher.onExit(lineNoToSend, blockType)
 		lineNoToSend = lineNo
@@ -153,6 +163,8 @@ internal class ParserData {
 			pusher.onComment(lineNoToSend, buf.toStr)
 		if (blockType == BlockType.fanCode)
 			pusher.onFanCode(lineNoToSend, buf.toStr)
+		if (blockType == BlockType.instruction)
+			pusher.onInstruction(lineNoToSend, buf.toStr)
 		if (blockType == BlockType.eval)
 			pusher.onEval(lineNoToSend, buf.toStr)
 		lineNoToSend = lineNo
@@ -161,13 +173,14 @@ internal class ParserData {
 }
 
 internal enum class BlockType {
-	text, comment, fanCode, eval; 
+	text, comment, fanCode, eval, instruction; 
 }
 
 internal mixin Pusher {
 	abstract Void onFanCode(Int lineNo, Str fanCode)
 	abstract Void onComment(Int lineNo, Str comment)
 	abstract Void onText(Int lineNo, Str text)
-	abstract Void onEval(Int lineNo, Str text)
+	abstract Void onEval(Int lineNo, Str fanCode)
+	abstract Void onInstruction(Int lineNo, Str instruction)
 	abstract Void onExit(Int lineNo, BlockType blockType)
 }

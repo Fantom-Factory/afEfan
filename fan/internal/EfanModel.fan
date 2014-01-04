@@ -1,11 +1,17 @@
+using afPlastic::SrcCodeSnippet
 
 internal class EfanModel : Pusher {
 	
 	StrBuf 	code
 	Int		indentSize	:= 1
+	Str[]	usings		:= [,]
+	SrcCodeSnippet snippet
+	Int		linesOfPadding
 	
-	new make(Int bufSize) {
-		this.code 		= StrBuf(bufSize)
+	new make(SrcCodeSnippet snippet, Int linesOfPadding, Int bufSize) {
+		this.code 			= StrBuf(bufSize)
+		this.snippet		= snippet
+		this.linesOfPadding	= linesOfPadding
 	}
 	
 	override Void onFanCode(Int lineNo, Str text) {
@@ -30,8 +36,8 @@ internal class EfanModel : Pusher {
 			indentSize++
 	}
 
-	override Void onEval(Int lineNo, Str text) {
-		eval := text.trim
+	override Void onEval(Int lineNo, Str code) {
+		eval := code.trim
 		if (eval.isEmpty) return
 		
 		if (eval.contains("\n")) {
@@ -54,6 +60,17 @@ internal class EfanModel : Pusher {
 			appendMulti(comment, lineNo) { "// # " + it }
 		} else {
 			indent.append("// # ${comment}").appendLineNo(lineNo).endLine
+		}
+	}
+
+	override Void onInstruction(Int lineNo, Str code) {
+		instruction := code.trim
+		if (instruction.isEmpty) return
+
+		if (instruction.lower.startsWith("using ")) {
+			usings.add(instruction["using ".size..-1] + "\t// (efan) --> ${lineNo}")
+		} else {
+			throw EfanParserErr(snippet, lineNo, ErrMsgs.unknownInstruction(instruction), linesOfPadding)
 		}
 	}
 	
