@@ -36,7 +36,7 @@ class EfanRenderCtx {
 		if (bodyFunc == null)
 			return
 		
-		parent := EfanCtxStack.peekParent("Could not render body - there is no enclosing template!")
+		parent := EfanCtxStack.peekParent(true, "Could not render body - there is no enclosing template!")
 		
 		EfanCtxStack.withCtx("Body") |EfanCtxStackElement element| {
 			// copy the ctx down from the parent
