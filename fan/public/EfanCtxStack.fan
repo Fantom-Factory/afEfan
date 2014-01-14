@@ -16,8 +16,8 @@ class EfanCtxStack {
 		ThreadStack.peek(stackId, false) ?: throw EfanErr("Could not find EfanCtxStackElement on thread.")
 	}
 
-	static EfanCtxStackElement peekParent(Str? errMsg := null) {
-		ThreadStack.peekParent(stackId, false) ?: throw EfanErr(errMsg ?: "Could not a parent of EfanCtxStackElement")
+	static EfanCtxStackElement? peekParent(Bool checked := true, Str? errMsg := null) {
+		ThreadStack.peekParent(stackId, false) ?: (checked ? throw EfanErr(errMsg ?: "Could not a parent of EfanCtxStackElement") : null)
 	}
 
 	private static Str goDeeper(Str? currentId, Str id) {

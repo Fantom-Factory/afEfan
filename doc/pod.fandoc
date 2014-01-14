@@ -11,18 +11,16 @@ logicless templates such as [Mustache]`https://bitbucket.org/xored/mustache/`.
 > **ALIEN-AID:** Create powerful re-usable components with [efanXtra]`http://www.fantomfactory.org/pods/afEfanXtra` and
 > [Ioc]`http://www.fantomfactory.org/pods/afIoc` !!!
 
-> **ALIEN-AID:** If rendering HTML, use [afSlim]`http://repo.status302.com/doc/afSlim/#overview` !!!
+> **ALIEN-AID:** If rendering HTML, use [Slim]`http://www.fantomfactory.org/pods/afSlim` !!!
 > The concise and lightweight template syntax makes generating HTML easy!
 
 
 
 Install [#install]
 ******************
-Install 'efan' with the [Fantom Respository Manager]`http://fantom.org/doc/docFanr/Tool.html#install`:
+Install 'efan' with the [Fantom Repository Manager]`http://fantom.org/doc/docFanr/Tool.html#install`:
 
   C:\> fanr install -r http://repo.status302.com/fanr/ afEfan
-
-Or to install manually, download the pod from [Status302]`http://repo.status302.com/browse/afEfan` and copy it to '%FAN_HOME%/lib/fan/'.
 
 To use in a Fantom project, add a dependency to its 'build.fan':
 
@@ -59,6 +57,8 @@ pre>
 C:\> fan Example.fan
 Ho! Ho! Ho! Merry Christmas!
 <pre
+
+
 
 Tags [#tags]
 ************
