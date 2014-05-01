@@ -5,7 +5,7 @@ class Build : BuildPod {
 	new make() {
 		podName = "afEfan"
 		summary = "A library for rendering Embedded Fantom (efan) templates"
-		version = Version("1.3.8")
+		version = Version("1.3.9")
 
 		meta = [	
 			"org.name"		: "Alien-Factory",
@@ -14,7 +14,7 @@ class Build : BuildPod {
 			"proj.uri"		: "http://www.fantomfactory.org/pods/afEfan",
 			"vcs.uri"		: "https://bitbucket.org/AlienFactory/afefan",
 			"license.name"	: "The MIT Licence",
-			"repo.private"	: "false"
+			"repo.private"	: "true"
 		]
 
 		depends = [
