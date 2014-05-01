@@ -1,4 +1,4 @@
-# afEfan
+# efan
 
 `efan` is a [Fantom](http://fantom.org/) library for rendering Embedded Fantom (efan) templates.
 
@@ -10,15 +10,13 @@ Much like `EJS` for Javascript, `ERB` for Ruby and `JSP` for Java, `efan` allows
 
 ## Install
 
-Download from [status302](http://repo.status302.com/browse/afEfan).
+Install `efan` with the Fantom Respository Manager ( [fanr](http://fantom.org/doc/docFanr/Tool.html#install) ):
 
-Or install via fanr:
-
-    $ fanr install -r http://repo.status302.com/fanr/ afEfan
+    C:\> fanr install -r http://repo.status302.com/fanr/ afEfan
 
 To use in a project, add a dependency in your `build.fan`:
 
-    depends = ["sys 1.0", ..., "afEfan 1+"]
+    depends = ["sys 1.0", ..., "afEfan 1.3+"]
 
 
 

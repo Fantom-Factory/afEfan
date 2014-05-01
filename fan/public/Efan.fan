@@ -4,7 +4,7 @@ const class Efan {
 	
 	const private EfanCompiler	efanCompiler	:= EfanCompiler()
 	
-	** Compiles a new renderer from the given efanTemplate. 
+	** Compiles a new renderer from the given efan 'Str' template. 
 	** 
 	** The compiled renderer extends the given view helper mixins.
 	** 
@@ -14,11 +14,9 @@ const class Efan {
 		return efanCompiler.compile(srcLocation, efanTemplate, ctxType, viewHelpers ?: Type#.emptyList)
 	}	
 
-	** Compiles a new renderer from the given efanFile. 
+	** Compiles a new renderer from the given efan 'File' template. 
 	** 
 	** The compiled renderer extends the given view helper mixins.
-	** 
-	** 'srcLocation' may be anything - used for meta information only.
 	EfanRenderer compileFromFile(File efanFile, Type? ctxType := null, Type[]? viewHelpers := null) {
 		srcLocation	:= efanFile.normalize.uri
 		return efanCompiler.compile(efanFile.normalize.uri, efanFile.readAllStr, ctxType, viewHelpers ?: Type#.emptyList)
