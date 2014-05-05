@@ -5,7 +5,7 @@ templates.
 
 Why stop with just 'efan'???
 
- - Create re-useable components with [efanXtra]`afEfanXtra`
- - Use [Pillow]`afPillow` for your [BedSheet]`afBedSheet` applications.
- - To render HTML, use [Slim]`afSlim`.
+ - Create re-useable components with [efanXtra]`pod:afEfanXtra`
+ - Use [Pillow]`pod:afPillow` for your [BedSheet]`pod:afBedSheet` applications.
+ - To render HTML, use [Slim]`pod:afSlim`.
 
