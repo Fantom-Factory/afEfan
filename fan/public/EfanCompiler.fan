@@ -42,13 +42,13 @@ const class EfanCompiler {
 	** The compiled renderer extends the given view helper mixins.
 	** 
 	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
-	** 'srcLocation' is only used for reporting Err msgs.
+	** 'templateLoc' is only used for reporting Err msgs.
 	EfanRenderer compile(Uri templateLoc, Str template, Type? ctxType := null, Type[] viewHelpers := Type#.emptyList) {
 		
 		model := parseTemplateIntoModel(templateLoc, template, PlasticClassModel(rendererClassName, true))
 
-		model.extendMixin(EfanRenderer#)
-		viewHelpers.each { model.extendMixin(it) }
+		model.extend(EfanRenderer#)
+		viewHelpers.each { model.extend(it) }
 		
 		// 'cos it'll be common to want to cast to it - I did! 
 		// I spent half an hour tracking down why my cast didn't work! 
@@ -60,50 +60,31 @@ const class EfanCompiler {
 		// check the ctx type here so it also works from renderEfan()  
 		ctxTypeSig	:= (ctxType == null) ? "Obj?" : ctxType.signature
 		renderCode	:= ""
-		// FIXME:
-//		renderCode	:= "ctxType := efanMetaData.ctxType\n"
-//		renderCode	+= "if (_ctx == null && ctxType != null && !ctxType.isNullable)\n"
-//		renderCode	+= "	throw afEfan::EfanErr(\"${ErrMsgs.rendererCtxIsNull} \${ctxType.typeof.signature}\")\n"
-//		renderCode	+= "if (_ctx != null && ctxType != null && !_ctx.typeof.fits(ctxType))\n"
-//		renderCode	+= "	throw afEfan::EfanErr(\"ctx \${_ctx.typeof.signature} ${ErrMsgs.rendererCtxBadFit(ctxType)}\")\n"
+		if (ctxType != null && !ctxType.isNullable) {
+			renderCode	+= "if (_ctx == null)\n"
+			renderCode	+= "	throw afEfan::EfanErr(\"${ErrMsgs.rendererCtxIsNull} ${ctxType.typeof.signature}\")\n"
+		}
+		if (ctxType != null) {
+			renderCode	+= "if (_ctx != null && !_ctx.typeof.fits(${ctxType.qname}#))\n"
+			renderCode	+= "	throw afEfan::EfanErr(\"ctx \${_ctx.typeof.signature} ${ErrMsgs.rendererCtxBadFit(ctxType)}\")\n"
+		}		
 		renderCode	+= "${ctxTypeSig} ctx := _ctx\n"
 		renderCode	+= "\n"
 		renderCode	+=  renderMethod.body
 		
-		model.addField(EfanMetaData#, "_af_efanMetaData")
-		model.overrideField(EfanRenderer#efanMetaData, "_af_efanMetaData", """throw Err("efanMetaData is read only.")""")
+		model.addField(EfanMetaData#, "_efan_metaData")
+		model.overrideField(EfanRenderer#efanMetaData, "_efan_metaData", """throw Err("efanMetaData is read only.")""")
 		model.overrideMethod(EfanRenderer#_efan_render, renderCode)
 
 		efanMetaData := compileModel(templateLoc, template, model)
 		
-		return CtorPlanBuilder(efanMetaData.type).set("_af_efanMetaData", efanMetaData).makeObj
-	}
-
-	** Advanced compiler usage; 
-	EfanMetaData compileModel(Uri templateLoc, Str template, PlasticClassModel classModel) {
-
-		efanMetaData := |Type efanType->EfanMetaData| { EfanMetaData {
-			it.type 		= efanType
-			it.typeSrc		= classModel.toFantomCode
-			it.templateLoc	= templateLoc
-			it.template		= template
-			// FQCN is pretty yucky, but for unique ids we don't have much to go on!
-			// Thankfully only efanExtra needs it, and it provides its own impl.
-			it.templateId	= type.qname
-			it.srcCodePadding = plasticCompiler.srcCodePadding
-		}}
-		
-		try {
-			efanType := plasticCompiler.compileModel(classModel)
-			return efanMetaData(efanType)
-			
-		} catch (PlasticCompilationErr err) {
-			efanMetaData(Void#).throwCompilationErr(err, err.errLineNo)
-			throw Err("WTF!?")
-		}
+		return CtorPlanBuilder(efanMetaData.type).set("_efan_metaData", efanMetaData).makeObj
 	}
 	
-	** Advanced compiler usage; 
+	** Advanced compiler usage; parses the efan template into fantom code and adds it as a 
+	** render method in the given plastic model.
+	** 
+	** 'templateLoc' is only used for reporting Err msgs.
 	PlasticClassModel parseTemplateIntoModel(Uri srcLocation, Str efanTemplate, PlasticClassModel classModel) {
 		srcSnippet	:= SrcCodeSnippet(srcLocation, efanTemplate)
 		efanModel	:= EfanModel(srcSnippet, plasticCompiler.srcCodePadding, efanTemplate.size)
@@ -123,6 +104,34 @@ const class EfanCompiler {
 			   afEfan::EfanRenderCtx.peek.renderBuf.add(it)""")
 		
 		return classModel
+	}
+
+	** Advanced compiler usage; Compiles the plastic model into a Fantom type, re-throwing any 
+	** compilation Errs with added efan information. All efan compilation info (including the type 
+	** and the template src) is available in the returned 'EfanMetaData' object.
+	**  
+	** 'templateLoc' is only used for reporting Err msgs.
+	EfanMetaData compileModel(Uri templateLoc, Str efanTemplate, PlasticClassModel classModel) {
+
+		efanMetaData := |Type efanType->EfanMetaData| { EfanMetaData {
+			it.type 		= efanType
+			it.typeSrc		= classModel.toFantomCode
+			it.templateLoc	= templateLoc
+			it.template		= efanTemplate
+			// FQCN is pretty yucky, but for unique ids we don't have much to go on!
+			// Thankfully only efanExtra needs it, and it provides its own impl.
+			it.templateId	= type.qname
+			it.srcCodePadding = plasticCompiler.srcCodePadding
+		}}
+		
+		try {
+			efanType := plasticCompiler.compileModel(classModel)
+			return efanMetaData(efanType)
+			
+		} catch (PlasticCompilationErr err) {
+			efanMetaData(Void#).throwCompilationErr(err, err.errLineNo)
+			throw Err("WTF!?")
+		}
 	}
 
 	internal Str parseIntoCode(Uri srcLocation, Str efanTemplate) {

@@ -23,11 +23,14 @@ internal class ErrMsgs {
 	}
 
 	static Str rendererCtxBadFit(Type? ctxType) {
-		"does not fit ctx renderer type ${ctxType?.signature}"
+		stripSys("does not fit ctx renderer type ${ctxType?.signature}")
 	}
 
 	static Str unknownInstruction(Str instruction) {
 		"Unknown processing instruction: ${instruction}"
 	}
 
+	private static Str stripSys(Str str) {
+		str.replace("sys::", "")
+	}
 }

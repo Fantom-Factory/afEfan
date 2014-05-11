@@ -20,6 +20,15 @@ const class EfanMetaData {
 	** The original efan template.
 	const Str template
 	
+	// ctx variables used by BedSheetEfan and Genesis - they recompile the template if they change.
+	
+	** The 'ctx' type the renderer was compiled against.
+	const Type? ctxType
+
+	** The name of the 'ctx' variable the renderer was compiled with. 
+	** Returns 'null' if a ctx variable was not used.
+	const Str? ctxName
+	
 	internal const Int srcCodePadding
 
 	@NoDoc
@@ -61,5 +70,10 @@ const class EfanMetaData {
 		}
 		
 		return efanLineNo
+	}
+	
+	** Clones this object, setting the given values.
+	EfanMetaData clone(|Field:Obj?|? overridePlan := null) {
+		Utils.cloneObj(this, overridePlan)
 	}
 }
