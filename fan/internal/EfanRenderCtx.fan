@@ -24,7 +24,8 @@ class EfanRenderCtx {
 	// ---- static methods ----
 
 	static Obj? renderEfan(StrBuf renderBuf, Obj rendering, |->|? bodyFunc, |Obj?->Obj?| func) {
-		EfanCtxStack.withCtx(rendering->efanMetaData->templateId) |EfanCtxStackElement element->Obj?| {
+		efanMetaData := (EfanMetaData) rendering->efanMetaData
+		return EfanCtxStack.withCtx(efanMetaData.templateId) |EfanCtxStackElement element->Obj?| {
 			ctx := EfanRenderCtx(renderBuf, rendering, bodyFunc)
 			element.ctx["efan.renderCtx"] = ctx
 			return convertErrs(func)
@@ -80,7 +81,8 @@ class EfanRenderCtx {
 				return reggy.find ? reggy.group(1).toInt : null
 			} ?: throw err
 
-			peek.rendering->efanMetaData->throwRuntimeErr(err, codeLineNo)
+			efanMetaData := (EfanMetaData) peek.rendering->efanMetaData
+			efanMetaData.throwRuntimeErr(err, codeLineNo)
 			throw Err("WTF?")
 		}
 	}

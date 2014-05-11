@@ -2,29 +2,35 @@ Overview [#overview]
 ********************
 'efan' is a library for rendering Embedded Fantom (efan) templates.
 
-Much like 'EJS' for Javascript, 'ERB' for Ruby and 'JSP' for Java, 'efan' lets you embed snippets of Fantom code inside textual
+Like 'EJS' for Javascript, 'ERB' for Ruby and 'JSP' for Java, 'efan' lets you embed snippets of Fantom code inside textual
 templates.
 
 'efan' aims to hit the middle ground between programmatically rendering markup with `web::WebOutStream` and rendering
 logicless templates such as [Mustache]`https://bitbucket.org/xored/mustache/`.
 
 > **ALIEN-AID:** Create powerful re-usable components with [efanXtra]`http://www.fantomfactory.org/pods/afEfanXtra` and
-> [Ioc]`http://www.fantomfactory.org/pods/afIoc` !!!
+> [IoC]`pod:afIoc` !!!
 
-> **ALIEN-AID:** If rendering HTML, use [Slim]`http://www.fantomfactory.org/pods/afSlim` !!!
+> **ALIEN-AID:** If rendering HTML, use [Slim]`pod:afSlim` !!!
 > The concise and lightweight template syntax makes generating HTML easy!
 
 
 
-Install [#install]
+Install [#Install]
 ******************
-Install 'efan' with the Fantom Repository Manager ( [fanr]`http://fantom.org/doc/docFanr/Tool.html#install` ):
+Install '@{project.name}' with the Fantom Repository Manager ( [fanr]`docFanr::Tool.install` ):
 
-  C:\> fanr install -r http://repo.status302.com/fanr/ afEfan
+  C:\> fanr install -r http://repo.status302.com/fanr/ @{pod.name}
 
-To use in a Fantom project, add a dependency to its 'build.fan':
+To use in a [Fantom]`http://fantom.org/` project, add a dependency to 'build.fan':
 
-  depends = ["sys 1.0", ..., "afEfan 1.3+"]
+  depends = ["sys 1.0", ..., "@{pod.name} @{pod.version}+"]
+
+
+
+Documentation [#documentation]
+******************************
+Full API & fandocs are available on the [Status302 repository]`http://repo.status302.com/doc/@{pod.name}/#overview`.
 
 
 
@@ -32,6 +38,8 @@ Quick Start [#quickStart]
 *************************
 1). Create a text file called 'xmas.efan':
 pre>
+syntax: jade
+
   <% ctx.times |i| { %>
     Ho!
   <% } %>
@@ -40,6 +48,8 @@ pre>
 
 2). Create a text file called 'Example.fan':
 pre>
+syntax: fantom
+
 using afEfan
 
 class Example {
@@ -110,6 +120,8 @@ Each template render method takes an argument called 'ctx' which you can referen
 
 Using maps:
 pre>
+syntax: fantom
+
   ctx := ["name":"Emma"]  // ctx is a map
 
   template := "Hello <%= ctx["name"] %>!"
@@ -119,6 +131,8 @@ pre>
 
 Using objs:
 pre>
+syntax: fantom
+
   class Entity {
     Str name
     new make(Str name) { this.name = name }
@@ -149,6 +163,8 @@ Efan lets you provide view helpers for common tasks. View helpers are 'mixins' t
 templates access to commonly used methods. Example, for escaping XML:
 
 pre>
+syntax: fantom
+
 mixin XmlViewHelper {
   Str xml(Str str) {
     str.toXml()
@@ -159,12 +175,16 @@ mixin XmlViewHelper {
 Set view helpers when calling efan:
 
 pre>
+syntax: fantom
+
   Efan().renderFromStr(template, ctx, [XmlViewHelper#])
 <pre
 
 Template usage would then be:
 
 pre>
+syntax: jade
+
   <p>
     Hello <%= xml(ctx.name) %>!
   </p>
@@ -182,6 +202,8 @@ This is best explained in an example. Here we will use the *layout pattern* to p
 
 layout.efan:
 pre>
+syntax: jade
+
 <head>
   <title><%= ctx %></title>
 </head>
@@ -192,6 +214,8 @@ pre>
 
 index.efan:
 pre>
+syntax: jade
+
 <html>
 <%= ctx.layout.render("Cranberry Whips") { %>
     ...my cool page content...
@@ -203,6 +227,8 @@ Code to run the above example:
 
 Index.fan:
 pre>
+syntax: fantom
+
 using afEfan
 
 class Index {
@@ -218,6 +244,8 @@ class Index {
 This produces an amalgamation of the two templates:
 
 pre>
+syntax: html
+
 <html>
 <head>
   <title>Cranberry Whips</title>
@@ -266,6 +294,8 @@ Each invocation of `EfanCompiler.compile` creates a new Fantom type, so use it j
 `EfanRenderer` classes is highly recommended. Example:
 
 pre>
+syntax: fantom
+
   template := "<% ctx.times |i| { %>Ho! <% } %>"
   renderer := EfanCompiler().compile(template, Int#)  // <-- cache this class!
 
@@ -278,6 +308,11 @@ pre>
 
 Release Notes [#releaseNotes]
 *****************************
+v1.4.0 [#v1.4.0]
+----------------
+ - Chg: Renamed some fields in 'EfanMetaData'. (Breaking change.)
+ - Chg: Changed the advanced methods in 'EfanCompiler'. (Breaking change.)
+
 v1.3.8 [#v1.3.8]
 ----------------
  - Chg: Updated licence to *The MIT Licence*.

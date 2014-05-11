@@ -1,19 +1,16 @@
 
-For v1.3.8
+For v1.4.0
 ----------
+Trim before / after whitespace on all tags except <%= ... %>.
+ - It's complicated to do in parser and prone to error
+ - Can get around it by using <%# \n %> tags anyway
 
+EfanRenderCtx... rendering->efanMetaData is nasty
 
 
 Future:
 -------
-Trim before / after whitespace on all tags except <%= ... %>.
- - It's complicated to do in parser and prone to error
- - Can get around it by using <%# \n %> tags anyway
  
-Rename BaseEfanImpl -> BaseEfanRenderer (any better names?)
- - have EfanRenderer extend BaseEfanRenderer
- - update efanXtra
- - have compiler.compileWithModel() return BaseEfanRenderer 
 
 
 Bad Idea:
