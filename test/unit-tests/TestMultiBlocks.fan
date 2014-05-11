@@ -8,7 +8,7 @@ internal class TestMultiBlocks : EfanTest {
 		// test the code looks pretty
 		code := compiler.parseIntoCode(``, c)
 		verify( code.contains("\t3.times |i| {"))
-		verify( code.contains("\t\t_af_code = i+1"))
+		verify( code.contains("\t\t_efan_output = i+1"))
 	}
 
 	Void testBlocksTrimmed() {

@@ -26,10 +26,6 @@ internal class ErrMsgs {
 		"does not fit ctx renderer type ${ctxType?.signature}"
 	}
 
-	static Str rendererModelMustBeConst(PlasticClassModel model) {
-		"afPlastic model for '${model.className}' must be const"
-	}
-
 	static Str unknownInstruction(Str instruction) {
 		"Unknown processing instruction: ${instruction}"
 	}

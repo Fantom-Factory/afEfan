@@ -38,89 +38,100 @@ const class EfanCompiler {
 		this.parser				= EfanParser(plasticCompiler)
 	}
 
-	** Standard compilation usage; compiles and instantiates a new renderer from the given efanTemplate. 
+	** Standard compilation usage; compiles and instantiates a new 'EfanRenderer' from the given efan template. 
 	** The compiled renderer extends the given view helper mixins.
 	** 
 	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
 	** 'srcLocation' is only used for reporting Err msgs.
-	EfanRenderer compile(Uri srcLocation, Str efanTemplate, Type? ctxType := null, Type[] viewHelpers := Type#.emptyList) {
-		model	:= PlasticClassModel(rendererClassName, true)
+	EfanRenderer compile(Uri templateLoc, Str template, Type? ctxType := null, Type[] viewHelpers := Type#.emptyList) {
+		
+		model := parseTemplateIntoModel(templateLoc, template, PlasticClassModel(rendererClassName, true))
+
 		model.extendMixin(EfanRenderer#)
 		viewHelpers.each { model.extendMixin(it) }
-		return (EfanRenderer) compileWithModel(srcLocation, efanTemplate, ctxType, model)
-	}
-
-	** Advanced compiler usage; compiles and instantiates a new renderer from the given  
-	** [Plastic]`http://repo.status302.com/doc/afPlastic/#overview` model.
-	** 
-	** The (optional) 'makeFunc' is used to create an 'EfanRenderer' instance from the supplied Type
-	** and meta data. 
-	** 
-	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
-	** 'srcLocation' is only used for reporting Err msgs.
-	Obj compileWithModel(Uri srcLocation, Str efanTemplate, Type? ctxType, PlasticClassModel model, |Type, EfanMetaData->BaseEfanImpl|? makeFunc := null) {
-		if (!model.isConst)
-			throw EfanErr(ErrMsgs.rendererModelMustBeConst(model))
- 
-		efanModel	:= parseIntoModel(srcLocation, efanTemplate)
-
-		// check the ctx type here so it also works from renderEfan()  
-		renderType	:= (Type?) null
-		ctxTypeSig	:= (ctxType == null) ? "Obj?" : ctxType.signature
-		renderCode	:= "ctxType := efanMetaData.ctxType\n"
-		renderCode	+= "if (_ctx == null && ctxType != null && !ctxType.isNullable)\n"
-		renderCode	+= "	throw afEfan::EfanErr(\"${ErrMsgs.rendererCtxIsNull} \${ctxType.typeof.signature}\")\n"
-		renderCode	+= "if (_ctx != null && ctxType != null && !_ctx.typeof.fits(ctxType))\n"
-		renderCode	+= "	throw afEfan::EfanErr(\"ctx \${_ctx.typeof.signature} ${ErrMsgs.rendererCtxBadFit(ctxType)}\")\n"
-		renderCode	+= "${ctxTypeSig} ctx := _ctx\n"
-		renderCode	+= "\n"
-		renderCode	+=  efanModel.code
-
+		
 		// 'cos it'll be common to want to cast to it - I did! 
 		// I spent half an hour tracking down why my cast didn't work! 
 		model.usingType(EfanRenderer#)
-		efanModel.usings.each { model.usingStr(it) }
+
+		renderMethod := model.methods.find { it.name == "_efan_render" }
+		model.methods.remove(renderMethod)
 		
-		model.extendMixin(BaseEfanImpl#)
+		// check the ctx type here so it also works from renderEfan()  
+		ctxTypeSig	:= (ctxType == null) ? "Obj?" : ctxType.signature
+		renderCode	:= ""
+		// FIXME:
+//		renderCode	:= "ctxType := efanMetaData.ctxType\n"
+//		renderCode	+= "if (_ctx == null && ctxType != null && !ctxType.isNullable)\n"
+//		renderCode	+= "	throw afEfan::EfanErr(\"${ErrMsgs.rendererCtxIsNull} \${ctxType.typeof.signature}\")\n"
+//		renderCode	+= "if (_ctx != null && ctxType != null && !_ctx.typeof.fits(ctxType))\n"
+//		renderCode	+= "	throw afEfan::EfanErr(\"ctx \${_ctx.typeof.signature} ${ErrMsgs.rendererCtxBadFit(ctxType)}\")\n"
+		renderCode	+= "${ctxTypeSig} ctx := _ctx\n"
+		renderCode	+= "\n"
+		renderCode	+=  renderMethod.body
+		
 		model.addField(EfanMetaData#, "_af_efanMetaData")
-		model.overrideField(BaseEfanImpl#efanMetaData, "_af_efanMetaData", """throw Err("efanMetaData is read only.")""")
-		model.overrideMethod(BaseEfanImpl#_af_render, renderCode)
-//		model.addMethod(StrBuf#, "_af_code", "", "afEfan::EfanRenderCtx.peek.renderBuf") 
+		model.overrideField(EfanRenderer#efanMetaData, "_af_efanMetaData", """throw Err("efanMetaData is read only.")""")
+		model.overrideMethod(EfanRenderer#_efan_render, renderCode)
 
-		model.addField(Log#, "_af_log").withInitValue("afEfan::EfanRenderer#.pod.log")
+		efanMetaData := compileModel(templateLoc, template, model)
 		
-		// we need the special syntax of "_af_code = XXXX" so we don't have to close any brackets with eval expressions
-		model.addField(Obj?#, "_af_code", """throw Err("_af_code is write only.")""", 
-			"""if (_af_log.isDebug)
-			   	_af_log.debug("[_af_code] \${afEfan::EfanCtxStack.peek.nestedId} -> \${it?.toStr?.toCode}")
-			   afEfan::EfanRenderCtx.peek.renderBuf.add(it)""")
-		
-		podName	:= plasticCompiler.generatePodName
-		efanMetaData	:= EfanMetaData {
-			it.srcLocation 	= srcLocation
-			it.ctxName		= ctxVarName
-			it.ctxType		= ctxType
-			it.efanTemplate	= efanTemplate
-			it.efanSrcCode	= model.toFantomCode
-			it.srcCodePadding= plasticCompiler.srcCodePadding
-			// FQCN is pretty yucky, but for unique ids we don't have much to go on!
-			// Thankfully only efanExtra needs it, and it provides its own impl.
-			it.templateId	= "${podName}::${model.className}"
-		}
-
-		try {
-			renderType	= plasticCompiler.compileModel(model, podName)
-		} catch (PlasticCompilationErr err) {
-			efanMetaData.throwCompilationErr(err, err.errLineNo)
-		}
-
-		efan	:= (makeFunc != null)
-				?  makeFunc(renderType, efanMetaData)
-				:  CtorPlanBuilder(renderType).set("_af_efanMetaData", efanMetaData).makeObj
-
-		return efan
+		return CtorPlanBuilder(efanMetaData.type).set("_af_efanMetaData", efanMetaData).makeObj
 	}
 
+	** Advanced compiler usage; 
+	EfanMetaData compileModel(Uri templateLoc, Str template, PlasticClassModel classModel) {
+
+		efanMetaData := |Type efanType->EfanMetaData| { EfanMetaData {
+			it.type 		= efanType
+			it.typeSrc		= classModel.toFantomCode
+			it.templateLoc	= templateLoc
+			it.template		= template
+			// FQCN is pretty yucky, but for unique ids we don't have much to go on!
+			// Thankfully only efanExtra needs it, and it provides its own impl.
+			it.templateId	= type.qname
+			it.srcCodePadding = plasticCompiler.srcCodePadding
+		}}
+		
+		try {
+			efanType := plasticCompiler.compileModel(classModel)
+			return efanMetaData(efanType)
+			
+		} catch (PlasticCompilationErr err) {
+			efanMetaData(Void#).throwCompilationErr(err, err.errLineNo)
+			throw Err("WTF!?")
+		}
+	}
+	
+	** Advanced compiler usage; 
+	PlasticClassModel parseTemplateIntoModel(Uri srcLocation, Str efanTemplate, PlasticClassModel classModel) {
+		srcSnippet	:= SrcCodeSnippet(srcLocation, efanTemplate)
+		efanModel	:= EfanModel(srcSnippet, plasticCompiler.srcCodePadding, efanTemplate.size)
+		parser.parse(srcLocation, efanModel, efanTemplate)
+		
+		// we *need* to return a plastic model because of this!
+		efanModel.usings.each { classModel.usingStr(it) }
+		
+		classModel.addMethod(Void#, "_efan_render", Str.defVal, efanModel.toFantomCode)
+		
+		classModel.addField(Log#, "_efan_log").withInitValue("afEfan::EfanRenderer#.pod.log")
+		
+		// we need the special syntax of "_efan_output = XXXX" so we don't have to close any brackets with eval expressions
+		classModel.addField(Obj?#, "_efan_output", """throw Err("_efan_output is write only.")""", 
+			"""if (_efan_log.isDebug)
+			   	_efan_log.debug("[_efan_output] \${afEfan::EfanCtxStack.peek.nestedId} -> \${it?.toStr?.toCode}")
+			   afEfan::EfanRenderCtx.peek.renderBuf.add(it)""")
+		
+		return classModel
+	}
+
+	internal Str parseIntoCode(Uri srcLocation, Str efanTemplate) {
+		srcSnippet	:= SrcCodeSnippet(srcLocation, efanTemplate)
+		efanModel	:= EfanModel(srcSnippet, plasticCompiler.srcCodePadding, efanTemplate.size)
+		parser.parse(srcLocation, efanModel, efanTemplate)
+		return efanModel.toFantomCode
+	}
+	
 	** Called by afBedSheetEfan - ensures all given ViewHelper types are valid. 
 	@NoDoc
 	static Type[] validateViewHelpers(Type[] viewHelpers) {
@@ -133,16 +144,5 @@ const class EfanCompiler {
 				throw EfanErr(ErrMsgs.viewHelperMixinIsNotPublic(it))
 		}
 		return viewHelpers
-	}
-	
-	private EfanModel parseIntoModel(Uri srcLocation, Str efan) {
-		data := EfanModel(SrcCodeSnippet(srcLocation, efan), plasticCompiler.srcCodePadding, efan.size)
-		parser.parse(srcLocation, data, efan)
-		return data
-	}
-
-	** used in testing
-	internal Str parseIntoCode(Uri srcLocation, Str efan) {
-		parseIntoModel(srcLocation, efan).toFantomCode
 	}
 }

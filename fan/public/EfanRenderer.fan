@@ -27,7 +27,7 @@ const mixin EfanRenderer {
 	virtual Str render(Obj? ctx, |Obj?|? bodyFunc := null) {
 		
 		// much better than the default capacity of 16 bytes!
-		renderBuf := StrBuf(efanMetaData.efanTemplate.size)
+		renderBuf := StrBuf(efanMetaData.template.size)
 		
 		// TODO: Dodgy Fantom Syntax!!!		
 		// if we change "|Obj?|? bodyFunc" to "|->| bodyFunc" then the following: 
@@ -40,8 +40,8 @@ const mixin EfanRenderer {
 		// if you forget to type it.
 		// Bizarrely enough, this DOES still work...?
 		//    render() { ... }
-		EfanRenderCtx.renderEfan(renderBuf, (BaseEfanImpl) this, (|->|?) bodyFunc) |->| {
-			_af_render(ctx)
+		EfanRenderCtx.renderEfan(renderBuf, this, (|->|?) bodyFunc) |->| {
+			_efan_render(ctx)
 		}
 		return renderBuf.toStr
 	}
@@ -59,7 +59,7 @@ const mixin EfanRenderer {
 	** </html>
 	** <pre
 	virtual Str renderBody() {
-		renderBuf := StrBuf(efanMetaData.efanTemplate.size)
+		renderBuf := StrBuf(efanMetaData.template.size)
 		EfanRenderCtx.renderBody(renderBuf)
 		return renderBuf.toStr
 	}
@@ -69,5 +69,5 @@ const mixin EfanRenderer {
 	
 	** Where the compiled efan template code lives. 
 	@NoDoc
-	abstract Void _af_render(Obj? _ctx)
+	abstract Void _efan_render(Obj? _ctx)
 }

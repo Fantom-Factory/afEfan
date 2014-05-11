@@ -43,10 +43,10 @@ internal class TestRuntimeErr : EfanTest {
 	}
 	
 	Void testRegex() {
-		code := "  afPlastic001::EfanRenderer._af_render (afPlastic001:27)"
+		code := "  afPlastic001::EfanRenderer._efan_render (afPlastic001:27)"
 		rendering1:="afPlastic001::EfanRenderer"
 		rendering2:="afPlastic001"
-		reggy 	:= Regex.fromStr("^\\s*?${rendering1}\\._af_render\\s\\(${rendering2}:([0-9]+)\\)\$")
+		reggy 	:= Regex.fromStr("^\\s*?${rendering1}\\._efan_render\\s\\(${rendering2}:([0-9]+)\\)\$")
 		reg := reggy.matcher(code)
 		reg.find
 		lineNo	:= reg.group(1).toInt

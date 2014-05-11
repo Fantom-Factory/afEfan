@@ -4,27 +4,27 @@ using afPlastic::SrcCodeSnippet
 ** This code could be in EfanRenderer but I want to keep that class as clean as possible.
 @NoDoc
 class EfanRenderCtx {
-	BaseEfanImpl	rendering
-	|->|? 			bodyFunc
-	StrBuf 			efanBuf
-	StrBuf?			bodyBuf
-	Bool			inBody
+	Obj		rendering
+	|->|? 	bodyFunc
+	StrBuf 	efanBuf
+	StrBuf?	bodyBuf
+	Bool	inBody
 
-	private new make(StrBuf renderBuf, BaseEfanImpl rendering, |->|? bodyFunc) {
+	private new make(StrBuf renderBuf, Obj rendering, |->|? bodyFunc) {
 		this.rendering	= rendering
 		this.bodyFunc 	= bodyFunc
 		this.efanBuf	= renderBuf
 	}
 	
-	** As used by _af_code
+	** As used by _efan_output
 	StrBuf renderBuf() {
 		inBody ? bodyBuf : efanBuf
 	}
 
 	// ---- static methods ----
 
-	static Obj? renderEfan(StrBuf renderBuf, BaseEfanImpl rendering, |->|? bodyFunc, |Obj?->Obj?| func) {
-		EfanCtxStack.withCtx(rendering.efanMetaData.templateId) |EfanCtxStackElement element->Obj?| {
+	static Obj? renderEfan(StrBuf renderBuf, Obj rendering, |->|? bodyFunc, |Obj?->Obj?| func) {
+		EfanCtxStack.withCtx(rendering->efanMetaData->templateId) |EfanCtxStackElement element->Obj?| {
 			ctx := EfanRenderCtx(renderBuf, rendering, bodyFunc)
 			element.ctx["efan.renderCtx"] = ctx
 			return convertErrs(func)
@@ -73,14 +73,14 @@ class EfanRenderCtx {
 
 		} catch (Err err) {
 			rType	:= peek.rendering.typeof
-			regex 	:= Regex.fromStr("^\\s*?${rType.qname}\\._af_render\\s\\(${rType.pod.name}:([0-9]+)\\)\$")
+			regex 	:= Regex.fromStr("^\\s*?${rType.qname}\\._efan_render\\s\\(${rType.pod.name}:([0-9]+)\\)\$")
 			trace	:= Utils.traceErr(err, 50)
 			codeLineNo := trace.splitLines.eachWhile |line -> Int?| {
 				reggy 	:= regex.matcher(line)
 				return reggy.find ? reggy.group(1).toInt : null
 			} ?: throw err
 
-			peek.rendering.efanMetaData.throwRuntimeErr(err, codeLineNo)
+			peek.rendering->efanMetaData->throwRuntimeErr(err, codeLineNo)
 			throw Err("WTF?")
 		}
 	}
