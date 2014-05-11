@@ -56,66 +56,66 @@ internal class TestNesting : EfanTest {
 	}
 }
 
-internal const class T_Index : BaseEfanImpl, EfanRenderer {
+internal const class T_Index : EfanRenderer {
 	override EfanMetaData efanMetaData {
-		get { EfanMetaData() { it.ctxName=""; it.srcLocation=``; it.efanTemplate=""; it.efanSrcCode=""; it.templateId="" } }
+		get { EfanMetaData() }
 		set { }
 	}
 
-	Obj? _af_code {
+	Obj? _efan_output {
 		get { null }
 		set { EfanRenderCtx.peek.renderBuf.add(it) }
 	}
 	
-	override Void _af_render(Obj? _ctx) {
+	override Void _efan_render(Obj? _ctx) {
 		[Str:Obj] ctx := _ctx
 
-		_af_code = "before\n"
-		_af_code = ((EfanRenderer)ctx["layout"]).render(ctx["layoutCtx"]) {
-			_af_code = "    body\n"
+		_efan_output = "before\n"
+		_efan_output = ((EfanRenderer)ctx["layout"]).render(ctx["layoutCtx"]) {
+			_efan_output = "    body\n"
 		}
-		_af_code = "after"
+		_efan_output = "after"
 	}		
 }
 
-internal const class T_Layout : BaseEfanImpl, EfanRenderer {
+internal const class T_Layout : EfanRenderer {
 	override EfanMetaData efanMetaData {
-		get { EfanMetaData() { it.ctxName=""; it.srcLocation=``; it.efanTemplate=""; it.efanSrcCode=""; it.templateId="" } }
+		get { EfanMetaData() }
 		set { }
 	}
 
-	Obj? _af_code {
+	Obj? _efan_output {
 		get { null }
 		set { EfanRenderCtx.peek.renderBuf.add(it) }
 	}
 	
-	override Void _af_render(Obj? _ctx) {
+	override Void _efan_render(Obj? _ctx) {
 		Int ctx := _ctx
 		
-		_af_code = "  <html> "
-		_af_code = ctx
-		_af_code = "\n"
-		_af_code = renderBody
-		_af_code = "  </html>\n"		
+		_efan_output = "  <html> "
+		_efan_output = ctx
+		_efan_output = "\n"
+		_efan_output = renderBody
+		_efan_output = "  </html>\n"		
 	}
 }
 
-internal const class T_Index2 : BaseEfanImpl, EfanRenderer {
+internal const class T_Index2 : EfanRenderer {
 	override EfanMetaData efanMetaData {
-		get { EfanMetaData() { it.ctxName=""; it.srcLocation=``; it.efanTemplate=""; it.efanSrcCode=""; it.templateId="" } }
+		get { EfanMetaData() }
 		set { }
 	}
 
-	Obj? _af_code {
+	Obj? _efan_output {
 		get { null }
 		set { EfanRenderCtx.peek.renderBuf.add(it) }
 	}
 	
-	override Void _af_render(Obj? _ctx) {
+	override Void _efan_render(Obj? _ctx) {
 		[Str:Obj] ctx := _ctx
 		
-		_af_code = "before\n"
-		_af_code = ((EfanRenderer)ctx["layout"]).render(ctx["layoutCtx"])
-		_af_code = "after"
+		_efan_output = "before\n"
+		_efan_output = ((EfanRenderer)ctx["layout"]).render(ctx["layoutCtx"])
+		_efan_output = "after"
 	}
 }

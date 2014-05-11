@@ -42,10 +42,10 @@ internal class EfanModel : Pusher {
 		if (eval.isEmpty) return
 		
 		if (eval.contains("\n")) {
-			indent.append("_af_code = ")	// no need to end this line
+			indent.append("_efan_output = ")	// no need to end this line
 			appendMulti(eval, lineNo)
 		} else {
-			indent.append("_af_code = ${eval}").appendLineNo(lineNo).endLine
+			indent.append("_efan_output = ${eval}").appendLineNo(lineNo).endLine
 		}
 		
 		if (eval.endsWith("{"))
@@ -77,7 +77,7 @@ internal class EfanModel : Pusher {
 	
 	override Void onText(Int lineNo, Str text) {
 		if (text.isEmpty) return
-		indent.append("_af_code = ${text.toCode}").appendLineNo(lineNo).endLine
+		indent.append("_efan_output = ${text.toCode}").appendLineNo(lineNo).endLine
 	}
 
 	override Void onExit(Int lineNo, BlockType blockType) { }
