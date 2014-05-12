@@ -7,7 +7,7 @@ using afPlastic::SrcCodeSnippet
 ** Call 'render()' on the returned objects to render the efan template into a Str. 
 ** 
 **    template := ...
-**    renderer := EfanCompiler().compile(`index.efan`, template)
+**    renderer := EfanCompiler().compile(`index.html.efan`, template)
 **    htmlStr  := renderer.render(...)
 ** 
 const class EfanCompiler {
@@ -77,8 +77,12 @@ const class EfanCompiler {
 		model.overrideMethod(EfanRenderer#_efan_render, renderCode)
 
 		efanMetaData := compileModel(templateLoc, template, model)
+		myEfanMeta	 := efanMetaData.clone([
+			EfanMetaData#ctxName : ctxVarName,
+			EfanMetaData#ctxType : ctxType
+		])
 		
-		return CtorPlanBuilder(efanMetaData.type).set("_efan_metaData", efanMetaData).makeObj
+		return CtorPlanBuilder(efanMetaData.type).set("_efan_metaData", myEfanMeta).makeObj
 	}
 	
 	** Advanced compiler usage; parses the efan template into fantom code and adds it as a 

@@ -40,7 +40,7 @@ const mixin EfanRenderer {
 		// if you forget to type it.
 		// Bizarrely enough, this DOES still work...?
 		//    render() { ... }
-		EfanRenderCtx.renderEfan(renderBuf, this, (|->|?) bodyFunc) |->| {
+		EfanRenderCtx.renderEfan(efanMetaData, this, renderBuf, (|->|?) bodyFunc) |->| {
 			_efan_render(ctx)
 		}
 		return renderBuf.toStr
