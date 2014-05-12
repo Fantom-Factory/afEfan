@@ -4,16 +4,18 @@ using afPlastic::SrcCodeSnippet
 ** This code could be in EfanRenderer but I want to keep that class as clean as possible.
 @NoDoc
 class EfanRenderCtx {
-	Obj		rendering
-	|->|? 	bodyFunc
-	StrBuf 	efanBuf
-	StrBuf?	bodyBuf
-	Bool	inBody
+	EfanMetaData	efanMetaData
+	Obj				rendering
+	|->|? 			bodyFunc
+	StrBuf 			efanBuf
+	StrBuf?			bodyBuf
+	Bool			inBody
 
-	private new make(StrBuf renderBuf, Obj rendering, |->|? bodyFunc) {
-		this.rendering	= rendering
-		this.bodyFunc 	= bodyFunc
-		this.efanBuf	= renderBuf
+	private new make(EfanMetaData efanMetaData, Obj rendering, StrBuf renderBuf, |->|? bodyFunc) {
+		this.efanMetaData	= efanMetaData
+		this.rendering		= rendering
+		this.bodyFunc 		= bodyFunc
+		this.efanBuf		= renderBuf
 	}
 	
 	** As used by _efan_output
@@ -23,12 +25,11 @@ class EfanRenderCtx {
 
 	// ---- static methods ----
 
-	static Obj? renderEfan(StrBuf renderBuf, Obj rendering, |->|? bodyFunc, |Obj?->Obj?| func) {
-		efanMetaData := (EfanMetaData) rendering->efanMetaData
+	static Obj? renderEfan(EfanMetaData efanMetaData, Obj rendering, StrBuf renderBuf, |->|? bodyFunc, |Obj?->Obj?| func) {
 		return EfanCtxStack.withCtx(efanMetaData.templateId) |EfanCtxStackElement element->Obj?| {
-			ctx := EfanRenderCtx(renderBuf, rendering, bodyFunc)
+			ctx := EfanRenderCtx(efanMetaData, rendering, renderBuf, bodyFunc)
 			element.ctx["efan.renderCtx"] = ctx
-			return convertErrs(func)
+			return convertErrs(efanMetaData, func)
 		}
 	}
 
@@ -47,7 +48,7 @@ class EfanRenderCtx {
 			try {
 				ctx.bodyBuf = renderBuf
 				ctx.inBody = true
-				convertErrs(bodyFunc)
+				convertErrs(ctx.efanMetaData, bodyFunc)
 				
 			} finally {
 				ctx.inBody = false
@@ -59,7 +60,7 @@ class EfanRenderCtx {
 		EfanCtxStack.peek.ctx["efan.renderCtx"]
 	}
 	
-	private static Obj? convertErrs(|Obj?->Obj?| func) {
+	private static Obj? convertErrs(EfanMetaData efanMetaData, |Obj?->Obj?| func) {
 		try {
 			// TODO: Dodgy Fantom Syntax! See EfanRender.render()
 			// currently, there is no 'it' so we just pass in a number
@@ -81,7 +82,6 @@ class EfanRenderCtx {
 				return reggy.find ? reggy.group(1).toInt : null
 			} ?: throw err
 
-			efanMetaData := (EfanMetaData) peek.rendering->efanMetaData
 			efanMetaData.throwRuntimeErr(err, codeLineNo)
 			throw Err("WTF?")
 		}

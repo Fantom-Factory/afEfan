@@ -73,7 +73,7 @@ const class EfanMetaData {
 	}
 	
 	** Clones this object, setting the given values.
-	EfanMetaData clone(|Field:Obj?|? overridePlan := null) {
-		Utils.cloneObj(this, overridePlan)
+	EfanMetaData clone([Field:Obj?]? overrides := null) {
+		Utils.cloneObj(this) |[Field:Obj?] plan| { plan.setAll(overrides) }
 	}
 }

@@ -5,7 +5,7 @@ class Build : BuildPod {
 	new make() {
 		podName = "afEfan"
 		summary = "A library for rendering Embedded Fantom (efan) templates"
-		version = Version("1.3.9")
+		version = Version("1.4.0")
 
 		meta = [	
 			"proj.name"		: "efan",
