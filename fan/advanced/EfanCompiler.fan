@@ -15,17 +15,11 @@ const class EfanCompiler {
 
 	** The class name given to compiled efan template instances.
 	const Str 	templateClassName	:= "EfanTemplateImpl"  
-
-	** Create an 'EfanCompiler'.
-	new make(|This|? in := null) {
-		in?.call(this)
-		this.engine = EfanEngine(PlasticCompiler())
-	}
 	
-	** For use by afBedSheetEfan.
-	new makeWithServices(PlasticCompiler plasticCompiler, |This|? in := null) {
+	** Create an 'EfanCompiler'.
+	new make(EfanEngine efanEngine, |This|? in := null) {
 		in?.call(this)
-		this.engine = EfanEngine(plasticCompiler)
+		this.engine = efanEngine
 	}
 
 	** Compiles and instantiates a new 'EfanTemplate' from the given efan string. 

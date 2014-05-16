@@ -10,11 +10,14 @@ const class EfanEngine {
 	** other projects, such as [afSlim]`http://repo.status302.com/doc/afSlim/#overview`.
 	const PlasticCompiler	plasticCompiler
 	
+	** Controls whether 'code' only lines are trimmed to remove (usually) unwanted line breaks.  
+	const Bool intelligentWhitespaceRemoval	:= true
+	
 	** For use by afIoc.
 	new makeWithServices(PlasticCompiler plasticCompiler, |This|? in := null) {
 		in?.call(this)
 		this.plasticCompiler	= plasticCompiler
-		this.parser				= EfanParser(plasticCompiler)
+		this.parser				= EfanParser(plasticCompiler, intelligentWhitespaceRemoval)
 	}
 
 	** Advanced compiler usage; parses the efan template into fantom code and adds it as a 
