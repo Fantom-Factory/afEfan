@@ -4,6 +4,7 @@ using afPlastic::SrcCodeSnippet
 internal const class EfanParser {
 
 	private const PlasticCompiler	plasticCompiler
+	private const Bool				removeWhitespace
 	
 	// don't contribute these, as currently, there are a lot of assumptions around <%# starting with <%
 	private static const Str tokenEscapeStart		:= "<%%"
@@ -15,24 +16,14 @@ internal const class EfanParser {
 	private static const Str tokenEnd				:= "%>"
 	
 	** We pass the PlasticCompiler in so we always get the latest srcCodePadding
-	new make(PlasticCompiler plasticCompiler) {
-		this.plasticCompiler = plasticCompiler
+	new make(PlasticCompiler plasticCompiler, Bool removeWhitespace) {
+		this.plasticCompiler 	= plasticCompiler
+		this.removeWhitespace	= removeWhitespace
 	}
 
 	Void parse(Uri srcLocation, Pusher pusher, Str efanCode) {
-//		codeBuf	 := StrBuf(efanCode.size)
-//		efanCode.splitLines.each |line| {
-//			matcher := Regex<|^\s*(<%[^=](?:(?!%>).)+%>)\s*$|>.matcher(line)
-//			if (matcher.find) {
-//				codeBuf.add(matcher.group(1))
-//			} else {
-//				codeBuf.add(line).addChar('\n')
-//			}
-//		}
-//		efanCode = codeBuf.toStr
-
 		efanIn	:= efanCode.toBuf
-		data	:= ParserData(pusher, efanCode)
+		data	:= ParserData(pusher, efanCode, removeWhitespace)
 		while (efanIn.more) {
 			// escape chars can be in both text and blocks
 			if (peekEq(efanIn, tokenEscapeStart)) {
@@ -137,10 +128,12 @@ internal class ParserData {
 	private Int			lineNo			:= 1
 	private Int			lineNoToSend	:= 1	// needed 'cos of multilines
 	private	Push[]		pushes			:= [,]
+	private Bool		removeWs
 
-	new make(Pusher pusher, Str efanCode) {
+	new make(Pusher pusher, Str efanCode, Bool removeWhitespace) {
 		this.pusher 	= pusher
 		this.buf 		= StrBuf(efanCode.size)
+		this.removeWs	= removeWhitespace
 	}
 	
 	This addChar(Int char) {
@@ -195,10 +188,9 @@ internal class ParserData {
 		buf.clear
 	}
 	Void flush() {
-		if (pushes.size == 3 && pushes[0].isEmpty && pushes[1].canClear && pushes[-1].isEmpty) {
-			pushes.removeAt(0)
-			pushes.removeAt(-1)
-		}
+		// do dat intelligent whitespace removal - only clear lines WITH non-text blocks!
+		if (removeWs && pushes.all { it.isEmpty || it.canClear } && pushes.any { it.canClear })
+			pushes = pushes.exclude { it.isEmpty }
 		pushes.each { it.push(pusher) }
 		pushes.clear
 	}

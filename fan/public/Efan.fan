@@ -1,9 +1,14 @@
+using afPlastic
 
 ** Methods for compiling and rendering efan templates.
 ** Note these methods are non-caching.
 const class Efan {
 	
-	const private EfanCompiler	efanCompiler	:= EfanCompiler()
+	@NoDoc
+	const EfanCompiler	efanCompiler	:= EfanCompiler(EfanEngine(PlasticCompiler()))
+	
+	@NoDoc
+	new make(|This|? in := null) { in?.call(this) } 
 	
 	** Compiles a new efan template from the given efan 'Str'. 
 	** 

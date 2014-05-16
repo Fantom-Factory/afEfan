@@ -1,20 +1,16 @@
 
-For v1.4.0
+For v1.4.2
 ----------
-Trim before / after whitespace on all tags except <%= ... %>.
- - It's complicated to do in parser and prone to error
- - Can get around it by using <%# \n %> tags anyway
-
 
 
 
 Future:
 -------
- 
+
 
 
 Bad Idea:
 ---------
 Check for render recursion
  - Is possible using efanXtra
-  
+

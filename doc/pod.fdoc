@@ -74,11 +74,15 @@ Tags [#tags]
 ************
 Efan supports the following tags:
 
+
+
 Eval Tags [#evalTags]
 =====================
 Any tag with the prefix '<%=' will evaluate the fantom expression and write it out as a Str.
 
   Hello, <%= "Emma".upper %>!
+
+
 
 Comment Tags [#commentTags]
 ===========================
@@ -86,11 +90,15 @@ Any tag with the prefix '<%#' is a comment and will be left out of the resulting
 
   <%# This is just a comment %>
 
+
+
 Code Tags [#codeTags]
 =====================
 Any tag with the prefix '<%' will be converted into Fantom code.
 
   <% echo("Hello!") %>
+
+
 
 Instruction Tags [#instructionTags]
 ===================================
@@ -98,8 +106,10 @@ The content of any tag with the prefix '<%?' is taken to be a Fantom 'using' ins
 
     <%? using concurrent::Actor %>
 
+
+
 Escaping Tags [#escapingTags]
-===========================
+=============================
 All efan tags can be escaped by adding an extra '%' character to the start and end tags. Example:
 
   This is how you <%%= escape %%> efan tags.
@@ -108,8 +118,40 @@ prints:
 
   This is how you <%= escape %> efan tags.
 
-> **ALIEN-AID:** efan believes templates are sacred! It preserves all formatting and all whitespace **not** contained in
-> '<% ... %>' tags. Even DOS / UNIX line-endings are preserved!
+
+
+Whitespace [#whitespace]
+========================
+All whitespace in efan templates is preserved, except for when a line exists only to contain a code block (or similar).
+This has the effect of removing unwanted line breaks. Consider:
+
+pre>
+Hey! It's
+<% if (ctx.isXmas) { %>
+  Christmas
+<% } %>
+Time!
+<pre
+
+would be rendered as
+
+pre>
+Hey! It's
+  Christmas
+Time!
+<pre
+
+and not:
+
+pre>
+Hey! It's
+
+  Christmas
+
+Time!
+<pre
+
+(Advanced users may turn this feature off in 'EfanCompiler'.)
 
 
 
@@ -140,9 +182,8 @@ syntax: fantom
 
   ...
 
-  ctx      := Entity("Emma")  // ctx is an Entity
-
   template := "Hello <%= ctx.name %>!"
+  ctx      := Entity("Emma")  // ctx is an Entity
 
   Efan().renderFromStr(template, ctx)
 <pre
@@ -155,6 +196,7 @@ syntax: fantom
 > <%? using concurrent %><% Actor.sleep(2sec) %>
 
 > This includes classes in your application too!
+
 
 
 View Helpers [#viewHelpers]
@@ -290,14 +332,14 @@ Templates [#templates]
 Efan works by dynamically generating Fantom source code and compiling it into a Fantom type. Because types can not be
 *unloaded*, if you were compile 1000s of efan templates, it could be considered a memory leak.
 
-Each invocation of `Efan.compileXXX()` creates a new Fantom type, so use it judiciously. Caching the returned
+Each invocation of 'Efan.compileXXX()' creates a new Fantom type, so use it judiciously. Caching the returned
 `EfanTemplate` classes is highly recommended. Example:
 
 pre>
 syntax: fantom
 
   efanStr  := "<% ctx.times |i| { %>Ho! <% } %>"
-  template := Efan().compileFromStr(efanStr, Int#)  // <-- cache this class!
+  template := Efan().compileFromStr(efanStr, Int#)  // <-- cache this template!
 
   ho       := template.render(1)
   hoho     := template.render(2)
@@ -310,8 +352,9 @@ Release Notes [#releaseNotes]
 *****************************
 v1.4.0 [#v1.4.0]
 ----------------
+ - New: Intelligent whitespace removal.
  - Chg: Overhauled and simplified the public API, mainly the advanced classes. (Breaking change.)
- - Chg: Split 'EfanCompiler' up to create 'EfanEngine', a good seperation of concerns.
+ - Chg: Split 'EfanCompiler' up to create 'EfanEngine', a good seperation of concerns. (Breaking change.)
  - Chg: Renamed 'EfanRenderer' --> 'EfanTemplate'. (Breaking change.)
  - Chg: Renamed 'EfanMetaData' --> 'EfanTemplateMeta'. (Breaking change.)
 
@@ -341,7 +384,7 @@ v1.3.0 [#v1.3.0]
  - Chg: Removed 'EfanRenderer.renderEfan(...)'. All template rendering is done via 'EfanRenderer.render(...)'.
  - Chg: Nested efan templates and body functions now return a 'Str', so you MUST use eval tags; '<%= renderBody() %>'
  - Chg: Massivly simplified nested component rendering by introducing a threaded 'EfanCtxStack'.
- - Chg: Added 'EfanRenderer.id' to make debugging EfanExtra a bit more humane!
+ - Chg: Added 'EfanRenderer.id' to make debugging efanXtra a bit more humane!
 
 v1.2.0 [#v1.2.0]
 ----------------

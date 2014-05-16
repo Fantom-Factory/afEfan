@@ -2,7 +2,7 @@ using afPlastic::PlasticCompiler
 
 abstract internal class EfanTest : Test {
 	
-	EfanCompiler	compiler	:= EfanCompiler(PlasticCompiler() { it.srcCodePadding = 50 })
+	EfanCompiler	compiler	:= EfanCompiler(EfanEngine(PlasticCompiler() { it.srcCodePadding = 50 }))
 	EfanEngine		engine		:= compiler.engine
 	Efan			efan		:= Efan()
 	
