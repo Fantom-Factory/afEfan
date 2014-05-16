@@ -1,5 +1,5 @@
 
-** Represents a compiled efan template. Returned from `EfanCompiler`.
+** Represents a compiled efan template. 
 const mixin EfanRenderer {
 
 	** Meta data about the compiled efan templates
@@ -65,6 +65,7 @@ const mixin EfanRenderer {
 	}
 	
 	** Returns efanMetaData.templateId()
+	@NoDoc
 	override Str toStr() { efanMetaData.templateId }
 	
 	** Where the compiled efan template code lives. 

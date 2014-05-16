@@ -7,6 +7,7 @@ const class EfanErr : Err {
 }
 
 ** Thrown when the efan template can not be parsed.
+@NoDoc
 const class EfanParserErr : EfanErr, SrcCodeErr {
 	const override SrcCodeSnippet 	srcCode
 	const override Int 				errLineNo
@@ -30,6 +31,7 @@ const class EfanParserErr : EfanErr, SrcCodeErr {
 }
 
 ** Thrown when the generated efan code can not be compiled.
+@NoDoc
 const class EfanCompilationErr : EfanErr, SrcCodeErr {
 	const override SrcCodeSnippet 	srcCode
 	const override Int 				errLineNo
@@ -53,6 +55,7 @@ const class EfanCompilationErr : EfanErr, SrcCodeErr {
 }
 
 ** Wraps any Errs thrown when rendering from an `EfanRenderer` instance. 
+@NoDoc
 const class EfanRuntimeErr : EfanErr, SrcCodeErr {
 	const override SrcCodeSnippet 	srcCode
 	const override Int 				errLineNo
