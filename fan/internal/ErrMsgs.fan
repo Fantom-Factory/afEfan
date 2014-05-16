@@ -18,12 +18,12 @@ internal class ErrMsgs {
 		"${blockType.name.toDisplayName} block not closed."
 	}
 
-	static Str rendererCtxIsNull() {
-		"ctx is null - but renderer ctx type is not nullable:"
+	static Str compiler_ctxIsNull() {
+		"ctx is null - but ctx type is not nullable:"
 	}
 
-	static Str rendererCtxBadFit(Type? ctxType) {
-		stripSys("does not fit ctx renderer type ${ctxType?.signature}")
+	static Str compiler_ctxNoFit(Type? ctxType) {
+		stripSys("does not fit ctx type ${ctxType?.signature}")
 	}
 
 	static Str unknownInstruction(Str instruction) {

@@ -4,7 +4,7 @@ internal class TestViewHelpers : EfanTest {
 	Void testHelpersAreMixins() {
 		verifyEfanErrMsg(ErrMsgs.viewHelperMixinIsNotMixin(Int#)) {
 			EfanCompiler.validateViewHelpers([Int#])
-		}		
+		}
 	}
 	
 	Void testHelpersAreConst() {

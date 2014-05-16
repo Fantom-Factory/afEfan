@@ -1,12 +1,14 @@
 
-** Represents a compiled efan template. 
-const mixin EfanRenderer {
+** A compiled efan template, ready for rendering! 
+const mixin EfanTemplate {
 
-	** Meta data about the compiled efan templates
-	abstract EfanMetaData efanMetaData
+	** Meta data about this efan template.
+	abstract EfanTemplateMeta templateMeta
 
-	** The main render method. The 'bodyFunc' is executed when 'renderBody()' is called. Use it for
-	** enclosing content in *Layout* templates. Example:
+	** The main render method. 
+	** 
+	** The 'bodyFunc' is executed when 'renderBody()' is called. Use it when enclosing content in 
+	** *Layout* templates. Example:
 	** 
 	** pre>
 	** ...
@@ -19,15 +21,15 @@ const mixin EfanRenderer {
 	** 'ctx' must be provided. This prevents you from accidently passing in 'bodyFunc' as the 'ctx'.
 	** Example: 
 	** 
-	**   layout.render() { ... } - WRONG!
-	**   layout.render(null) { ... } - CORRECT!
+	**   layout.render() { ... }      // --> WRONG!
+	**   layout.render(null) { ... }  // --> CORRECT!
 	** 
 	** The signature for 'bodyFunc' is actually '|->|? bodyFunc' - see source for an explanation of 
 	** why '|Obj?|?' is used.
 	virtual Str render(Obj? ctx, |Obj?|? bodyFunc := null) {
 		
 		// much better than the default capacity of 16 bytes!
-		renderBuf := StrBuf(efanMetaData.template.size)
+		renderBuf := StrBuf(templateMeta.templateSrc.size)
 		
 		// TODO: Dodgy Fantom Syntax!!!		
 		// if we change "|Obj?|? bodyFunc" to "|->| bodyFunc" then the following: 
@@ -40,7 +42,7 @@ const mixin EfanRenderer {
 		// if you forget to type it.
 		// Bizarrely enough, this DOES still work...?
 		//    render() { ... }
-		EfanRenderCtx.renderEfan(efanMetaData, this, renderBuf, (|->|?) bodyFunc) |->| {
+		EfanRenderer.renderTemplate(templateMeta, this, renderBuf, (|->|?) bodyFunc) |->| {
 			_efan_render(ctx)
 		}
 		return renderBuf.toStr
@@ -59,14 +61,14 @@ const mixin EfanRenderer {
 	** </html>
 	** <pre
 	virtual Str renderBody() {
-		renderBuf := StrBuf(efanMetaData.template.size)
-		EfanRenderCtx.renderBody(renderBuf)
+		renderBuf := StrBuf(templateMeta.templateSrc.size)
+		EfanRenderer.renderBody(renderBuf)
 		return renderBuf.toStr
 	}
 	
 	** Returns efanMetaData.templateId()
 	@NoDoc
-	override Str toStr() { efanMetaData.templateId }
+	override Str toStr() { templateMeta.templateId }
 	
 	** Where the compiled efan template code lives. 
 	@NoDoc
