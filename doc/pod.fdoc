@@ -233,7 +233,7 @@ using afEfan
 
 class Index {
   Str renderIndex() {
-    index     := efan().compileFromFile(`index.efan` .toFile, EfanRenderer#)
+    index     := efan().compileFromFile(`index.efan` .toFile, EfanTemplate#)
     layout    := efan().compileFromFile(`layout.efan`.toFile, Str#)
 
     return index.render(layout)
@@ -285,23 +285,23 @@ This really helps you see where typos occurred.
 
 
 
-Renderers [#renderers]
+Templates [#templates]
 **********************
 Efan works by dynamically generating Fantom source code and compiling it into a Fantom type. Because types can not be
 *unloaded*, if you were compile 1000s of efan templates, it could be considered a memory leak.
 
-Each invocation of `EfanCompiler.compile` creates a new Fantom type, so use it judiciously. Caching the returned
-`EfanRenderer` classes is highly recommended. Example:
+Each invocation of `Efan.compileXXX()` creates a new Fantom type, so use it judiciously. Caching the returned
+`EfanTemplate` classes is highly recommended. Example:
 
 pre>
 syntax: fantom
 
-  template := "<% ctx.times |i| { %>Ho! <% } %>"
-  renderer := EfanCompiler().compile(template, Int#)  // <-- cache this class!
+  efanStr  := "<% ctx.times |i| { %>Ho! <% } %>"
+  template := Efan().compileFromStr(efanStr, Int#)  // <-- cache this class!
 
-  ho       := renderer.render(1)
-  hoho     := renderer.render(2)
-  hohoho   := renderer.render(3)
+  ho       := template.render(1)
+  hoho     := template.render(2)
+  hohoho   := template.render(3)
 <pre
 
 
@@ -310,8 +310,10 @@ Release Notes [#releaseNotes]
 *****************************
 v1.4.0 [#v1.4.0]
 ----------------
- - Chg: Renamed some fields in 'EfanMetaData'. (Breaking change.)
- - Chg: Changed the advanced methods in 'EfanCompiler'. (Breaking change.)
+ - Chg: Overhauled and simplified the public API, mainly the advanced classes. (Breaking change.)
+ - Chg: Split 'EfanCompiler' up to create 'EfanEngine', a good seperation of concerns.
+ - Chg: Renamed 'EfanRenderer' --> 'EfanTemplate'. (Breaking change.)
+ - Chg: Renamed 'EfanMetaData' --> 'EfanTemplateMeta'. (Breaking change.)
 
 v1.3.8 [#v1.3.8]
 ----------------
@@ -344,35 +346,35 @@ v1.3.0 [#v1.3.0]
 v1.2.0 [#v1.2.0]
 ----------------
  - New: Runtime Errs thrown while rendering report efan template code snippets and line numbers.
- - New: `EfanRenderer` now has an 'efanMetaData' field with more contextual information.
+ - New: 'EfanRenderer' now has an 'efanMetaData' field with more contextual information.
  - New: The class name of efan renderer instances is now configurable.
  - Chg: Rejigged the efan parser.
  - Chg: Efan template line numbers no longer take up a whole line of code.
- - Chg: `EfanCompiler` now returns a 'const' `EfanRenderer` instance, not a rendering type.
+ - Chg: 'EfanCompiler' now returns a 'const' 'EfanRenderer' instance, not a rendering type.
  - Chg: Exposed (made public) the 'EfanErr' hierarchy.
  - Chg: Added optional 'makeFunc' to 'EfanCompiler.compileWithModel()'.
 
 v1.1.0 [#v1.1.0]
 ----------------
  - New: Added 'EfanRenderCtx' to ease efan extensions.
- - Chg: Updated to use [Plastic]`http://repo.status302.com/doc/afPlastic/#overview`.
- - Chg: `EfanCompiler` now returns the rendering type, not an 'EfanRenderer' instance.
- - Chg: `EfanRenderer` is now a mixin and is implemented by the rendering type.
- - Chg: 'renderEfan()' and 'renderBody()' are now methods on `EfanRenderer`.
+ - Chg: Updated to use [Plastic]`pod:afPlastic`.
+ - Chg: 'EfanCompiler' now returns the rendering type, not an 'EfanRenderer' instance.
+ - Chg: 'EfanRenderer' is now a mixin and is implemented by the rendering type.
+ - Chg: 'renderEfan()' and 'renderBody()' are now methods on 'EfanRenderer'.
 
 v1.0.0 [#v1.0.0]
 ----------------
  - New: Efan templates may now be nested and can optionally render their body!
- - Chg: `EfanCompiler` wraps the generated renderer in a sane 'const' `EfanRenderer` wrapper.
- - Chg: Removed dependency on [BedSheet]`http://repo.status302.com/doc/afBedSheet/#overview` - see
+ - Chg: 'EfanCompiler' wraps the generated renderer in a sane 'const' 'EfanRenderer' wrapper.
+ - Chg: Removed dependency on [BedSheet]`pod:afBedSheet` - see
  [afBedSheetEfan]`http://repo.status302.com/doc/afBedSheetEfan/#overview` for BedSheet integration.
- - Chg: Removed dependency on [Ioc]`http://www.fantomfactory.org/pods/afIoc`, all 'afPlastic' has been copied in to efan.
+ - Chg: Removed dependency on [IoC]`pod:afIoc`, all 'Plastic' code has been copied in to efan.
  - Chg: Updated docs.
 
 v0.0.4 [#v0.0.4]
 ----------------
  - New: Hooked error reporting into afBedSheet.
- - New: `EfanErr` now gives code snippets and line numbers of parsing and compilation errors.
+ - New: 'EfanErr' now gives code snippets and line numbers of parsing and compilation errors.
  - Chg: Re-factored fantom code generation.
 
 v0.0.2 [#v0.0.2]

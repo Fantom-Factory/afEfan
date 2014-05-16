@@ -8,7 +8,7 @@ internal class EfanModel : Pusher {
 	private Int				indentSize	:= 1
 	private SrcCodeSnippet	snippet
 	private Int				linesOfPadding
-	
+
 	new make(SrcCodeSnippet snippet, Int linesOfPadding) {
 		this.code 			= StrBuf(snippet.srcCode.size)
 		this.snippet		= snippet

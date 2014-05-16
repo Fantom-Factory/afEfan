@@ -15,7 +15,7 @@ Str<|
      <% } %>
 |>
 		text := efan.renderFromStr(str, 3)
-		verifyEq(text, "\n\n\t>1<\n\n\t>2<\n\n\t>3<\n\n")
+		verifyEq(text, "\n\t>1<\n\t>2<\n\t>3<\n")
 	}
 
 }
