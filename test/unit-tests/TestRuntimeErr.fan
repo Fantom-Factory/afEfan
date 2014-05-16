@@ -8,8 +8,8 @@ internal class TestRuntimeErr : EfanTest {
 		       <% } %>"""
 
 		try {
-			renderer := compiler.compile(``, c, Int?#)
-			renderer.render(6)
+			template := compiler.compile(``, c, Int?#)
+			template.render(6)
 			fail
 		} catch (EfanRuntimeErr err) {
 			verifyEq(err.errLineNo, 3)
@@ -33,7 +33,7 @@ internal class TestRuntimeErr : EfanTest {
 		       inner-after"""
 
 		try {
-			outer := compiler.compile(`outer`, o, EfanRenderer#)
+			outer := compiler.compile(`outer`, o, EfanTemplate#)
 			inner := compiler.compile(`inner`, i)
 			outer.render(inner)
 			fail
@@ -43,8 +43,8 @@ internal class TestRuntimeErr : EfanTest {
 	}
 	
 	Void testRegex() {
-		code := "  afPlastic001::EfanRenderer._efan_render (afPlastic001:27)"
-		rendering1:="afPlastic001::EfanRenderer"
+		code := "  afPlastic001::EfanTemplate._efan_render (afPlastic001:27)"
+		rendering1:="afPlastic001::EfanTemplate"
 		rendering2:="afPlastic001"
 		reggy 	:= Regex.fromStr("^\\s*?${rendering1}\\._efan_render\\s\\(${rendering2}:([0-9]+)\\)\$")
 		reg := reggy.matcher(code)

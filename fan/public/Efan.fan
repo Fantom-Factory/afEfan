@@ -5,20 +5,20 @@ const class Efan {
 	
 	const private EfanCompiler	efanCompiler	:= EfanCompiler()
 	
-	** Compiles a new renderer from the given efan 'Str' template. 
+	** Compiles a new efan template from the given efan 'Str'. 
 	** 
-	** The compiled renderer extends the given view helper mixins.
+	** The compiled template extends the given view helper mixins.
 	** 
 	** 'srcLocation' may be anything - used for meta information only.
-	EfanRenderer compileFromStr(Str efanTemplate, Type? ctxType := null, Type[]? viewHelpers := null, Uri? srcLocation := null) {
+	EfanTemplate compileFromStr(Str efanTemplate, Type? ctxType := null, Type[]? viewHelpers := null, Uri? srcLocation := null) {
 		srcLocation	= srcLocation ?: `from/efan/template`
 		return efanCompiler.compile(srcLocation, efanTemplate, ctxType, viewHelpers ?: Type#.emptyList)
 	}	
 
-	** Compiles a new renderer from the given efan 'File' template. 
+	** Compiles a new template from the given efan 'File'. 
 	** 
-	** The compiled renderer extends the given view helper mixins.
-	EfanRenderer compileFromFile(File efanFile, Type? ctxType := null, Type[]? viewHelpers := null) {
+	** The compiled template extends the given view helper mixins.
+	EfanTemplate compileFromFile(File efanFile, Type? ctxType := null, Type[]? viewHelpers := null) {
 		srcLocation	:= efanFile.normalize.uri
 		return efanCompiler.compile(efanFile.normalize.uri, efanFile.readAllStr, ctxType, viewHelpers ?: Type#.emptyList)
 	}	
@@ -27,13 +27,13 @@ const class Efan {
 	** 
 	** 'srcLocation' may be anything - used for meta information only.
 	Str renderFromStr(Str efanTemplate, Obj? ctx := null, Type[]? viewHelpers := null, Uri? srcLocation := null) {
-		renderer := compileFromStr(efanTemplate, ctx?.typeof, viewHelpers, srcLocation)
-		return renderer.render(ctx)
+		template := compileFromStr(efanTemplate, ctx?.typeof, viewHelpers, srcLocation)
+		return template.render(ctx)
 	}
 
 	** Compiles and renders the given efan 'File' template.
 	Str renderFromFile(File efanFile, Obj? ctx := null, Type[]? viewHelpers := null) {
-		renderer := compileFromFile(efanFile, ctx?.typeof, viewHelpers)
-		return renderer.render(ctx)
+		template := compileFromFile(efanFile, ctx?.typeof, viewHelpers)
+		return template.render(ctx)
 	}
 }

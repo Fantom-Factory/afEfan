@@ -1,5 +1,5 @@
 index-before
-<%= ((EfanRenderer) ctx["layout"]).render(ctx["layoutCtx"]) { %>
+<%= ((EfanTemplate) ctx["layout"]).render(ctx["layoutCtx"]) { %>
     index-body
 <% } %>
 index-after

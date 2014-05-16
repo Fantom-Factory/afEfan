@@ -21,23 +21,23 @@ const class EfanEngine {
 	** render method in the given plastic model.
 	** 
 	** 'templateLoc' is only used for reporting Err msgs.
-	PlasticClassModel parseTemplateIntoModel(Uri srcLocation, Str efanTemplate, PlasticClassModel classModel) {
-		srcSnippet	:= SrcCodeSnippet(srcLocation, efanTemplate)
-		efanModel	:= EfanModel(srcSnippet, plasticCompiler.srcCodePadding, efanTemplate.size)
-		parser.parse(srcLocation, efanModel, efanTemplate)
+	PlasticClassModel parseTemplateIntoModel(Uri srcLocation, Str templateSrc, PlasticClassModel classModel) {
+		srcSnippet	:= SrcCodeSnippet(srcLocation, templateSrc)
+		efanModel	:= EfanModel(srcSnippet, plasticCompiler.srcCodePadding)
+		parser.parse(srcLocation, efanModel, templateSrc)
 		
 		// we *need* to return a plastic model because of this!
 		efanModel.usings.each { classModel.usingStr(it) }
 		
 		classModel.addMethod(Void#, "_efan_render", Str.defVal, efanModel.toFantomCode)
 		
-		classModel.addField(Log#, "_efan_log").withInitValue("afEfan::EfanRenderer#.pod.log")
+		classModel.addField(Log#, "_efan_log").withInitValue("afEfan::EfanTemplate#.pod.log")
 		
 		// we need the special syntax of "_efan_output = XXXX" so we don't have to close any brackets with eval expressions
 		classModel.addField(Obj?#, "_efan_output", """throw Err("_efan_output is write only.")""", 
 			"""if (_efan_log.isDebug)
-			   	_efan_log.debug("[_efan_output] \${afEfan::EfanCtxStack.peek.nestedId} -> \${it?.toStr?.toCode}")
-			   afEfan::EfanRenderCtx.peek.renderBuf.add(it)""")
+			   	_efan_log.debug("[_efan_output] \${afEfan::EfanRenderingStack.peek.nestedId} -> \${it?.toStr?.toCode}")
+			   afEfan::EfanRenderer.peek.renderBuf.add(it)""")
 		
 		return classModel
 	}
@@ -47,13 +47,13 @@ const class EfanEngine {
 	** and the template src) is available in the returned 'EfanMetaData' object.
 	**  
 	** 'templateLoc' is only used for reporting Err msgs.
-	EfanMetaData compileModel(Uri templateLoc, Str efanTemplate, PlasticClassModel classModel) {
+	EfanTemplateMeta compileModel(Uri templateLoc, Str templateSrc, PlasticClassModel classModel) {
 
-		efanMetaData := |Type efanType->EfanMetaData| { EfanMetaData {
+		efanMetaData := |Type efanType->EfanTemplateMeta| { EfanTemplateMeta {
 			it.type 		= efanType
 			it.typeSrc		= classModel.toFantomCode
 			it.templateLoc	= templateLoc
-			it.template		= efanTemplate
+			it.templateSrc	= templateSrc
 			// FQCN is pretty yucky, but for unique ids we don't have much to go on!
 			// Thankfully only efanExtra needs it, and it provides its own impl.
 			it.templateId	= type.qname
@@ -72,7 +72,7 @@ const class EfanEngine {
 	
 	internal Str parseIntoCode(Uri srcLocation, Str efanTemplate) {
 		srcSnippet	:= SrcCodeSnippet(srcLocation, efanTemplate)
-		efanModel	:= EfanModel(srcSnippet, plasticCompiler.srcCodePadding, efanTemplate.size)
+		efanModel	:= EfanModel(srcSnippet, plasticCompiler.srcCodePadding)
 		parser.parse(srcLocation, efanModel, efanTemplate)
 		return efanModel.toFantomCode
 	}

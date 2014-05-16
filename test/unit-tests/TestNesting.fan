@@ -56,37 +56,37 @@ internal class TestNesting : EfanTest {
 	}
 }
 
-internal const class T_Index : EfanRenderer {
-	override EfanMetaData efanMetaData {
-		get { EfanMetaData() }
+internal const class T_Index : EfanTemplate {
+	override EfanTemplateMeta templateMeta {
+		get { EfanTemplateMeta() }
 		set { }
 	}
 
 	Obj? _efan_output {
 		get { null }
-		set { EfanRenderCtx.peek.renderBuf.add(it) }
+		set { EfanRenderer.peek.renderBuf.add(it) }
 	}
 	
 	override Void _efan_render(Obj? _ctx) {
 		[Str:Obj] ctx := _ctx
 
 		_efan_output = "before\n"
-		_efan_output = ((EfanRenderer)ctx["layout"]).render(ctx["layoutCtx"]) {
+		_efan_output = ((EfanTemplate)ctx["layout"]).render(ctx["layoutCtx"]) {
 			_efan_output = "    body\n"
 		}
 		_efan_output = "after"
 	}		
 }
 
-internal const class T_Layout : EfanRenderer {
-	override EfanMetaData efanMetaData {
-		get { EfanMetaData() }
+internal const class T_Layout : EfanTemplate {
+	override EfanTemplateMeta templateMeta {
+		get { EfanTemplateMeta() }
 		set { }
 	}
 
 	Obj? _efan_output {
 		get { null }
-		set { EfanRenderCtx.peek.renderBuf.add(it) }
+		set { EfanRenderer.peek.renderBuf.add(it) }
 	}
 	
 	override Void _efan_render(Obj? _ctx) {
@@ -100,22 +100,22 @@ internal const class T_Layout : EfanRenderer {
 	}
 }
 
-internal const class T_Index2 : EfanRenderer {
-	override EfanMetaData efanMetaData {
-		get { EfanMetaData() }
+internal const class T_Index2 : EfanTemplate {
+	override EfanTemplateMeta templateMeta {
+		get { EfanTemplateMeta() }
 		set { }
 	}
 
 	Obj? _efan_output {
 		get { null }
-		set { EfanRenderCtx.peek.renderBuf.add(it) }
+		set { EfanRenderer.peek.renderBuf.add(it) }
 	}
 	
 	override Void _efan_render(Obj? _ctx) {
 		[Str:Obj] ctx := _ctx
 		
 		_efan_output = "before\n"
-		_efan_output = ((EfanRenderer)ctx["layout"]).render(ctx["layoutCtx"])
+		_efan_output = ((EfanTemplate)ctx["layout"]).render(ctx["layoutCtx"])
 		_efan_output = "after"
 	}
 }

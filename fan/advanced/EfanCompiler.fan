@@ -3,14 +3,9 @@ using afPlastic::PlasticClassModel
 using afPlastic::PlasticCompiler
 using afPlastic::SrcCodeSnippet
 
-** Compiles efan templates into `EfanRenderer` classes. 
-** Call 'render()' on the returned objects to render the efan template into a Str. 
-** 
-**    template := ...
-**    renderer := EfanCompiler().compile(`index.html.efan`, template)
-**    htmlStr  := renderer.render(...)
-** 
-@NoDoc	// still public 'cos afBedSheetEfan references validateViewHelpers()
+** Advanced API usage only!
+** Used by afBedSheetEfan
+@NoDoc
 const class EfanCompiler {
 	** Vroom vroom!!!
 	const EfanEngine engine
@@ -18,8 +13,8 @@ const class EfanCompiler {
 	** The name given to the 'ctx' variable in the render method. 
 	const Str	ctxVarName			:= "ctx"
 
-	** The class name given to compiled efan renderer instances.
-	const Str 	rendererClassName	:= "EfanRendererImpl"  
+	** The class name given to compiled efan template instances.
+	const Str 	templateClassName	:= "EfanTemplateImpl"  
 
 	** Create an 'EfanCompiler'.
 	new make(|This|? in := null) {
@@ -33,21 +28,21 @@ const class EfanCompiler {
 		this.engine = EfanEngine(plasticCompiler)
 	}
 
-	** Standard compilation usage; compiles and instantiates a new 'EfanRenderer' from the given efan template. 
-	** The compiled renderer extends the given view helper mixins.
+	** Compiles and instantiates a new 'EfanTemplate' from the given efan string. 
+	** The compiled template extends the given view helper mixins.
 	** 
 	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
 	** 'templateLoc' is only used for reporting Err msgs.
-	EfanRenderer compile(Uri templateLoc, Str template, Type? ctxType := null, Type[] viewHelpers := Type#.emptyList) {
+	EfanTemplate compile(Uri templateLoc, Str template, Type? ctxType := null, Type[] viewHelpers := Type#.emptyList) {
 		
-		model := engine.parseTemplateIntoModel(templateLoc, template, PlasticClassModel(rendererClassName, true))
+		model := engine.parseTemplateIntoModel(templateLoc, template, PlasticClassModel(templateClassName, true))
 
-		model.extend(EfanRenderer#)
+		model.extend(EfanTemplate#)
 		viewHelpers.each { model.extend(it) }
 		
 		// 'cos it'll be common to want to cast to it - I did! 
 		// I spent half an hour tracking down why my cast didn't work! 
-		model.usingType(EfanRenderer#)
+		model.usingType(EfanTemplate#)
 
 		renderMethod := model.methods.find { it.name == "_efan_render" }
 		model.methods.remove(renderMethod)
@@ -57,31 +52,30 @@ const class EfanCompiler {
 		renderCode	:= ""
 		if (ctxType != null && !ctxType.isNullable) {
 			renderCode	+= "if (_ctx == null)\n"
-			renderCode	+= "	throw afEfan::EfanErr(\"${ErrMsgs.rendererCtxIsNull} ${ctxType.typeof.signature}\")\n"
+			renderCode	+= "	throw afEfan::EfanErr(\"${ErrMsgs.compiler_ctxIsNull} ${ctxType.typeof.signature}\")\n"
 		}
 		if (ctxType != null) {
 			renderCode	+= "if (_ctx != null && !_ctx.typeof.fits(${ctxType.qname}#))\n"
-			renderCode	+= "	throw afEfan::EfanErr(\"ctx \${_ctx.typeof.signature} ${ErrMsgs.rendererCtxBadFit(ctxType)}\")\n"
+			renderCode	+= "	throw afEfan::EfanErr(\"ctx \${_ctx.typeof.signature} ${ErrMsgs.compiler_ctxNoFit(ctxType)}\")\n"
 		}		
 		renderCode	+= "${ctxTypeSig} ctx := _ctx\n"
 		renderCode	+= "\n"
 		renderCode	+=  renderMethod.body
 		
-		model.addField(EfanMetaData#, "_efan_metaData")
-		model.overrideField(EfanRenderer#efanMetaData, "_efan_metaData", """throw Err("efanMetaData is read only.")""")
-		model.overrideMethod(EfanRenderer#_efan_render, renderCode)
+		model.addField(EfanTemplateMeta#, "_efan_templateMeta")
+		model.overrideField(EfanTemplate#templateMeta, "_efan_templateMeta", """throw Err("templateMeta is read only.")""")
+		model.overrideMethod(EfanTemplate#_efan_render, renderCode)
 
 		efanMetaData := engine.compileModel(templateLoc, template, model)
 		myEfanMeta	 := efanMetaData.clone([
-			EfanMetaData#ctxName : ctxVarName,
-			EfanMetaData#ctxType : ctxType
+			EfanTemplateMeta#ctxName : ctxVarName,
+			EfanTemplateMeta#ctxType : ctxType
 		])
 		
-		return CtorPlanBuilder(efanMetaData.type).set("_efan_metaData", myEfanMeta).makeObj
+		return CtorPlanBuilder(efanMetaData.type).set("_efan_templateMeta", myEfanMeta).makeObj
 	}
 	
 	** Called by afBedSheetEfan - ensures all given ViewHelper types are valid. 
-	@NoDoc
 	static Type[] validateViewHelpers(Type[] viewHelpers) {
 		viewHelpers.each {
 			if (!it.isMixin)
