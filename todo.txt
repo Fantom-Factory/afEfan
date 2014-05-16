@@ -5,7 +5,6 @@ Trim before / after whitespace on all tags except <%= ... %>.
  - It's complicated to do in parser and prone to error
  - Can get around it by using <%# \n %> tags anyway
 
-What's the diff between EfanRenderCtx & EfanCtxStack? Can they be merged?
 
 
 

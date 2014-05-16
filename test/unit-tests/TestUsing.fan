@@ -5,7 +5,7 @@ internal class TestUsing : EfanTest {
 		c :="""<%? using sys::Int as Dude %>
 		       <%= Dude("69") %>""" 
 		text := efan.renderFromStr(c, null)
-		verifyEq(text, "\n69")
+		verifyEq(text, "69")
 	}
 	
 	Void testNotUsingErr() {

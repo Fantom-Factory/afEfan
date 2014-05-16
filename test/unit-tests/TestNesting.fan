@@ -13,7 +13,6 @@ internal class TestNesting : EfanTest {
 		                 index-body
 		             
 		               layout-html
-		             
 		             index-after
 		             """
 		Env.cur.err.printLine("[${html}]")

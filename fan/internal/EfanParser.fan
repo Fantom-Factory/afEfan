@@ -20,19 +20,28 @@ internal const class EfanParser {
 	}
 
 	Void parse(Uri srcLocation, Pusher pusher, Str efanCode) {
+//		codeBuf	 := StrBuf(efanCode.size)
+//		efanCode.splitLines.each |line| {
+//			matcher := Regex<|^\s*(<%[^=](?:(?!%>).)+%>)\s*$|>.matcher(line)
+//			if (matcher.find) {
+//				codeBuf.add(matcher.group(1))
+//			} else {
+//				codeBuf.add(line).addChar('\n')
+//			}
+//		}
+//		efanCode = codeBuf.toStr
+
 		efanIn	:= efanCode.toBuf
-		
-		buf		:= StrBuf(100)	// 100 being an average line length; it's better than 16 anyhow!
-		data	:= ParserData() { it.buf = buf; it.pusher = pusher; it.efanCode = efanCode; it.srcLocation = srcLocation; it.srcCodePadding = plasticCompiler.srcCodePadding }
+		data	:= ParserData(pusher, efanCode)
 		while (efanIn.more) {
 			// escape chars can be in both text and blocks
 			if (peekEq(efanIn, tokenEscapeStart)) {
-				buf.addChar('<').addChar('%')
+				data.addChar('<').addChar('%')
 				continue
 			}
 
 			if (peekEq(efanIn, tokenEscapeEnd)) {
-				buf.addChar('%').addChar('>')
+				data.addChar('%').addChar('>')
 				continue
 			}
 
@@ -78,17 +87,19 @@ internal const class EfanParser {
 					char = '\n'
 				} else {
 					if (peekEq(efanIn, "\n")) { 
-						buf.addChar(char)
+						data.addChar(char)
 						char = '\n'
 					}					
 				}
 			}
 
-			buf.addChar(char)
+			data.addChar(char)
 
 			if (newLine) {
-				if (!data.inBlock)
+				if (!data.inBlock) {
 					data.push
+					data.flush
+				}
 				data.newLine
 			}
 		}
@@ -100,6 +111,7 @@ internal const class EfanParser {
 		}
 
 		data.push
+		data.flush
 	}
 
 	** If tag is next, consume it and return true
@@ -119,16 +131,22 @@ internal const class EfanParser {
 }
 
 internal class ParserData {
-	Pusher 		pusher
-	StrBuf		buf
-	Str			efanCode
-	Uri 		srcLocation
-	BlockType	blockType		:= BlockType.text
-	Int			lineNo			:= 1
-	Int			lineNoToSend	:= 1	// needed 'cos of multilines
-	Int 		srcCodePadding	:= 5
+	private Pusher 		pusher
+	private StrBuf		buf
+			BlockType	blockType		:= BlockType.text
+	private Int			lineNo			:= 1
+	private Int			lineNoToSend	:= 1	// needed 'cos of multilines
+	private	Push[]		pushes			:= [,]
 
-	new make(|This|in) { in(this) }
+	new make(Pusher pusher, Str efanCode) {
+		this.pusher 	= pusher
+		this.buf 		= StrBuf(efanCode.size)
+	}
+	
+	This addChar(Int char) {
+		buf.addChar(char)
+		return this
+	}
 	
 	Void enteringFanCode() {
 		blockType = BlockType.fanCode
@@ -154,21 +172,53 @@ internal class ParserData {
 		blockType == BlockType.text
 	}
 	Void newLine() {
+		flush
 		lineNo++
 	}
 	Void push() {
-		if (blockType == BlockType.text)
-			pusher.onText(lineNo, buf.toStr)
-		if (blockType == BlockType.comment)
-			pusher.onComment(lineNoToSend, buf.toStr)
-		if (blockType == BlockType.fanCode)
-			pusher.onFanCode(lineNoToSend, buf.toStr)
-		if (blockType == BlockType.instruction)
-			pusher.onInstruction(lineNoToSend, buf.toStr)
-		if (blockType == BlockType.eval)
-			pusher.onEval(lineNoToSend, buf.toStr)
+		switch (blockType) {
+			case BlockType.text:
+			    pushes.add(Push() { it.method = Pusher#onText; 		it.lineNo = this.lineNo })
+			case BlockType.comment:
+			    pushes.add(Push() { it.method = Pusher#onComment; 	it.lineNo = this.lineNoToSend })
+			case BlockType.fanCode:
+			    pushes.add(Push() { it.method = Pusher#onFanCode; 	it.lineNo = this.lineNoToSend })
+			case BlockType.instruction:
+			    pushes.add(Push() { it.method = Pusher#onInstruction;it.lineNo = this.lineNoToSend })
+			case BlockType.eval:
+			    pushes.add(Push() { it.method = Pusher#onEval; 		it.lineNo = this.lineNoToSend })
+		}
+		pushes.peek.blockType = blockType
+		pushes.peek.line = buf.toStr
+		
 		lineNoToSend = lineNo
 		buf.clear
+	}
+	Void flush() {
+		if (pushes.size == 3 && pushes[0].isEmpty && pushes[1].canClear && pushes[-1].isEmpty) {
+			pushes.removeAt(0)
+			pushes.removeAt(-1)
+		}
+		pushes.each { it.push(pusher) }
+		pushes.clear
+	}
+}
+
+internal class Push {
+	static const BlockType[]	clearables := [BlockType.comment, BlockType.fanCode, BlockType.instruction]
+	Method		method
+	Int			lineNo
+	BlockType?	blockType
+	Str?		line
+	new make(|This|in) { in(this) }
+	Bool isEmpty() {
+		blockType == BlockType.text && line.trim.isEmpty
+	}
+	Bool canClear() {
+		 clearables.contains(blockType)
+	}
+	Void push(Pusher pusher) {
+		method.callOn(pusher, [lineNo, line])
 	}
 }
 
