@@ -1,14 +1,16 @@
 using afPlastic::SrcCodeSnippet
 
-** Provides meta data about an efan template.
+** Meta data about an efan template and its generated renderer. 
+** 
+** It is returned from the compiler and made available to 'EfanRenderer' objects.
 ** 
 ** @see `EfanRenderer.efanMetaData`
 const class EfanMetaData {
 
-	** The compiled efan type.
+	** The 'Type' of the compiled efan renderer.
 	const Type type
 
-	** The generated fantom code (for the inquisitive).
+	** The generated fantom code for the efan renderer (for the inquisitive).
 	const Str typeSrc
 
 	** A unique ID for the template. Defaults to the fully qualified type name.
@@ -23,6 +25,7 @@ const class EfanMetaData {
 	// ctx variables used by BedSheetEfan and Genesis - they recompile the template if they change.
 	
 	** The 'ctx' type the renderer was compiled against.
+	** Returns 'null' if a ctx variable was not used.
 	const Type? ctxType
 
 	** The name of the 'ctx' variable the renderer was compiled with. 
@@ -73,6 +76,7 @@ const class EfanMetaData {
 	}
 	
 	** Clones this object, setting the given values.
+	@NoDoc
 	EfanMetaData clone([Field:Obj?]? overrides := null) {
 		Utils.cloneObj(this) |[Field:Obj?] plan| { plan.setAll(overrides) }
 	}

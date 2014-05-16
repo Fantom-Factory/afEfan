@@ -1,5 +1,6 @@
 
-** Non-caching service methods for compiling and rendering efan templates.
+** Methods for compiling and rendering efan templates.
+** Note these methods are non-caching.
 const class Efan {
 	
 	const private EfanCompiler	efanCompiler	:= EfanCompiler()

@@ -1,4 +1,3 @@
-using concurrent::Actor
 
 ** Advanced API usage only!
 @NoDoc

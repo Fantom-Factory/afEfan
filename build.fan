@@ -20,8 +20,8 @@ class Build : BuildPod {
 			"afPlastic 1.0.10+"
 		]
 
-		srcDirs = [`test/unit-tests/`, `fan/`, `fan/public/`, `fan/internal/`, `fan/internal/utils/`]
-		resDirs = [,]
+		srcDirs = [`test/unit-tests/`, `fan/`, `fan/public/`, `fan/internal/`, `fan/internal/utils/`, `fan/advanced/`]
+		resDirs = [`doc/about.fdoc`]
 
 		docApi = true
 		docSrc = true
