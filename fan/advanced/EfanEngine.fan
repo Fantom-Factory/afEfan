@@ -37,10 +37,12 @@ const class EfanEngine {
 		classModel.addField(Log#, "_efan_log").withInitValue("afEfan::EfanTemplate#.pod.log")
 		
 		// we need the special syntax of "_efan_output = XXXX" so we don't have to close any brackets with eval expressions
+		// peek(false) to prevent dodgy / nasty errs during an IoC autobuild when a provider thinks it can provide Obj
+		// like what efanXtra did on upgrading to IoC 2.0.0!
 		classModel.addField(Obj?#, "_efan_output", """throw Err("_efan_output is write only.")""", 
 			"""if (_efan_log.isDebug)
-			   	_efan_log.debug("[_efan_output] \${afEfan::EfanRenderingStack.peek.nestedId} -> \${it?.toStr?.toCode}")
-			   afEfan::EfanRenderer.peek.renderBuf.add(it)""")
+			   	_efan_log.debug("[_efan_output] \${afEfan::EfanRenderingStack.peek(false)?.nestedId} -> \${it?.toStr?.toCode}")
+			   afEfan::EfanRenderer.peek(false)?.renderBuf?.add(it)""")
 		
 		return classModel
 	}
