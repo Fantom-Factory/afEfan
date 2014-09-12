@@ -350,6 +350,10 @@ syntax: fantom
 
 Release Notes [#releaseNotes]
 *****************************
+v1.4.2 [#v1.4.2]
+----------------
+ - Chg: 'EfanEngine' generates less brittle rendering code.
+
 v1.4.0 [#v1.4.0]
 ----------------
  - New: Intelligent whitespace removal.

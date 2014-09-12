@@ -35,8 +35,8 @@ const class EfanRenderer {
 		}
 	}
 	
-	static EfanRendererCtx peek() {
-		EfanRenderingStack.peek.ctx["efan.renderCtx"]
+	static EfanRendererCtx? peek(Bool checked := true) {
+		EfanRenderingStack.peek(checked)?.ctx?.get("efan.renderCtx")
 	}
 
 	private static Obj? convertErrs(EfanTemplateMeta efanMetaData, |Obj?->Obj?| func) {
