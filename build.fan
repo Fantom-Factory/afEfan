@@ -10,7 +10,7 @@ class Build : BuildPod {
 		meta = [	
 			"proj.name"		: "efan",
 			"tags"			: "templating",
-			"repo.private"	: "false"	
+			"repo.private"	: "true"	
 		]
 
 		depends = [
