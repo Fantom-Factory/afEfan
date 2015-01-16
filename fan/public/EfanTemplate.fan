@@ -31,6 +31,9 @@ const mixin EfanTemplate {
 		// much better than the default capacity of 16 bytes!
 		renderBuf := StrBuf(templateMeta.templateSrc.size)
 		
+		// FIXME: try using |This|, (see Locale.use) and then we could write: it.renderBody()
+		// Locale("zh-CN").use {  echo(Locale.cur) }
+		
 		// TODO: Dodgy Fantom Syntax!!!		
 		// if we change "|Obj?|? bodyFunc" to "|->| bodyFunc" then the following: 
 		//    render(ctx) { ... }
