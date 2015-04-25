@@ -30,4 +30,11 @@ internal class TestUsing : EfanTest {
 			verifyEq(err.errLineNo, 2)
 		}
 	}
+
+	Void testJava() {
+		c :="""<%? using [java]java.util::Date as JDate %>
+		       <%= JDate().toString %>"""
+		type := compiler.compile(``, c, null)
+		reb:=type.render(null)
+	}
 }

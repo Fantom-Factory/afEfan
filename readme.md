@@ -1,4 +1,10 @@
-## Overview 
+#efan v1.4.2
+---
+[![Written in: Fantom](http://img.shields.io/badge/written%20in-Fantom-lightgray.svg)](http://fantom.org/)
+[![pod: v1.4.2](http://img.shields.io/badge/pod-v1.4.2-yellow.svg)](http://www.fantomfactory.org/pods/afEfan)
+![Licence: MIT](http://img.shields.io/badge/licence-MIT-blue.svg)
+
+## Overview
 
 `efan` is a library for rendering Embedded Fantom (efan) templates.
 
@@ -10,7 +16,7 @@ Like `EJS` for Javascript, `ERB` for Ruby and `JSP` for Java, `efan` lets you em
 
 > **ALIEN-AID:** If rendering HTML, use [Slim](http://www.fantomfactory.org/pods/afSlim) !!! The concise and lightweight template syntax makes generating HTML easy!
 
-## Install 
+## Install
 
 Install `efan` with the Fantom Repository Manager ( [fanr](http://fantom.org/doc/docFanr/Tool.html#install) ):
 
@@ -20,11 +26,11 @@ To use in a [Fantom](http://fantom.org/) project, add a dependency to `build.fan
 
     depends = ["sys 1.0", ..., "afEfan 1.4+"]
 
-## Documentation 
+## Documentation
 
 Full API & fandocs are available on the [Status302 repository](http://repo.status302.com/doc/afEfan/#overview).
 
-## Quick Start 
+## Quick Start
 
 1). Create a text file called `xmas.efan`:
 
@@ -57,35 +63,35 @@ C:\> fan Example.fan
 Ho! Ho! Ho! Merry Christmas!
 ```
 
-## Tags 
+## Tags
 
 Efan supports the following tags:
 
-### Eval Tags 
+### Eval Tags
 
 Any tag with the prefix `<%=` will evaluate the fantom expression and write it out as a Str.
 
     Hello, <%= "Emma".upper %>!
 
-### Comment Tags 
+### Comment Tags
 
 Any tag with the prefix `<%#` is a comment and will be left out of the resulting template.
 
     <%# This is just a comment %>
 
-### Code Tags 
+### Code Tags
 
 Any tag with the prefix `<%` will be converted into Fantom code.
 
     <% echo("Hello!") %>
 
-### Instruction Tags 
+### Instruction Tags
 
 The content of any tag with the prefix `<%?` is taken to be a Fantom `using` instruction.
 
     <%? using concurrent::Actor %>
 
-### Escaping Tags 
+### Escaping Tags
 
 All efan tags can be escaped by adding an extra `%` character to the start and end tags. Example:
 
@@ -95,7 +101,7 @@ prints:
 
     This is how you <%= escape %> efan tags.
 
-### Whitespace 
+### Whitespace
 
 All whitespace in efan templates is preserved, except for when a line exists only to contain a code block (or similar). This has the effect of removing unwanted line breaks. Consider:
 
@@ -127,7 +133,7 @@ Time!
 
 (Advanced users may turn this feature off in `EfanCompiler`.)
 
-## Template Context 
+## Template Context
 
 Each template render method takes an argument called `ctx` which you can reference in your template. `ctx` is typed to whatever Obj you pass in, so you don't need to cast it. Examples:
 
@@ -165,7 +171,7 @@ Using objs:
 
 > This includes classes in your application too!
 
-## View Helpers 
+## View Helpers
 
 Efan lets you provide view helpers for common tasks. View helpers are `mixins` that your efan template will extend, giving your templates access to commonly used methods. Example, for escaping XML:
 
@@ -191,7 +197,7 @@ Template usage would then be:
   </p>
 ```
 
-## Layout Pattern / Nesting Templates 
+## Layout Pattern / Nesting Templates
 
 Efan templates may be nested inside one another, effectively allowing you to componentise your templates. This is accomplished by passing body functions in to the efan `render()` method and calling `renderBody()` to invoke it.
 
@@ -248,7 +254,7 @@ This produces an amalgamation of the two templates:
 </html>
 ```
 
-## Err Reporting 
+## Err Reporting
 
 Efan compilation and runtime Errs report snippets of code showing which line in the `efan` template the error occurred. Example:
 
@@ -272,7 +278,7 @@ Efan Compilation Err:
 
 This really helps you see where typos occurred.
 
-## Templates 
+## Templates
 
 Efan works by dynamically generating Fantom source code and compiling it into a Fantom type. Because types can not be *unloaded*, if you were compile 1000s of efan templates, it could be considered a memory leak.
 
