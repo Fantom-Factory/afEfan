@@ -1,0 +1,11 @@
+'efan' is a library for rendering Embedded Fantom (efan) templates.
+
+Like 'EJS' for Javascript, 'ERB' for Ruby and 'JSP' for Java, 'efan' lets you embed snippets of Fantom code inside textual
+templates.
+
+Why stop with just 'efan'???
+
+ - Create re-useable components with [efanXtra]`pod:afEfanXtra`
+ - Use [Pillow]`pod:afPillow` for your [BedSheet]`pod:afBedSheet` applications.
+ - To render HTML, use [Slim]`pod:afSlim`.
+

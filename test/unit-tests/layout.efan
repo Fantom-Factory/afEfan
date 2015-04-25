@@ -1,0 +1,3 @@
+  layout-html <%= ctx %>
+  <%= renderBody %>
+  layout-html

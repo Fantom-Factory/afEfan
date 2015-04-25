@@ -1,0 +1,16 @@
+
+For v1.4.2
+----------
+
+
+
+Future:
+-------
+
+
+
+Bad Idea:
+---------
+Check for render recursion
+ - Is possible using efanXtra
+
