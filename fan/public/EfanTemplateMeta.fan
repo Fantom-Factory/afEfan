@@ -75,6 +75,7 @@ const class EfanTemplateMeta {
 		return efanLineNo
 	}
 	
+	// Used by afEfanXtra::ComponentCompiler
 	** Clones this object, setting the given values.
 	@NoDoc
 	EfanTemplateMeta clone([Field:Obj?]? overrides := null) {
