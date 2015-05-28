@@ -41,4 +41,30 @@ const class Efan {
 		template := compileFromFile(efanFile, ctx?.typeof, viewHelpers)
 		return template.render(ctx)
 	}
+
+	** Returns a stack of nested templates that are currently being rendered. 
+	** Returns an empty list if nothing is being rendered.
+	** 
+	** The first item in the list is the top level template, and subsequent items represent nested templates.
+	static RenderingElement[] renderingStack() {
+		EfanRenderingStack.getStack(false)?.map |element| {
+			ctx := (EfanRendererCtx) element.ctx["efan.renderCtx"]
+			return RenderingElement {
+				it.templateInstance = ctx.rendering
+				it.templateMeta		= ctx.efanMetaData
+			}
+		} ?: RenderingElement#.emptyList
+	}
+}
+
+** An item in the [rendering stack]`Efan.renderingStack`. 
+class RenderingElement {
+	
+	** The efan template instance being rendered.
+	Obj					templateInstance
+	
+	** Associated meta for the template instance.
+	EfanTemplateMeta	templateMeta
+	
+	internal new make(|This|in) { in(this) }
 }

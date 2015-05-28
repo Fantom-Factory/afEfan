@@ -350,6 +350,10 @@ syntax: fantom
 
 Release Notes [#releaseNotes]
 *****************************
+v1.4.4 [#v1.4.4]
+================
+ - New: Added 'Efan.renderingStack()' and associated 'RenderingElements' to inspect what's currently being rendered.
+
 v1.4.2 [#v1.4.2]
 ================
  - Chg: 'EfanEngine' generates less brittle rendering code.
