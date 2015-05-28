@@ -22,6 +22,10 @@ class EfanRenderingStack {
 		ThreadStack.peekParent(stackId, false) ?: (checked ? throw EfanErr(errMsg ?: "Could not a parent of EfanCtxStackElement") : null)
 	}
 
+	static EfanRenderingStackElement[]? getStack(Bool checked := true) {
+		ThreadStack.elements(stackId, checked)
+	}
+
 	private static Str goDeeper(Str? currentId, Str id) {
 		(currentId == null) ? "(${id})" : "${currentId}->(${id})"
 	}
