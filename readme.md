@@ -12,9 +12,9 @@ Like `EJS` for Javascript, `ERB` for Ruby and `JSP` for Java, `efan` lets you em
 
 `efan` aims to hit the middle ground between programmatically rendering markup with [web::WebOutStream](http://fantom.org/doc/web/WebOutStream.html) and rendering logicless templates such as [Mustache](https://bitbucket.org/xored/mustache/).
 
-> **ALIEN-AID:** Create powerful re-usable components with [efanXtra](http://www.fantomfactory.org/pods/afEfanXtra) and [IoC](http://www.fantomfactory.org/pods/afIoc) !!!
+> **ALIEN-AID:** Create powerful re-usable components with [efanXtra](http://pods.fantomfactory.org/pods/afEfanXtra) and [IoC](http://pods.fantomfactory.org/pods/afIoc) !!!
 
-> **ALIEN-AID:** If rendering HTML, use [Slim](http://www.fantomfactory.org/pods/afSlim) !!! The concise and lightweight template syntax makes generating HTML easy!
+> **ALIEN-AID:** If rendering HTML, use [Slim](http://pods.fantomfactory.org/pods/afSlim) !!! The concise and lightweight template syntax makes generating HTML easy!
 
 ## Install
 
@@ -24,44 +24,42 @@ Install `efan` with the Fantom Repository Manager ( [fanr](http://fantom.org/doc
 
 To use in a [Fantom](http://fantom.org/) project, add a dependency to `build.fan`:
 
-    depends = ["sys 1.0", ..., "afEfan 1.4+"]
+    depends = ["sys 1.0", ..., "afEfan 1.4"]
 
 ## Documentation
 
-Full API & fandocs are available on the [Status302 repository](http://repo.status302.com/doc/afEfan/#overview).
+Full API & fandocs are available on the [Fantom Pod Repository](http://pods.fantomfactory.org/pods/afEfan/).
 
 ## Quick Start
 
-1). Create a text file called `xmas.efan`:
+1. Create a text file called `xmas.efan`
 
-```
-  <% ctx.times |i| { %>
-    Ho!
-  <% } %>
-  Merry Christmas!
-```
+        <% ctx.times |i| { %>
+           Ho!
+        <% } %>
+        Merry Christmas!
 
-2). Create a text file called `Example.fan`:
 
-```
-using afEfan
+2. Create a text file called `Example.fan`
 
-class Example {
-    Void main() {
-        template := `xmas.efan`.toFile.readAllStr
+        using afEfan
+        
+        class Example {
+            Void main() {
+                template := `xmas.efan`.toFile.readAllStr
+        
+                text := Efan().renderFromFile(template, 3)  // --> Ho! Ho! Ho! Merry Christmas!
+                echo(text)
+            }
+        }
 
-        text := Efan().renderFromFile(template, 3)  // --> Ho! Ho! Ho! Merry Christmas!
-        echo(text)
-    }
-}
-```
 
-3). Run `Example.fan` as a Fantom script from the command line:
+3. Run `Example.fan` as a Fantom script from the command line:
 
-```
-C:\> fan Example.fan
-Ho! Ho! Ho! Merry Christmas!
-```
+        C:\> fan Example.fan
+        Ho! Ho! Ho! Merry Christmas!
+
+
 
 ## Tags
 
@@ -140,36 +138,41 @@ Each template render method takes an argument called `ctx` which you can referen
 Using maps:
 
 ```
-  ctx := ["name":"Emma"]  // ctx is a map
+ctx := ["name":"Emma"]  // ctx is a map
 
-  template := "Hello <%= ctx["name"] %>!"
+template := "Hello <%= ctx["name"] %>!"
 
-  Efan().renderFromStr(template, ctx)
+Efan().renderFromStr(template, ctx)
 ```
 
 Using objs:
 
 ```
-  class Entity {
+class Entity {
     Str name
     new make(Str name) { this.name = name }
-  }
+}
 
-  ...
+...
 
-  template := "Hello <%= ctx.name %>!"
-  ctx      := Entity("Emma")  // ctx is an Entity
+template := "Hello <%= ctx.name %>!"
+ctx      := Entity("Emma")  // ctx is an Entity
 
-  Efan().renderFromStr(template, ctx)
+Efan().renderFromStr(template, ctx)
 ```
 
-> **ALIEN-AID:** All classes not in `sys` either need to be imported with `<%? using %>` statements or referenced by their fully qualified class name (FQCN), example:
+### Warning!
 
-> <% concurrent::Actor.sleep(2sec) %>
+All classes not in `sys` (and that includes all classes in your application) need to be referenced by their fully qualified class name:
 
-> <%? using concurrent %><% Actor.sleep(2sec) %>
+    <% concurrent::Actor.sleep(2sec) %>
 
-> This includes classes in your application too!
+Or imported with `<%? using %>` statements:
+
+    <%? using concurrent %>
+    <% Actor.sleep(2sec) %>
+
+This is because compiled efan code resides in a newly constructed pod!
 
 ## View Helpers
 
@@ -177,24 +180,24 @@ Efan lets you provide view helpers for common tasks. View helpers are `mixins` t
 
 ```
 mixin XmlViewHelper {
-  Str xml(Str str) {
-    str.toXml()
-  }
+    Str xml(Str str) {
+        str.toXml()
+    }
 }
 ```
 
 Set view helpers when calling efan:
 
 ```
-  Efan().renderFromStr(template, ctx, [XmlViewHelper#])
+Efan().renderFromStr(template, ctx, [XmlViewHelper#])
 ```
 
 Template usage would then be:
 
 ```
-  <p>
+<p>
     Hello <%= xml(ctx.name) %>!
-  </p>
+</p>
 ```
 
 ## Layout Pattern / Nesting Templates
@@ -207,10 +210,10 @@ layout.efan:
 
 ```
 <head>
-  <title><%= ctx %></title>
+    <title><%= ctx %></title>
 </head>
 <body>
-  <%= renderBody() %>
+    <%= renderBody() %>
 </body>
 ```
 
@@ -232,12 +235,12 @@ Index.fan:
 using afEfan
 
 class Index {
-  Str renderIndex() {
-    index     := efan().compileFromFile(`index.efan` .toFile, EfanTemplate#)
-    layout    := efan().compileFromFile(`layout.efan`.toFile, Str#)
+    Str renderIndex() {
+        index     := efan().compileFromFile(`index.efan` .toFile, EfanTemplate#)
+        layout    := efan().compileFromFile(`layout.efan`.toFile, Str#)
 
-    return index.render(layout)
-  }
+        return index.render(layout)
+    }
 }
 ```
 
@@ -246,7 +249,7 @@ This produces an amalgamation of the two templates:
 ```
 <html>
 <head>
-  <title>Cranberry Whips</title>
+    <title>Cranberry Whips</title>
 </head>
 <body>
     ...my cool page content...
@@ -282,14 +285,14 @@ This really helps you see where typos occurred.
 
 Efan works by dynamically generating Fantom source code and compiling it into a Fantom type. Because types can not be *unloaded*, if you were compile 1000s of efan templates, it could be considered a memory leak.
 
-Each invocation of `Efan.compileXXX()` creates a new Fantom type, so use it judiciously. Caching the returned [EfanTemplate](http://repo.status302.com/doc/afEfan/EfanTemplate.html) classes is highly recommended. Example:
+Each invocation of `Efan.compileXXX()` creates a new Fantom type, so use it judiciously. Caching the returned [EfanTemplate](http://pods.fantomfactory.org/pods/afEfan/api/EfanTemplate) classes is highly recommended. Example:
 
 ```
-  efanStr  := "<% ctx.times |i| { %>Ho! <% } %>"
-  template := Efan().compileFromStr(efanStr, Int#)  // <-- cache this template!
+efanStr  := "<% ctx.times |i| { %>Ho! <% } %>"
+template := Efan().compileFromStr(efanStr, Int#)  // <-- cache this template!
 
-  ho       := template.render(1)
-  hoho     := template.render(2)
-  hohoho   := template.render(3)
+ho       := template.render(1)
+hoho     := template.render(2)
+hohoho   := template.render(3)
 ```
 
