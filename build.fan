@@ -5,12 +5,12 @@ class Build : BuildPod {
 	new make() {
 		podName = "afEfan"
 		summary = "A library for rendering Embedded Fantom (efan) templates"
-		version = Version("1.4.2")
+		version = Version("1.4.3")
 
 		meta = [	
 			"proj.name"		: "efan",
 			"repo.tags"		: "templating",
-			"repo.public"	: "true"	
+			"repo.public"	: "false"	
 		]
 
 		depends = [
