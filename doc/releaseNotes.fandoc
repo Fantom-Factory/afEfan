@@ -1,0 +1,85 @@
+Release Notes
+*************
+
+v1.4.4
+======
+ - New: Added 'Efan.renderingStack()' and associated 'RenderingElements' to inspect what's currently being rendered.
+
+v1.4.2
+======
+ - Chg: 'EfanEngine' generates less brittle rendering code.
+
+v1.4.0
+======
+ - New: Intelligent whitespace removal.
+ - Chg: Overhauled and simplified the public API, mainly the advanced classes. (Breaking change.)
+ - Chg: Split 'EfanCompiler' up to create 'EfanEngine', a good seperation of concerns. (Breaking change.)
+ - Chg: Renamed 'EfanRenderer' --> 'EfanTemplate'. (Breaking change.)
+ - Chg: Renamed 'EfanMetaData' --> 'EfanTemplateMeta'. (Breaking change.)
+
+v1.3.8
+======
+ - Chg: Updated licence to *The MIT Licence*.
+
+v1.3.6
+======
+ - New: 'using' statements can be added with '<%? using ... %>' notation
+ - New: efan tags can be escaped with '<%% ... %%>' notation.
+ - Bug: Rendering 'null' values with debug logging turned on could cause NPEs.
+
+v1.3.4
+======
+ - Chg: Added 'withXtraMsg()' to EfanErrs so Err msgs can be appended to.
+ - Chg: Internal API changes for 'afEfanXtra'.
+
+v1.3.2
+======
+ - Chg: Moved 'EfanRenderer.id' -> 'EfanMetaData.templateId'
+ - Bug: Non ASCII templates could not be compiled.
+
+v1.3.0
+======
+ - Chg: Rejigged the public efan API.
+ - Chg: Removed 'EfanRenderer.renderEfan(...)'. All template rendering is done via 'EfanRenderer.render(...)'.
+ - Chg: Nested efan templates and body functions now return a 'Str', so you MUST use eval tags; '<%= renderBody() %>'
+ - Chg: Massivly simplified nested component rendering by introducing a threaded 'EfanCtxStack'.
+ - Chg: Added 'EfanRenderer.id' to make debugging efanXtra a bit more humane!
+
+v1.2.0
+======
+ - New: Runtime Errs thrown while rendering report efan template code snippets and line numbers.
+ - New: 'EfanRenderer' now has an 'efanMetaData' field with more contextual information.
+ - New: The class name of efan renderer instances is now configurable.
+ - Chg: Rejigged the efan parser.
+ - Chg: Efan template line numbers no longer take up a whole line of code.
+ - Chg: 'EfanCompiler' now returns a 'const' 'EfanRenderer' instance, not a rendering type.
+ - Chg: Exposed (made public) the 'EfanErr' hierarchy.
+ - Chg: Added optional 'makeFunc' to 'EfanCompiler.compileWithModel()'.
+
+v1.1.0
+======
+ - New: Added 'EfanRenderCtx' to ease efan extensions.
+ - Chg: Updated to use [Plastic]`pod:afPlastic`.
+ - Chg: 'EfanCompiler' now returns the rendering type, not an 'EfanRenderer' instance.
+ - Chg: 'EfanRenderer' is now a mixin and is implemented by the rendering type.
+ - Chg: 'renderEfan()' and 'renderBody()' are now methods on 'EfanRenderer'.
+
+v1.0.0
+======
+ - New: Efan templates may now be nested and can optionally render their body!
+ - Chg: 'EfanCompiler' wraps the generated renderer in a sane 'const' 'EfanRenderer' wrapper.
+ - Chg: Removed dependency on [BedSheet]`pod:afBedSheet` - see
+ [afBedSheetEfan]`http://repo.status302.com/doc/afBedSheetEfan/#overview` for BedSheet integration.
+ - Chg: Removed dependency on [IoC]`pod:afIoc`, all 'Plastic' code has been copied in to efan.
+ - Chg: Updated docs.
+
+v0.0.4
+======
+ - New: Hooked error reporting into afBedSheet.
+ - New: 'EfanErr' now gives code snippets and line numbers of parsing and compilation errors.
+ - Chg: Re-factored fantom code generation.
+
+v0.0.2
+======
+ - New: Preview release.
+
