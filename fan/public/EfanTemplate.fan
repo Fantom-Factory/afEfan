@@ -11,6 +11,7 @@ const mixin EfanTemplate {
 	** *Layout* templates. Example:
 	** 
 	** pre>
+	** syntax: html
 	** ...
 	** <%= ctx.layout.render(ctx.layoutCtx) { %>
 	**   ... my body content ...
@@ -20,6 +21,8 @@ const mixin EfanTemplate {
 	** 
 	** 'ctx' must be provided. This prevents you from accidently passing in 'bodyFunc' as the 'ctx'.
 	** Example: 
+	** 
+	**   syntax: fantom
 	** 
 	**   layout.render() { ... }      // --> WRONG!
 	**   layout.render(null) { ... }  // --> CORRECT!
@@ -55,6 +58,8 @@ const mixin EfanTemplate {
 	** defined as: 
 	** 
 	** pre>
+	** syntax: html
+	** 
 	** <html>
 	** <head>
 	**   <title><%= ctx.pageTitle %>
