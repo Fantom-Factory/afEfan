@@ -1,6 +1,10 @@
 Release Notes
 *************
 
+v1.4.6
+======
+ - Chg: Updated to work with [Plastic v1.0.20]`pod:afPlastic`.
+
 v1.4.4
 ======
  - New: Added 'Efan.renderingStack()' and associated 'RenderingElements' to inspect what's currently being rendered.

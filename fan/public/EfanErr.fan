@@ -11,7 +11,7 @@ const class EfanErr : Err {
 const class EfanParserErr : EfanErr, SrcCodeErr {
 	const override SrcCodeSnippet 	srcCode
 	const override Int 				errLineNo
-	private const  Int 				linesOfPadding
+	const override Int 				linesOfPadding
 
 	internal new make(SrcCodeSnippet srcCode, Int errLineNo, Str errMsg, Int linesOfPadding) : super(errMsg) {
 		this.srcCode = srcCode
@@ -25,8 +25,12 @@ const class EfanParserErr : EfanErr, SrcCodeErr {
 		EfanParserErr(srcCode, errLineNo, this.msg + xtraMsg, linesOfPadding)
 	}
 
+	@NoDoc
 	override Str toStr() {
-		print(msg, linesOfPadding)
+		trace := "\n${typeof.name.toDisplayName}:\n"
+		trace += toSnippetStr
+		trace += "Stack Trace:"
+		return trace
 	}
 }
 
@@ -35,7 +39,7 @@ const class EfanParserErr : EfanErr, SrcCodeErr {
 const class EfanCompilationErr : EfanErr, SrcCodeErr {
 	const override SrcCodeSnippet 	srcCode
 	const override Int 				errLineNo
-	private const  Int 				linesOfPadding
+	const override Int 				linesOfPadding
 
 	internal new make(SrcCodeSnippet srcCode, Int errLineNo, Str errMsg, Int linesOfPadding, Err cause) : super(errMsg, cause) {
 		this.srcCode = srcCode
@@ -49,8 +53,12 @@ const class EfanCompilationErr : EfanErr, SrcCodeErr {
 		EfanCompilationErr(srcCode, errLineNo, this.msg + xtraMsg, linesOfPadding, cause)
 	}
 	
+	@NoDoc
 	override Str toStr() {
-		print(msg, linesOfPadding)
+		trace := "\n${typeof.name.toDisplayName}:\n"
+		trace += toSnippetStr
+		trace += "Stack Trace:"
+		return trace
 	}
 }
 
@@ -59,7 +67,7 @@ const class EfanCompilationErr : EfanErr, SrcCodeErr {
 const class EfanRuntimeErr : EfanErr, SrcCodeErr {
 	const override SrcCodeSnippet 	srcCode
 	const override Int 				errLineNo
-	private const  Int 				linesOfPadding
+	const override Int 				linesOfPadding
 
 	internal new make(SrcCodeSnippet srcCode, Int errLineNo, Str errMsg, Int linesOfPadding, Err cause) : super(errMsg, cause) {
 		this.srcCode = srcCode
@@ -73,8 +81,12 @@ const class EfanRuntimeErr : EfanErr, SrcCodeErr {
 		EfanRuntimeErr(srcCode, errLineNo, this.msg + xtraMsg, linesOfPadding, cause)
 	}
 
+	@NoDoc
 	override Str toStr() {
-		print(msg, linesOfPadding)
+		trace := "\n${typeof.name.toDisplayName}:\n"
+		trace += toSnippetStr
+		trace += "Stack Trace:"
+		return trace
 	}
 }
 
