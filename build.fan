@@ -14,10 +14,9 @@ class Build : BuildPod {
 		]
 
 		depends = [
-			"sys 1.0", 
+			"sys        1.0", 
 			"concurrent 1.0", 
-
-			"afPlastic 1.0.20 - 1.0"
+			"afPlastic  1.1.0 - 1.1"
 		]
 
 		srcDirs = [`test/unit-tests/`, `fan/`, `fan/public/`, `fan/internal/`, `fan/internal/utils/`, `fan/advanced/`]
