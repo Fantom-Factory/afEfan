@@ -20,7 +20,7 @@ Like `EJS` for Javascript, `ERB` for Ruby and `JSP` for Java, `efan` lets you em
 
 Install `efan` with the Fantom Repository Manager ( [fanr](http://fantom.org/doc/docFanr/Tool.html#install) ):
 
-    C:\> fanr install -r http://repo.status302.com/fanr/ afEfan
+    C:\> fanr install -r http://pods.fantomfactory.org/fanr/ afEfan
 
 To use in a [Fantom](http://fantom.org/) project, add a dependency to `build.fan`:
 
