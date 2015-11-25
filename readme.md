@@ -1,7 +1,7 @@
-#efan v1.4.2
+#efan v1.5.0
 ---
 [![Written in: Fantom](http://img.shields.io/badge/written%20in-Fantom-lightgray.svg)](http://fantom.org/)
-[![pod: v1.4.2](http://img.shields.io/badge/pod-v1.4.2-yellow.svg)](http://www.fantomfactory.org/pods/afEfan)
+[![pod: v1.5.0](http://img.shields.io/badge/pod-v1.5.0-yellow.svg)](http://www.fantomfactory.org/pods/afEfan)
 ![Licence: MIT](http://img.shields.io/badge/licence-MIT-blue.svg)
 
 ## Overview
@@ -24,7 +24,7 @@ Install `efan` with the Fantom Repository Manager ( [fanr](http://fantom.org/doc
 
 To use in a [Fantom](http://fantom.org/) project, add a dependency to `build.fan`:
 
-    depends = ["sys 1.0", ..., "afEfan 1.4"]
+    depends = ["sys 1.0", ..., "afEfan 1.5"]
 
 ## Documentation
 
