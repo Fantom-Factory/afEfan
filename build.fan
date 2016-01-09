@@ -19,7 +19,7 @@ class Build : BuildPod {
 			"afPlastic  1.1.0 - 1.1"
 		]
 
-		srcDirs = [`test/unit-tests/`, `fan/`, `fan/public/`, `fan/internal/`, `fan/internal/utils/`, `fan/advanced/`]
+		srcDirs = [`fan/`, `fan/advanced/`, `fan/internal/`, `fan/internal/utils/`, `fan/public/`, `test/unit-tests/`]
 		resDirs = [`doc/`]
 	}
 }
