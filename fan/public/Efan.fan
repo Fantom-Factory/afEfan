@@ -15,7 +15,7 @@ const class Efan {
 	** The compiled template extends the given view helper mixins.
 	** 
 	** 'srcLocation' may be anything - used for meta information only.
-	EfanTemplate compileFromStr(Str efanTemplate, Type? ctxType := null, Type[]? viewHelpers := null, Uri? srcLocation := null) {
+	EfanTemplateMeta compileFromStr(Str efanTemplate, Type? ctxType := null, Type[]? viewHelpers := null, Uri? srcLocation := null) {
 		srcLocation	= srcLocation ?: `from/efan/template`
 		return efanCompiler.compile(srcLocation, efanTemplate, ctxType, viewHelpers ?: Type#.emptyList)
 	}	
@@ -23,7 +23,7 @@ const class Efan {
 	** Compiles a new template from the given efan 'File'. 
 	** 
 	** The compiled template extends the given view helper mixins.
-	EfanTemplate compileFromFile(File efanFile, Type? ctxType := null, Type[]? viewHelpers := null) {
+	EfanTemplateMeta compileFromFile(File efanFile, Type? ctxType := null, Type[]? viewHelpers := null) {
 		srcLocation	:= efanFile.normalize.uri
 		return efanCompiler.compile(efanFile.normalize.uri, efanFile.readAllStr, ctxType, viewHelpers ?: Type#.emptyList)
 	}	

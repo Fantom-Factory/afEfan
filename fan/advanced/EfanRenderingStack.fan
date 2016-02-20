@@ -1,6 +1,6 @@
 
 ** Advanced API usage only!
-** Lets us associated data with the efan template currently being rendered.
+** Lets us associate data with the efan template currently being rendered.
 ** Required to keep track of stuff when rendering nested templates / components.
 ** Because don't forget we jump back up to render the body, then back down again...
 @NoDoc

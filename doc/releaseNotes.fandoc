@@ -4,6 +4,7 @@ Release Notes
 v1.5.0
 ======
  - New: Added 'Efan.renderingStack()' and associated 'RenderingElements' to inspect what's currently being rendered.
+ - Chg: 'ViewHelpers' may be 'const' or 'non-const', 'classes' or 'mixins'.
  - Chg: Updated to work with [Plastic v1.1]`pod:afPlastic`.
 
 v1.4.2
