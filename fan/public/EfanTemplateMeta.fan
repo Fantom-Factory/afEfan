@@ -1,4 +1,5 @@
 using afPlastic::SrcCodeSnippet
+using concurrent::AtomicRef
 
 ** Meta data about an efan template. 
 ** 
@@ -30,7 +31,8 @@ const class EfanTemplateMeta {
 	** Returns 'null' if a ctx variable was not used.
 	const Str? ctxName
 	
-	internal const Int srcCodePadding
+	internal const Int 			srcCodePadding
+	internal const AtomicRef	instanceRef := AtomicRef()
 
 	@NoDoc
 	new make(|This|? in := null) {
@@ -67,12 +69,29 @@ const class EfanTemplateMeta {
 	** The signature for 'bodyFunc' is actually '|->|? bodyFunc' - see source for an explanation of 
 	** why '|Obj?|?' is used.
 	Str render(Obj? ctx, |Obj?|? bodyFunc := null) {
-		instance	:= type.make
+		renderFrom(instance, ctx, bodyFunc)
+	}
+
+	** Renders the given template instance, as oppose to the given 
+	Str renderFrom(Obj instance, Obj? ctx, |Obj?|? bodyFunc := null) {
+		if (instance.typeof.fits(type).not)
+			throw ArgErr("Given instance does not fit template type: ${instance.typeof.qname} => ${type.qname}")
 		renderBuf	:= StrBuf(templateSrc.size)
 		EfanRenderer.renderTemplate(this, instance, renderBuf, (|->|?) bodyFunc) |->| {
 			type.method("_efan_render").call(instance, ctx)
 		}
 		return renderBuf.toStr
+	}
+	
+	** Creates an efan template instance. If the template 'type' is const, and no 'ctorParams' are 
+	** specified then the instance is cached for re-use.
+	Obj instance(Obj[]? ctorParams := null) {
+		if (ctorParams == null && type.isConst) {
+			if (instanceRef.val == null)
+				instanceRef.val = type.make
+			return instanceRef.val
+		}
+		return type.make(ctorParams)
 	}
 	
 	** Renders the body of the enclosing efan template. Should only be called from within templates.

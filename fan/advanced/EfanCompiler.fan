@@ -34,6 +34,10 @@ const class EfanCompiler {
 		model	:= engine.parseTemplateIntoModel(templateLoc, template, PlasticClassModel(templateClassName, isConst))
 		viewHelpers.each { model.extend(it) }
 
+		viewHelpers.first?.methods?.findAll { it.isCtor }?.each {
+			model.overrideCtor(it, "")
+		}
+		
 		// remove the existing render() method so we can re-add it with moar src code...
 		renderMethod := model.methods.find { it.name == "_efan_render" }
 		model.methods.remove(renderMethod)
