@@ -61,11 +61,7 @@ const class EfanCompiler {
 		renderCode	+= "\n"
 		renderCode	+=  renderMethod.body
 
-		model.addMethod(Str#, "renderBody", "", 
-		"renderBuf := StrBuf(${template.size})
-		 afEfan::EfanRenderer.renderBody(renderBuf)
-		 return renderBuf.toStr")
-		
+		model.addMethod(Str#, "renderBody", "", "afEfan::EfanRenderer.renderBody()")		
 		model.addMethod(Void#, "_efan_render", "Obj? _ctx", renderCode)
 
 		efanMetaData := engine.compileModel(templateLoc, template, model)
