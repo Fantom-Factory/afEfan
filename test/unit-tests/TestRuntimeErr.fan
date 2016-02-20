@@ -33,7 +33,7 @@ internal class TestRuntimeErr : EfanTest {
 		       inner-after"""
 
 		try {
-			outer := compiler.compile(`outer`, o, EfanTemplate#)
+			outer := compiler.compile(`outer`, o, EfanTemplateMeta#)
 			inner := compiler.compile(`inner`, i)
 			outer.render(inner)
 			fail

@@ -62,7 +62,7 @@ const class EfanCompilationErr : EfanErr, SrcCodeErr {
 	}
 }
 
-** Wraps any Errs thrown when rendering an `EfanTemplate`. 
+** Wraps any Errs thrown when rendering an `EfanTemplateMeta`. 
 @NoDoc
 const class EfanRuntimeErr : EfanErr, SrcCodeErr {
 	const override SrcCodeSnippet 	srcCode

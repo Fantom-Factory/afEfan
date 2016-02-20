@@ -7,9 +7,9 @@ const class EfanEngine {
 	private const EfanParser parser 
 	
 	** Expose 'PlasticCompiler' so it (and it's mutable srcCodePadding value) may be re-used by 
-	** other projects, such as [afSlim]`http://repo.status302.com/doc/afSlim/#overview`.
+	** other projects, such as [afSlim]`http://pods.fantomfactory.org/pods/afSlim/`.
 	const PlasticCompiler	plasticCompiler
-	
+
 	** Controls whether 'code' only lines are trimmed to remove (usually) unwanted line breaks.  
 	const Bool intelligentWhitespaceRemoval	:= true
 	
@@ -34,7 +34,7 @@ const class EfanEngine {
 		
 		classModel.addMethod(Void#, "_efan_render", Str.defVal, efanModel.toFantomCode)
 		
-		classModel.addField(Log#, "_efan_log").withInitValue("afEfan::EfanTemplate#.pod.log")
+		classModel.addField(Log#, "_efan_log").withInitValue("afEfan::Efan#.pod.log")
 		
 		// we need the special syntax of "_efan_output = XXXX" so we don't have to close any brackets with eval expressions
 		// peek(false) to prevent dodgy / nasty errs during an IoC autobuild when a provider thinks it can provide Obj
