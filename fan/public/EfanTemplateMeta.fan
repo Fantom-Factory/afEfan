@@ -76,11 +76,10 @@ const class EfanTemplateMeta {
 	Str renderFrom(Obj instance, Obj? ctx, |Obj?|? bodyFunc := null) {
 		if (instance.typeof.fits(type).not)
 			throw ArgErr("Given instance does not fit template type: ${instance.typeof.qname} => ${type.qname}")
-		renderBuf	:= StrBuf(templateSrc.size)
-		EfanRenderer.renderTemplate(this, instance, renderBuf, (|->|?) bodyFunc) |->| {
+
+		return EfanRenderer.renderTemplate(this, instance, (|->|?) bodyFunc) |->| {
 			type.method("_efan_render").call(instance, ctx)
 		}
-		return renderBuf.toStr
 	}
 	
 	** Creates an efan template instance. If the template 'type' is const, and no 'ctorParams' are 
@@ -110,9 +109,7 @@ const class EfanTemplateMeta {
 	** </html>
 	** <pre
 	virtual Str renderBody() {
-		renderBuf := StrBuf(templateSrc.size)
-		EfanRenderer.renderBody(renderBuf)
-		return renderBuf.toStr
+		EfanRenderer.renderBody
 	}
 
 	internal Void throwCompilationErr(Err cause, Int srcCodeLineNo) {

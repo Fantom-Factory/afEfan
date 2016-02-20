@@ -51,7 +51,7 @@ const class Efan {
 			ctx := (EfanRendererCtx) element.ctx["efan.renderCtx"]
 			return RenderingElement {
 				it.templateInstance = ctx.rendering
-				it.templateMeta		= ctx.efanMetaData
+				it.templateMeta		= ctx.efanMeta
 			}
 		} ?: RenderingElement#.emptyList
 	}

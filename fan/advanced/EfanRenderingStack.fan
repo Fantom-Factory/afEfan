@@ -7,11 +7,11 @@
 class EfanRenderingStack {
 	private static const Str stackId	:= "efan.renderCtx"
 
-	static Obj? withCtx(Str id, |EfanRenderingStackElement->Obj?| func) {		
+	static Void withCtx(Str id, |EfanRenderingStackElement| func) {		
 		currentId	:= peek(false)?.nestedId
 		nestedId	:= goDeeper(currentId, id)
 		element		:= EfanRenderingStackElement(nestedId)
-		return ThreadStack.pushAndRun(stackId, element, func)
+		ThreadStack.pushAndRun(stackId, element, func)
 	}
 	
 	static EfanRenderingStackElement? peek(Bool checked := true) {

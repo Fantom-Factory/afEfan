@@ -4,18 +4,21 @@
 @NoDoc
 const class EfanRenderer {
 	
-	static Obj? renderTemplate(EfanTemplateMeta templateMeta, Obj rendering, StrBuf renderBuf, |->|? bodyFunc, |Obj?->Obj?| func) {
-		return EfanRenderingStack.withCtx(templateMeta.templateId) |EfanRenderingStackElement element->Obj?| {
+	static Str renderTemplate(EfanTemplateMeta templateMeta, Obj rendering, |->|? bodyFunc, |Obj?| func) {
+		renderBuf := StrBuf(templateMeta.templateSrc.size)
+		EfanRenderingStack.withCtx(templateMeta.templateId) |EfanRenderingStackElement element| {
 			ctx := EfanRendererCtx(templateMeta, rendering, renderBuf, bodyFunc)
 			element.ctx["efan.renderCtx"] = ctx
-			return convertErrs(templateMeta, func)
+			convertErrs(templateMeta, func)
 		}
+		return renderBuf.toStr
 	}
 
-	static Void renderBody(StrBuf renderBuf) {
-		bodyFunc := peek.bodyFunc
+	static Str renderBody() {
+		renderBuf	:= null as StrBuf
+		bodyFunc	:= peek.bodyFunc
 		if (bodyFunc == null)
-			return
+			return ""
 		
 		parent := EfanRenderingStack.peekParent(true, "Could not render body - there is no enclosing template!")
 		
@@ -25,25 +28,27 @@ const class EfanRenderer {
 
 			ctx := (EfanRendererCtx) element.ctx["efan.renderCtx"]
 			try {
-				ctx.bodyBuf = renderBuf
-				ctx.inBody = true
-				convertErrs(ctx.efanMetaData, bodyFunc)
+				renderBuf	= StrBuf(ctx.efanMeta.templateSrc.size)
+				ctx.bodyBuf	= renderBuf
+				ctx.inBody	= true
+				convertErrs(ctx.efanMeta, bodyFunc)
 				
 			} finally {
 				ctx.inBody = false
 			}			
 		}
+		return renderBuf.toStr
 	}
 	
 	static EfanRendererCtx? peek(Bool checked := true) {
 		EfanRenderingStack.peek(checked)?.ctx?.get("efan.renderCtx")
 	}
 
-	private static Obj? convertErrs(EfanTemplateMeta efanMetaData, |Obj?->Obj?| func) {
+	private static Void convertErrs(EfanTemplateMeta efanMetaData, |Obj?| func) {
 		try {
 			// TODO: Dodgy Fantom Syntax! See EfanRender.render()
 			// currently, there is no 'it' so we just pass in a number
-			return ((|Obj?->Obj?|) func).call(69)
+			func.call(69)
 			
 		} catch (EfanCompilationErr err) {
 			throw err
@@ -70,18 +75,18 @@ const class EfanRenderer {
 ** Saved on the rendering stack, so we know what's currently being rendered
 @NoDoc	// used by the compiled template to access the renderBuf 
 class EfanRendererCtx {
-	EfanTemplateMeta	efanMetaData
+	EfanTemplateMeta	efanMeta
 	Obj					rendering
 	|->|? 				bodyFunc
-	StrBuf 				efanBuf
+	StrBuf				efanBuf
 	StrBuf?				bodyBuf
 	Bool				inBody
 
 	new make(EfanTemplateMeta templateMeta, Obj rendering, StrBuf renderBuf, |->|? bodyFunc) {
-		this.efanMetaData	= templateMeta
-		this.rendering		= rendering
-		this.bodyFunc 		= bodyFunc
-		this.efanBuf		= renderBuf
+		this.efanMeta	= templateMeta
+		this.rendering	= rendering
+		this.bodyFunc 	= bodyFunc
+		this.efanBuf	= renderBuf
 	}
 	
 	** As used by _efan_output
