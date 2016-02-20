@@ -310,8 +310,6 @@ How efan Works
 **************
 Efan works by converting the efan template string in to Fantom source code. It then compiles this source code into a new Fantom class.  This new Fantom class extends any given 'ViewHelpers' and has a hidden 'render()' method. That is how code in the template is able to access the 'ViewHelpers'.
 
-dynamically generating Fantom source code and compiling it into a Fantom type. It has a hidden '_efan_render()' method that renders a The new generated class extends any given 'ViewHelpers' and contains a public
-
 Because types can not be *unloaded*, if you were compile 1000s of efan templates, it could be considered a memory leak.
 
 Each invocation of 'Efan.compileXXX()' creates a new Fantom type, so use it judiciously. Caching the returned
@@ -321,7 +319,7 @@ pre>
 syntax: fantom
 
 efanStr  := "<% ctx.times |i| { %>Ho! <% } %>"
-template := Efan().compileFromStr(efanStr, Int#)  // <-- cache this template!
+template := Efan().compileFromStr(efanStr, Int#)  // <-- cache this!
 
 ho       := template.render(1)
 hoho     := template.render(2)
