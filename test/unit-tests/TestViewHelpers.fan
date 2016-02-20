@@ -24,6 +24,18 @@ internal class TestViewHelpers : EfanTest {
 		output	 := efan.renderFromStr(template, null, [T_Vh4#, T_Vh5#])
 		verifyEq("Judge Dredd", output)
 	}
+
+	Void testClassCtor() {
+		source		:= "Judge <%= judge %>"
+		meta		:= efan.compileFromStr(source, null, [T_Vh6#])
+		
+		template	:= meta.type.make(["Anderson"])
+		verifyEq("Judge Anderson", meta.renderFrom(template, null))
+
+		// test default params
+		template	= meta.type.make
+		verifyEq("Judge poo", meta.renderFrom(template, null))
+	}
 }
 
 @NoDoc
@@ -46,4 +58,12 @@ const mixin T_Vh4 {
 @NoDoc
 const mixin T_Vh5 {
 	Str b() { "Dredd" }
+}
+
+@NoDoc
+const class T_Vh6 {
+	const Str judge
+	new make(Str judge := "poo") {
+		this.judge = judge
+	}
 }
