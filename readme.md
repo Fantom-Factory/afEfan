@@ -176,7 +176,7 @@ This is because compiled efan code resides in a newly constructed pod!
 
 ## View Helpers
 
-Efan lets you provide view helpers for common tasks. View helpers are `mixins` that your efan template will extend, giving your templates access to commonly used methods. Example, for escaping XML:
+Efan lets you provide view helpers for common tasks. View helpers are `classes` or `mixins` that your efan template will extend, giving your templates access to commonly used methods. Example, for escaping XML:
 
 ```
 mixin XmlViewHelper {
@@ -236,7 +236,7 @@ using afEfan
 
 class Index {
     Str renderIndex() {
-        index     := efan().compileFromFile(`index.efan` .toFile, EfanTemplate#)
+        index     := efan().compileFromFile(`index.efan` .toFile, EfanTemplateMeta#)
         layout    := efan().compileFromFile(`layout.efan`.toFile, Str#)
 
         return index.render(layout)
@@ -281,15 +281,17 @@ Efan Compilation Err:
 
 This really helps you see where typos occurred.
 
-## Templates
+## How efan Works
 
-Efan works by dynamically generating Fantom source code and compiling it into a Fantom type. Because types can not be *unloaded*, if you were compile 1000s of efan templates, it could be considered a memory leak.
+Efan works by converting the efan template string in to Fantom source code. It then compiles this source code into a new Fantom class.  This new Fantom class extends any given `ViewHelpers` and has a hidden `render()` method. That is how code in the template is able to access the `ViewHelpers`.
 
-Each invocation of `Efan.compileXXX()` creates a new Fantom type, so use it judiciously. Caching the returned [EfanTemplate](http://pods.fantomfactory.org/pods/afEfan/api/EfanTemplate) classes is highly recommended. Example:
+Because types can not be *unloaded*, if you were compile 1000s of efan templates, it could be considered a memory leak.
+
+Each invocation of `Efan.compileXXX()` creates a new Fantom type, so use it judiciously. Caching the returned [EfanTemplateMeta](http://pods.fantomfactory.org/pods/afEfan/api/EfanTemplateMeta) classes is highly recommended. Example:
 
 ```
 efanStr  := "<% ctx.times |i| { %>Ho! <% } %>"
-template := Efan().compileFromStr(efanStr, Int#)  // <-- cache this template!
+template := Efan().compileFromStr(efanStr, Int#)  // <-- cache this!
 
 ho       := template.render(1)
 hoho     := template.render(2)
