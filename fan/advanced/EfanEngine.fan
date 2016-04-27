@@ -41,7 +41,7 @@ const class EfanEngine {
 		// like what efanXtra did on upgrading to IoC 2.0.0!
 		classModel.addField(Obj?#, "_efan_output", """throw Err("_efan_output is write only.")""", 
 			"""if (_efan_log.isDebug)
-			   	_efan_log.debug("[_efan_output] \${afEfan::EfanRenderingStack.peek(false)?.nestedId} -> \${it?.toStr?.toCode}")
+			   	_efan_log.debug("[out] \${afEfan::EfanRenderingStack.peek(false)?.nestedId} -> \${it?.toStr?.toCode}")
 			   afEfan::EfanRenderer.peek(false)?.renderBuf?.add(it)""")
 		
 		return classModel

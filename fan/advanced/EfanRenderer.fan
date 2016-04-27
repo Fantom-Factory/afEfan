@@ -7,8 +7,7 @@ const class EfanRenderer {
 	static Str renderTemplate(EfanTemplateMeta templateMeta, Obj rendering, |->|? bodyFunc, |Obj?| func) {
 		renderBuf := StrBuf(templateMeta.templateSrc.size)
 		EfanRenderingStack.withCtx(templateMeta.templateId) |EfanRenderingStackElement element| {
-			ctx := EfanRendererCtx(templateMeta, rendering, renderBuf, bodyFunc)
-			element.ctx["efan.renderCtx"] = ctx
+			element.ctx["efan.renderCtx"] = EfanRendererCtx(templateMeta, rendering, renderBuf, bodyFunc)
 			convertErrs(templateMeta, func)
 		}
 		return renderBuf.toStr
@@ -20,26 +19,22 @@ const class EfanRenderer {
 		if (bodyFunc == null)
 			return ""
 		
-		parent := EfanRenderingStack.peekParent(true, "Could not render body - there is no enclosing template!")
+		parent  := EfanRenderingStack.peekParent(true, "Could not render body - there is no enclosing template!")
+		current := EfanRenderingStack.peek(true)
 		
 		EfanRenderingStack.withCtx("Body") |EfanRenderingStackElement element| {
 			// copy the ctx down from the parent
-			element.ctx	= parent.ctx
+			element.ctx	= parent.ctx.dup
 
-			ctx := (EfanRendererCtx) element.ctx["efan.renderCtx"]
-			try {
-				renderBuf	= StrBuf(ctx.efanMeta.templateSrc.size)
-				ctx.bodyBuf	= renderBuf
-				ctx.inBody	= true
-				convertErrs(ctx.efanMeta, bodyFunc)
+			curCtx		:= current.ctx["efan.renderCtx"] as EfanRendererCtx
+			renderBuf	= StrBuf(curCtx.efanMeta.templateSrc.size)
+			element.ctx["efan.renderCtx"] = EfanRendererCtx(curCtx.efanMeta, curCtx.rendering, renderBuf, null)
 				
-			} finally {
-				ctx.inBody = false
-			}			
+			convertErrs(curCtx.efanMeta, bodyFunc)
 		}
 		return renderBuf.toStr
 	}
-	
+
 	static EfanRendererCtx? peek(Bool checked := true) {
 		EfanRenderingStack.peek(checked)?.ctx?.get("efan.renderCtx")
 	}
@@ -78,19 +73,16 @@ class EfanRendererCtx {
 	EfanTemplateMeta	efanMeta
 	Obj					rendering
 	|->|? 				bodyFunc
-	StrBuf				efanBuf
-	StrBuf?				bodyBuf
-	Bool				inBody
+	StrBuf				renderBuf
+	@Deprecated
+	StrBuf 				efanBuf	// for efanXtra 1.1.0
 
 	new make(EfanTemplateMeta templateMeta, Obj rendering, StrBuf renderBuf, |->|? bodyFunc) {
 		this.efanMeta	= templateMeta
 		this.rendering	= rendering
 		this.bodyFunc 	= bodyFunc
+		this.renderBuf	= renderBuf
 		this.efanBuf	= renderBuf
 	}
 	
-	** As used by _efan_output
-	StrBuf renderBuf() {
-		inBody ? bodyBuf : efanBuf
-	}
 }

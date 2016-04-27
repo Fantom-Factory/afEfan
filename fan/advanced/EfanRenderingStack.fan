@@ -9,8 +9,7 @@ class EfanRenderingStack {
 
 	static Void withCtx(Str id, |EfanRenderingStackElement| func) {		
 		currentId	:= peek(false)?.nestedId
-		nestedId	:= goDeeper(currentId, id)
-		element		:= EfanRenderingStackElement(nestedId)
+		element		:= EfanRenderingStackElement(currentId, id)
 		ThreadStack.pushAndRun(stackId, element, func)
 	}
 	
@@ -26,19 +25,22 @@ class EfanRenderingStack {
 		ThreadStack.elements(stackId, checked)
 	}
 
-	private static Str goDeeper(Str? currentId, Str id) {
-		(currentId == null) ? "(${id})" : "${currentId}->(${id})"
-	}
 }
 
 @NoDoc
 class EfanRenderingStackElement {
+	Str 		simpleId
 	Str 		nestedId
 	Str:Obj?	ctx
 	
-	new make(Str nestedId) {
-		this.nestedId 	= nestedId 
+	new make(Str? fullId, Str id) {
+		this.simpleId	= id
+		this.nestedId 	= goDeeper(fullId, id) 
 		this.ctx		= Str:Obj?[:]
+	}
+
+	private static Str goDeeper(Str? currentId, Str id) {
+		(currentId == null) ? "(${id})" : "${currentId}->(${id})"
 	}
 	
 	override Str toStr() {
