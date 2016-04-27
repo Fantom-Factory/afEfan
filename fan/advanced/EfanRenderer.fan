@@ -20,17 +20,16 @@ const class EfanRenderer {
 			return ""
 		
 		parent  := EfanRenderingStack.peekParent(true, "Could not render body - there is no enclosing template!")
-		current := EfanRenderingStack.peek(true)
 		
 		EfanRenderingStack.withCtx("Body") |EfanRenderingStackElement element| {
 			// copy the ctx down from the parent
 			element.ctx	= parent.ctx.dup
 
-			curCtx		:= current.ctx["efan.renderCtx"] as EfanRendererCtx
-			renderBuf	= StrBuf(curCtx.efanMeta.templateSrc.size)
-			element.ctx["efan.renderCtx"] = EfanRendererCtx(curCtx.efanMeta, curCtx.rendering, renderBuf, null)
+			parentCtx	:= parent.ctx["efan.renderCtx"] as EfanRendererCtx
+			renderBuf	= StrBuf(parentCtx.efanMeta.templateSrc.size)
+			element.ctx["efan.renderCtx"] = EfanRendererCtx(parentCtx.efanMeta, parentCtx.rendering, renderBuf, null)
 				
-			convertErrs(curCtx.efanMeta, bodyFunc)
+			convertErrs(parentCtx.efanMeta, bodyFunc)
 		}
 		return renderBuf.toStr
 	}
