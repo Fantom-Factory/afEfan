@@ -3,31 +3,25 @@ internal class TestViewHelpers : EfanTest {
 	
 	Void testConstHelpers() {
 		template := "<%= a() %>"
-		output	 := efan.renderFromStr(template, null, [T_Vh1#])
+		output	 := efan.render(template, null, [T_Vh1#])
 		verifyEq("Poo", output)
 	}
 
 	Void testClassHelpers() {
 		template := "<%= a() %>"
-		output	 := efan.renderFromStr(template, null, [T_Vh2#])
+		output	 := efan.render(template, null, [T_Vh2#])
 		verifyEq("Bar", output)
-	}
-
-	Void testHelpersMustBePublic() {
-		verifyEfanErrMsg(ErrMsgs.viewHelperMixinIsNotPublic(T_Vh3#)) {
-			EfanCompiler.validateViewHelpers([T_Vh3#])
-		}		
 	}
 
 	Void testMultipleViewHelpers() {
 		template := "<%= a() %> <%= b %>"
-		output	 := efan.renderFromStr(template, null, [T_Vh4#, T_Vh5#])
+		output	 := efan.render(template, null, [T_Vh4#, T_Vh5#])
 		verifyEq("Judge Dredd", output)
 	}
 
 	Void testClassCtor() {
 		source		:= "Judge <%= judge %>"
-		meta		:= efan.compileFromStr(source, null, [T_Vh6#])
+		meta		:= efan.compile(source, null, [T_Vh6#])
 		
 		template	:= meta.type.make(["Anderson"])
 		verifyEq("Judge Anderson", meta.renderFrom(template, null))

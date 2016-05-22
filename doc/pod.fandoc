@@ -17,29 +17,28 @@ logicless templates such as [Mustache]`https://bitbucket.org/xored/mustache/`.
 
 Quick Start
 ***********
-1. Create a text file called 'xmas.efan'
-
-    <% ctx.times |i| { %>
-       Ho!
-    <% } %>
-    Merry Christmas!
-
-2. Create a text file called 'Example.fan'
+1. Create a text file called 'Example.fan'
     syntax: fantom
 
     using afEfan
 
     class Example {
         Void main() {
-            template := `xmas.efan`.toFile.readAllStr
+            template := """<% ctx.times |i| { %>
+                              Ho!
+                           <% } %>
+                           Merry Christmas!"""
 
-            text := Efan().renderFromFile(template, 3)  // --> Ho! Ho! Ho! Merry Christmas!
-            echo(text)
+            text := Efan().render(template, 3)
+
+            echo(text)  // --> Ho! Ho! Ho! Merry Christmas!
         }
     }
 
-3. Run 'Example.fan' as a Fantom script from the command line:
+2. Run 'Example.fan' as a Fantom script from the command line:
+
     C:\> fan Example.fan
+
     Ho! Ho! Ho! Merry Christmas!
 
 
@@ -213,72 +212,6 @@ syntax: html
 
 
 
-Layout Pattern / Nesting Templates
-**********************************
-Efan templates may be nested inside one another, effectively allowing you to componentise your templates. This is accomplished
-by passing body functions in to the efan 'render()' method and calling 'renderBody()' to invoke it.
-
-
-This is best explained in an example. Here we will use the *layout pattern* to place some common HTML into a 'layout.efan' file:
-
-layout.efan:
-pre>
-syntax: html
-
-<head>
-    <title><%= ctx %></title>
-</head>
-<body>
-    <%= renderBody() %>
-</body>
-<pre
-
-index.efan:
-pre>
-syntax: html
-
-<html>
-<%= ctx.layout.render("Cranberry Whips") { %>
-    ...my cool page content...
-<% } %>
-</html>
-<pre
-
-Code to run the above example:
-
-Index.fan:
-pre>
-syntax: fantom
-
-using afEfan
-
-class Index {
-    Str renderIndex() {
-        index     := efan().compileFromFile(`index.efan` .toFile, EfanTemplateMeta#)
-        layout    := efan().compileFromFile(`layout.efan`.toFile, Str#)
-
-        return index.render(layout)
-    }
-}
-<pre
-
-This produces an amalgamation of the two templates:
-
-pre>
-syntax: html
-
-<html>
-<head>
-    <title>Cranberry Whips</title>
-</head>
-<body>
-    ...my cool page content...
-</body>
-</html>
-<pre
-
-
-
 Err Reporting
 *************
 Efan compilation and runtime Errs report snippets of code showing which line in the 'efan' template the error occurred.
@@ -325,4 +258,16 @@ ho       := template.render(1)
 hoho     := template.render(2)
 hohoho   := template.render(3)
 <pre
+
+
+
+IoC
+***
+When efan is added as a dependency to an IoC enabled application, such as [BedSheet]`pod:afBedSheet` or [Reflux]`pod:afReflux`, then the following services are automatically made available to IoC:
+
+ - `Efan`
+ - `EfanCompiler`
+ - `EfanParser`
+
+This makes use of the non-invasive module feature of IoC 3.
 

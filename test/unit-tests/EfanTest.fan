@@ -2,8 +2,10 @@ using afPlastic::PlasticCompiler
 
 abstract internal class EfanTest : Test {
 	
-	EfanCompiler	compiler	:= EfanCompiler(EfanEngine(PlasticCompiler() { it.srcCodePadding = 50 }))
-	EfanEngine		engine		:= compiler.engine
+	EfanCompiler	compiler	:= EfanCompiler()
+//	EfanCompiler	compiler	:= EfanCompiler(EfanEngine(PlasticCompiler() { it.srcCodePadding = 50 }))
+//	EfanEngine		engine		:= compiler.engine
+	EfanParser		parser		:= EfanParser()
 	Efan			efan		:= Efan()
 	
 	Void verifyEfanErrMsg(Str errMsg, |Obj| func) {

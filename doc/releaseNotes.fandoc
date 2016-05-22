@@ -1,5 +1,11 @@
 Release Notes
 *************
+v2.0.0
+======
+ - Chg: Re-engineered, simplified, and exposed the internal workings of efan. The parser may be used for your own code generation.
+ - Chg: Removed nested templates / support for layout pattern. This is now the remit of [efanXtra]`pod:efanXtra`.
+
+
 v1.5.2
 ======
  - Bug: Rendering nested component bodies could corrupt the generated output.

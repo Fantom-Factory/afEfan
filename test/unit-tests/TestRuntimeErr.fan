@@ -15,32 +15,6 @@ internal class TestRuntimeErr : EfanTest {
 			verifyEq(err.errLineNo, 3)
 		}		
 	}
-
-	Void testRuntimeErrInBody() {
-		o :="""outer-before
-		       --
-		       -- padding
-		       --
-		       <%= ctx.render(null) { %>
-		       --
-		       --
-		       --
-		           <% 5.div(0) %>
-		       <% } %>
-		       outer-after"""
-		i :="""inner-before
-		       <%= renderBody %>
-		       inner-after"""
-
-		try {
-			outer := compiler.compile(`outer`, o, EfanTemplateMeta#)
-			inner := compiler.compile(`inner`, i)
-			outer.render(inner)
-			fail
-		} catch (EfanRuntimeErr err) {
-			verifyEq(err.errLineNo, 9)
-		}		
-	}
 	
 	Void testRegex() {
 		code := "  afPlastic001::EfanTemplate._efan_render (afPlastic001:27)"

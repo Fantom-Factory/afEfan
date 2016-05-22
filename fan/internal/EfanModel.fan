@@ -8,11 +8,13 @@ internal class EfanModel : Pusher {
 	private Int				indentSize	:= 1
 	private SrcCodeSnippet	snippet
 	private Int				linesOfPadding
+	private Str				bufFieldName
 
-	new make(SrcCodeSnippet snippet, Int linesOfPadding) {
+	new make(SrcCodeSnippet snippet, Int linesOfPadding, Str bufFieldName) {
 		this.code 			= StrBuf(snippet.srcCode.size)
 		this.snippet		= snippet
 		this.linesOfPadding	= linesOfPadding
+		this.bufFieldName	= bufFieldName
 	}
 	
 	override Void onFanCode(Int lineNo, Str text) {
@@ -42,10 +44,10 @@ internal class EfanModel : Pusher {
 		if (eval.isEmpty) return
 		
 		if (eval.contains("\n")) {
-			indent.append("_efan_output = ")	// no need to end this line
+			indent.append("${bufFieldName} = ")	// no need to end this line
 			appendMulti(eval, lineNo)
 		} else {
-			indent.append("_efan_output = ${eval}").appendLineNo(lineNo).endLine
+			indent.append("${bufFieldName} = ${eval}").appendLineNo(lineNo).endLine
 		}
 		
 		if (eval.endsWith("{"))
@@ -77,7 +79,7 @@ internal class EfanModel : Pusher {
 	
 	override Void onText(Int lineNo, Str text) {
 		if (text.isEmpty) return
-		indent.append("_efan_output = ${text.toCode}").appendLineNo(lineNo).endLine
+		indent.append("${bufFieldName} = ${text.toCode}").appendLineNo(lineNo).endLine
 	}
 
 	override Void onExit(Int lineNo, BlockType blockType) { }

@@ -1,5 +1,0 @@
-index-before
-<%= ((EfanTemplateMeta) ctx["layout"]).render(ctx["layoutCtx"]) { %>
-    index-body
-<% } %>
-index-after
