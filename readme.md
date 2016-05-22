@@ -1,7 +1,7 @@
-#efan v1.5.0
+#efan v1.5.2
 ---
 [![Written in: Fantom](http://img.shields.io/badge/written%20in-Fantom-lightgray.svg)](http://fantom.org/)
-[![pod: v1.5.0](http://img.shields.io/badge/pod-v1.5.0-yellow.svg)](http://www.fantomfactory.org/pods/afEfan)
+[![pod: v1.5.2](http://img.shields.io/badge/pod-v1.5.2-yellow.svg)](http://www.fantomfactory.org/pods/afEfan)
 ![Licence: MIT](http://img.shields.io/badge/licence-MIT-blue.svg)
 
 ## Overview
@@ -101,7 +101,7 @@ prints:
 
 ### Whitespace
 
-All whitespace in efan templates is preserved, except for when a line exists only to contain a code block (or similar). This has the effect of removing unwanted line breaks. Consider:
+All whitespace in efan templates is preserved, except for when a line exists only to contain a code block (or similar). This has the effect of removing unwanted line breaks. For example:
 
 ```
 Hey! It's
@@ -111,7 +111,7 @@ Hey! It's
 Time!
 ```
 
-would be rendered as
+is rendered as:
 
 ```
 Hey! It's

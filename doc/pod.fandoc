@@ -97,7 +97,7 @@ prints:
 Whitespace
 ==========
 All whitespace in efan templates is preserved, except for when a line exists only to contain a code block (or similar).
-This has the effect of removing unwanted line breaks. Consider:
+This has the effect of removing unwanted line breaks. For example:
 
 pre>
 Hey! It's
@@ -107,7 +107,7 @@ Hey! It's
 Time!
 <pre
 
-would be rendered as
+is rendered as:
 
 pre>
 Hey! It's
