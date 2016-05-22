@@ -4,7 +4,7 @@ internal class TestUsing : EfanTest {
 	Void testBasicEscape() {
 		c :="""<%? using sys::Int as Dude %>
 		       <%= Dude("69") %>""" 
-		text := efan.renderFromStr(c, null)
+		text := efan.render(c, null)
 		verifyEq(text, "69")
 	}
 	

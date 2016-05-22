@@ -1,10 +1,18 @@
 using afPlastic::PlasticCompiler
 using afPlastic::SrcCodeSnippet
 
-internal const class EfanParser {
+** Parses efan template strings into Fantom code.
+const class EfanParser {
 
-	private const PlasticCompiler	plasticCompiler
-	private const Bool				removeWhitespace
+	** When generating code snippets for parsing Errs, this is the number of src code lines 
+	** the erroneous line will be padded with. 
+	const Int		srcCodePadding		:= 5
+
+	** Controls whether 'code' only lines are trimmed to remove (usually) unwanted line breaks.  
+	const Bool		removeWhitespace	:= true
+	
+	** Name of the field that the generated template will be added to.
+	const Str		fieldName			:= "_efan_output"
 	
 	// don't contribute these, as currently, there are a lot of assumptions around <%# starting with <%
 	private static const Str tokenEscapeStart		:= "<%%"
@@ -15,13 +23,29 @@ internal const class EfanParser {
 	private static const Str tokenInstructionStart	:= "<%?"
 	private static const Str tokenEnd				:= "%>"
 	
-	** We pass the PlasticCompiler in so we always get the latest srcCodePadding
-	new make(PlasticCompiler plasticCompiler, Bool removeWhitespace) {
-		this.plasticCompiler 	= plasticCompiler
-		this.removeWhitespace	= removeWhitespace
-	}
+	** Standard it-block ctor. Use to set field values:
+	** 
+	**   syntax: fantom
+	**   parser := EfanParser {
+	**       it.srcCodePadding   = 5
+	**       it.removeWhitespace = true
+	**       it.fieldName       = "_efan_output"
+	**   }
+	new make(|This|? f := null) { f?.call(this)	}
 
-	Void parse(Uri srcLocation, Pusher pusher, Str efanCode) {
+	** Parses the given 'efan' template to Fantom code.
+	ParseResult parse(Uri srcLocation, Str efanTemplate) {
+		srcSnippet	:= SrcCodeSnippet(srcLocation, efanTemplate)
+		efanModel	:= EfanModel(srcSnippet, srcCodePadding, fieldName)
+		doParse(srcLocation, efanModel, efanTemplate)
+		return ParseResult {
+			it.fantomCode 	= efanModel.toFantomCode
+			it.usings	  	= efanModel.usings
+			it.fieldName	= this.fieldName
+		}
+	}
+	
+	internal Void doParse(Uri srcLocation, Pusher pusher, Str efanCode) {
 		efanIn	:= efanCode.toBuf
 		data	:= ParserData(pusher, efanCode, removeWhitespace)
 		while (efanIn.more) {
@@ -98,7 +122,7 @@ internal const class EfanParser {
 		if (data.inBlock) {
 			errMsg	:= ErrMsgs.parserBlockNotClosed(data.blockType)
 			srcCode	:= SrcCodeSnippet(srcLocation, efanCode)
-			throw EfanParserErr(srcCode, efanCode.splitLines.size, errMsg, plasticCompiler.srcCodePadding)
+			throw EfanParserErr(srcCode, efanCode.splitLines.size, errMsg, srcCodePadding)
 		}
 
 		data.push
@@ -106,7 +130,7 @@ internal const class EfanParser {
 	}
 
 	** If tag is next, consume it and return true
-	Bool peekEq(Buf buf, Str tag) {
+	private Bool peekEq(Buf buf, Str tag) {
 		if (buf.remaining < tag.size)
 			return false
 
@@ -119,6 +143,21 @@ internal const class EfanParser {
 			return false
 		}
 	}
+}
+
+** Contains Fantom code; the result of parsing efan templates.
+const class ParseResult {
+	
+	** Fantom src code.
+	const Str 	fantomCode
+	
+	** List of 'using' statements.
+	const Str[]	usings
+	
+	** Name of the 'StrBuf' variable / field that the generated template will be added to.
+	const Str fieldName
+	
+	internal new make(|This| in) { in(this) }
 }
 
 internal class ParserData {

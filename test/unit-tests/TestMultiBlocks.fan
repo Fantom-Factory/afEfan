@@ -6,7 +6,7 @@ internal class TestMultiBlocks : EfanTest {
 		       <%= i+1 %>
 		       <% } %>"""
 		// test the code looks pretty
-		code := engine.parseIntoCode(``, c)
+		code := parser.parse(``, c).fantomCode
 		verify( code.contains("\t3.times |i| {"))
 		verify( code.contains("\t\t_efan_output = i+1"))
 	}
@@ -14,28 +14,28 @@ internal class TestMultiBlocks : EfanTest {
 	Void testBlocksTrimmed() {
 		c :="""<%     echo("dude")     %>"""
 		// test the code looks pretty
-		code := engine.parseIntoCode(``, c)
+		code := parser.parse(``, c).fantomCode
 		verify( code.contains("\techo(\"dude\")"))
 	}
 
 	Void testEmptyTextBlocksAreIgnored() {
 		c :="""<% %><% %><% %>"""
 		// test the code looks pretty
-		code := engine.parseIntoCode(``, c)
+		code := parser.parse(``, c).fantomCode
 		verify(!code.contains("_afCode.add("))
 	}
 
 	Void testEmptyCodeBlocksAreIgnored() {
 		c :="""<% %>"""
 		// test the code looks pretty
-		code := engine.parseIntoCode(``, c)
+		code := parser.parse(``, c).fantomCode
 		verify(!code.contains("_afCode.add("))
 	}
 
 	Void testEmptyEvalBlocksAreIgnored() {
 		c :="""<%= %>"""
 		// test the code looks pretty
-		code := engine.parseIntoCode(``, c)
+		code := parser.parse(``, c).fantomCode
 		verify(!code.contains("_afCode.add("))
 	}
 }

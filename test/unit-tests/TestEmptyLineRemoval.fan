@@ -42,7 +42,7 @@ internal class TestEmptyLineRemoval : EfanTest {
       - null ]
    --line 10--"""
 		
-		code := efan.renderFromStr(template)
+		code := efan.render(template)
 		verifyEq(expected, code)
 	}
 
@@ -73,7 +73,7 @@ internal class TestEmptyLineRemoval : EfanTest {
    - <% null?.toStr %>- 
    --line 6--"""
 		
-		code := efan.renderFromStr(template)
+		code := efan.render(template)
 		verifyEq(code, expected)
 	}
 		
@@ -81,7 +81,7 @@ internal class TestEmptyLineRemoval : EfanTest {
 		template := """--line 1--  \n  <% null?.toStr %>  \n  --line 2-- """
 		expected := """--line 1--  \n  --line 2-- """
 
-		code := efan.renderFromStr(template)
+		code := efan.render(template)
 		verifyEq(expected, code)
 	}
 }
