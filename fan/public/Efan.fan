@@ -23,10 +23,10 @@ const class Efan {
 
 	** Compiles the given efan template to a re-usable meta object.
 	** 
-	** The compiled template extends the given view helper mixins.
+	** The compiled template (not the returned Meta) extends the given view helper mixins.
 	** 
 	** 'templateLoc' may be anything - used for meta information only.
-	EfanTemplateMeta compile(Str efanTemplate, Type? ctxType := null, Type[]? viewHelpers := null, Uri? templateLoc := null) {
+	EfanMeta compile(Str efanTemplate, Type? ctxType := null, Type[]? viewHelpers := null, Uri? templateLoc := null) {
 		efanCompiler.compile(templateLoc ?: `from/efan/template`, efanTemplate, ctxType, viewHelpers ?: Type#.emptyList)
 	}
 	

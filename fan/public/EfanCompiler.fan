@@ -12,13 +12,14 @@ const class EfanCompiler {
 	private const EfanParser 		efanParser 
 	
 	** The name of created render methods.
-	const Str	renderMethodName	:= "render"
+	const Str	renderMethodName	:= "_efanRender"
 
 	** The name given to the 'ctx' variable in the render method.
 	const Str	ctxName				:= "ctx"
 
+	// FIXME extend viewhelper class name
 	** The class name given to compiled efan template instances.
-	const Str 	templateClassName	:= "EfanTemplateImpl"  
+	const Str 	templateClassName	:= "EfanTemplate"
 	
 	** Standard it-block ctor for setting fields.
 	new make(|This|? in := null) {
@@ -33,13 +34,13 @@ const class EfanCompiler {
 		in(this)
 	}
 
-	** Compiles and instantiates a new 'EfanTemplateMeta' from the given efan template. 
+	** Compiles and instantiates a new 'EfanMeta' instance from the given efan template. 
 	** The compiled template extends the given view helper mixins.
 	** 
 	** This method compiles a new Fantom Type so use judiciously to avoid memory leaks.
 	** 
 	** Note that 'templateLoc' is only used for reporting Err msgs.
-	EfanTemplateMeta compile(Uri templateLoc, Str templateSrc, Type? ctxType := null, Type[] viewHelpers := Type#.emptyList) {
+	EfanMeta compile(Uri templateLoc, Str templateSrc, Type? ctxType := null, Type[] viewHelpers := Type#.emptyList) {
 		viewHelpers.each {
 			if (!it.isPublic)
 				throw EfanErr(ErrMsgs.viewHelperMixinIsNotPublic(it))
@@ -54,7 +55,7 @@ const class EfanCompiler {
 		
 		
 		parseResult.usings.each { model.usingStr(it) }
-		model.usingType(EfanTemplateMeta#)
+		model.usingType(EfanMeta#)
 
 		
 		viewHelpers.each { model.extend(it) }
@@ -91,7 +92,7 @@ const class EfanCompiler {
 
 		efanType := compileModel(model, templateSrc, templateLoc)
 		
-		return EfanTemplateMeta {
+		return EfanMeta {
 			it.type 			= efanType
 			it.typeSrc			= model.toFantomCode
 			it.templateLoc		= templateLoc
@@ -99,18 +100,19 @@ const class EfanCompiler {
 			it.srcCodePadding	= plasticCompiler.srcCodePadding
 			it.ctxType			= ctxType
 			it.ctxName			= this.ctxName
-			it.renderMethodName	= this.renderMethodName
+			it.renderMethod		= efanType.method(renderMethodName, true)
 		}
 	}
 
 	** Compiles the given Plastic model, converting any compilation errors to 'EfanCompilationErrs' 
 	** that shows where in the efan template the error occurred.
+	@NoDoc
 	Type compileModel(PlasticClassModel model, Str templateSrc, Uri templateLoc) {
 		try {
 			return plasticCompiler.compileModel(model)
 			
 		} catch (PlasticCompilationErr cause) {
-			templateLineNo	:= EfanTemplateMeta.findTemplateLineNo(model.toFantomCode, cause.errLineNo) ?: throw cause
+			templateLineNo	:= EfanMeta.findTemplateLineNo(model.toFantomCode, cause.errLineNo) ?: throw cause
 			srcCodeSnippet	:= SrcCodeSnippet(templateLoc, templateSrc)
 			throw EfanCompilationErr(srcCodeSnippet, templateLineNo, cause.msg, cause.linesOfPadding, cause)
 		}
