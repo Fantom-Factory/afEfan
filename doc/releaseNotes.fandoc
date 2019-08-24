@@ -7,7 +7,7 @@ v2.0.0
  - Chg: Re-engineered, simplified, and exposed the internal workings of efan. The parser may be used for your own code generation.
  - Chg: Removed nested templates / support for layout pattern. This is now the remit of [efanXtra]`pod:efanXtra`.
  - Chg: 'EfanTemplateMeta' renamed to just 'EfanMeta'.
-
+ - Chg: Generated pod and type names are more customised.
 
 
 v1.x.x

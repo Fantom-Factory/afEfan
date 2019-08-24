@@ -17,15 +17,14 @@ const class EfanCompiler {
 	** The name given to the 'ctx' variable in the render method.
 	const Str	ctxName				:= "ctx"
 
-	// FIXME extend viewhelper class name
-	** The class name given to compiled efan template instances.
-	const Str 	templateClassName	:= "EfanTemplate"
+	** Generates the type name given to compiled efan template instances.
+	const |Type[]->Str| templateTypeNameFn	:= |Type[] viewHelpers->Str| { (viewHelpers.first?.name ?: "") + "EfanTemplate" }
 	
 	** Standard it-block ctor for setting fields.
 	new make(|This|? in := null) {
-		in?.call(this)
-		this.plasticCompiler = PlasticCompiler()
+		this.plasticCompiler = PlasticCompiler { it.podBaseName = "afEfanTemplate" }
 		this.efanParser 	 = EfanParser()
+		in?.call(this)
 	}
 	
 	private new ctorForIoc(EfanParser efanParser, PlasticCompiler plasticCompiler, |This| in) {
@@ -51,7 +50,7 @@ const class EfanCompiler {
 
 
 		isConst	:= viewHelpers.first?.isConst ?: true	// const by default
-		model := PlasticClassModel(templateClassName, isConst)
+		model := PlasticClassModel(templateTypeNameFn(viewHelpers), isConst)
 		
 		
 		parseResult.usings.each { model.usingStr(it) }
@@ -75,11 +74,11 @@ const class EfanCompiler {
 		renderCode	:= ""
 		if (ctxType != null && !ctxType.isNullable) {
 			renderCode	+= "if (_ctx == null)\n"
-			renderCode	+= "	throw afEfan::EfanErr(\"${ErrMsgs.compiler_ctxIsNull} ${ctxType.typeof.signature}\")\n"
+			renderCode	+= "	throw ${EfanErr#.qname}(\"${ErrMsgs.compiler_ctxIsNull} ${ctxType.typeof.signature}\")\n"
 		}
 		if (ctxType != null) {
 			renderCode	+= "if (_ctx != null && !_ctx.typeof.fits(${ctxType.qname}#))\n"
-			renderCode	+= "	throw afEfan::EfanErr(\"ctx \${_ctx.typeof.signature} ${ErrMsgs.compiler_ctxNoFit(ctxType)}\")\n"
+			renderCode	+= "	throw ${EfanErr#.qname}(\"ctx \${_ctx.typeof.signature} ${ErrMsgs.compiler_ctxNoFit(ctxType)}\")\n"
 		}		
 		renderCode	+= "${ctxTypeSig} ${ctxName} := _ctx\n"
 		renderCode	+= "\n"

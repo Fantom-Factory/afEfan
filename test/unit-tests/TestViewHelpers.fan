@@ -22,7 +22,7 @@ internal class TestViewHelpers : EfanTest {
 	Void testClassCtor() {
 		source		:= "Judge <%= judge %>"
 		meta		:= efan.compile(source, null, [T_Vh6#])
-		
+
 		template	:= meta.type.make(["Anderson"])
 		verifyEq("Judge Anderson", meta.renderFrom(template, null))
 
