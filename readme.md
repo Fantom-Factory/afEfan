@@ -1,8 +1,9 @@
-#efan v1.5.2
+# efan v2.0.0
 ---
-[![Written in: Fantom](http://img.shields.io/badge/written%20in-Fantom-lightgray.svg)](http://fantom.org/)
-[![pod: v1.5.2](http://img.shields.io/badge/pod-v1.5.2-yellow.svg)](http://www.fantomfactory.org/pods/afEfan)
-![Licence: MIT](http://img.shields.io/badge/licence-MIT-blue.svg)
+
+[![Written in: Fantom](http://img.shields.io/badge/written%20in-Fantom-lightgray.svg)](http://fantom-lang.org/)
+[![pod: v2.0.0](http://img.shields.io/badge/pod-v2.0.0-yellow.svg)](http://eggbox.fantomfactory.org/pods/afEfan)
+[![Licence: ISC](http://img.shields.io/badge/licence-ISC-blue.svg)](https://choosealicense.com/licenses/isc/)
 
 ## Overview
 
@@ -12,51 +13,52 @@ Like `EJS` for Javascript, `ERB` for Ruby and `JSP` for Java, `efan` lets you em
 
 `efan` aims to hit the middle ground between programmatically rendering markup with [web::WebOutStream](http://fantom.org/doc/web/WebOutStream.html) and rendering logicless templates such as [Mustache](https://bitbucket.org/xored/mustache/).
 
-> **ALIEN-AID:** Create powerful re-usable components with [efanXtra](http://pods.fantomfactory.org/pods/afEfanXtra) and [IoC](http://pods.fantomfactory.org/pods/afIoc) !!!
+> **ALIEN-AID:** Create powerful re-usable components with [efanXtra](http://eggbox.fantomfactory.org/pods/afEfanXtra) and [IoC](http://eggbox.fantomfactory.org/pods/afIoc) !!!
 
-> **ALIEN-AID:** If rendering HTML, use [Slim](http://pods.fantomfactory.org/pods/afSlim) !!! The concise and lightweight template syntax makes generating HTML easy!
+> **ALIEN-AID:** If rendering HTML, use [Slim](http://eggbox.fantomfactory.org/pods/afSlim) !!! The concise and lightweight template syntax makes generating HTML easy!
 
 ## Install
 
-Install `efan` with the Fantom Repository Manager ( [fanr](http://fantom.org/doc/docFanr/Tool.html#install) ):
+Install `efan` with the Fantom Pod Manager ( [FPM](http://eggbox.fantomfactory.org/pods/afFpm) ):
 
-    C:\> fanr install -r http://pods.fantomfactory.org/fanr/ afEfan
+    C:\> fpm install afEfan
 
-To use in a [Fantom](http://fantom.org/) project, add a dependency to `build.fan`:
+Or install `efan` with [fanr](http://fantom.org/doc/docFanr/Tool.html#install):
 
-    depends = ["sys 1.0", ..., "afEfan 1.5"]
+    C:\> fanr install -r http://eggbox.fantomfactory.org/fanr/ afEfan
+
+To use in a [Fantom](http://fantom-lang.org/) project, add a dependency to `build.fan`:
+
+    depends = ["sys 1.0", ..., "afEfan 2.0"]
 
 ## Documentation
 
-Full API & fandocs are available on the [Fantom Pod Repository](http://pods.fantomfactory.org/pods/afEfan/).
+Full API & fandocs are available on the [Eggbox](http://eggbox.fantomfactory.org/pods/afEfan/) - the Fantom Pod Repository.
 
 ## Quick Start
 
-1. Create a text file called `xmas.efan`
-
-        <% ctx.times |i| { %>
-           Ho!
-        <% } %>
-        Merry Christmas!
-
-
-2. Create a text file called `Example.fan`
+1. Create a text file called `Example.fan`
 
         using afEfan
         
         class Example {
             Void main() {
-                template := `xmas.efan`.toFile.readAllStr
+                template := """<% ctx.times |i| { %>
+                                  Ho!
+                               <% } %>
+                               Merry Christmas!"""
         
-                text := Efan().renderFromFile(template, 3)  // --> Ho! Ho! Ho! Merry Christmas!
-                echo(text)
+                text := Efan().render(template, 3)
+        
+                echo(text)  // --> Ho! Ho! Ho! Merry Christmas!
             }
         }
 
 
-3. Run `Example.fan` as a Fantom script from the command line:
+2. Run `Example.fan` as a Fantom script from the command line:
 
         C:\> fan Example.fan
+        
         Ho! Ho! Ho! Merry Christmas!
 
 
@@ -200,63 +202,6 @@ Template usage would then be:
 </p>
 ```
 
-## Layout Pattern / Nesting Templates
-
-Efan templates may be nested inside one another, effectively allowing you to componentise your templates. This is accomplished by passing body functions in to the efan `render()` method and calling `renderBody()` to invoke it.
-
-This is best explained in an example. Here we will use the *layout pattern* to place some common HTML into a `layout.efan` file:
-
-layout.efan:
-
-```
-<head>
-    <title><%= ctx %></title>
-</head>
-<body>
-    <%= renderBody() %>
-</body>
-```
-
-index.efan:
-
-```
-<html>
-<%= ctx.layout.render("Cranberry Whips") { %>
-    ...my cool page content...
-<% } %>
-</html>
-```
-
-Code to run the above example:
-
-Index.fan:
-
-```
-using afEfan
-
-class Index {
-    Str renderIndex() {
-        index     := efan().compileFromFile(`index.efan` .toFile, EfanTemplateMeta#)
-        layout    := efan().compileFromFile(`layout.efan`.toFile, Str#)
-
-        return index.render(layout)
-    }
-}
-```
-
-This produces an amalgamation of the two templates:
-
-```
-<html>
-<head>
-    <title>Cranberry Whips</title>
-</head>
-<body>
-    ...my cool page content...
-</body>
-</html>
-```
-
 ## Err Reporting
 
 Efan compilation and runtime Errs report snippets of code showing which line in the `efan` template the error occurred. Example:
@@ -287,7 +232,7 @@ Efan works by converting the efan template string in to Fantom source code. It t
 
 Because types can not be *unloaded*, if you were compile 1000s of efan templates, it could be considered a memory leak.
 
-Each invocation of `Efan.compileXXX()` creates a new Fantom type, so use it judiciously. Caching the returned [EfanTemplateMeta](http://pods.fantomfactory.org/pods/afEfan/api/EfanTemplateMeta) classes is highly recommended. Example:
+Each invocation of `Efan.compileXXX()` creates a new Fantom type, so use it judiciously. Caching the returned [EfanTemplateMeta](http://eggbox.fantomfactory.org/pods/afEfan/api/EfanTemplateMeta) classes is highly recommended. Example:
 
 ```
 efanStr  := "<% ctx.times |i| { %>Ho! <% } %>"
@@ -297,4 +242,14 @@ ho       := template.render(1)
 hoho     := template.render(2)
 hohoho   := template.render(3)
 ```
+
+## IoC
+
+When efan is added as a dependency to an IoC enabled application, such as [BedSheet](http://eggbox.fantomfactory.org/pods/afBedSheet) or [Reflux](http://eggbox.fantomfactory.org/pods/afReflux), then the following services are automatically made available to IoC:
+
+- [Efan](http://eggbox.fantomfactory.org/pods/afEfan/api/Efan)
+- [EfanCompiler](http://eggbox.fantomfactory.org/pods/afEfan/api/EfanCompiler)
+- [EfanParser](http://eggbox.fantomfactory.org/pods/afEfan/api/EfanParser)
+
+This makes use of the non-invasive module feature of IoC 3.
 

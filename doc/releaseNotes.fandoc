@@ -1,10 +1,17 @@
-Release Notes
-*************
+v2.0.0
+******
+
 v2.0.0
 ======
+ - New: 'afEfan' now available as a SkySpark extension.
  - Chg: Re-engineered, simplified, and exposed the internal workings of efan. The parser may be used for your own code generation.
  - Chg: Removed nested templates / support for layout pattern. This is now the remit of [efanXtra]`pod:efanXtra`.
+ - Chg: 'EfanTemplateMeta' renamed to just 'EfanMeta'.
 
+
+
+v1.x.x
+******
 
 v1.5.2
 ======
