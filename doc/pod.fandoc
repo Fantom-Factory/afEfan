@@ -140,7 +140,7 @@ ctx := ["name":"Emma"]  // ctx is a map
 
 template := "Hello <%= ctx["name"] %>!"
 
-Efan().renderFromStr(template, ctx)
+Efan().render(template, ctx)
 <pre
 
 Using objs:
@@ -157,7 +157,7 @@ class Entity {
 template := "Hello <%= ctx.name %>!"
 ctx      := Entity("Emma")  // ctx is an Entity
 
-Efan().renderFromStr(template, ctx)
+Efan().render(template, ctx)
 <pre
 
 Warning!
@@ -196,7 +196,7 @@ Set view helpers when calling efan:
 pre>
 syntax: fantom
 
-Efan().renderFromStr(template, ctx, [XmlViewHelper#])
+Efan().render(template, ctx, [XmlViewHelper#])
 <pre
 
 Template usage would then be:

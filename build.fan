@@ -25,8 +25,11 @@ class Build : BuildPod {
 		]
 
 		depends = [
+			// ---- Fantom Core ----
 			"sys          1.0.68 - 1.0",
 			"concurrent   1.0.68 - 1.0",
+			
+			// ---- Fantom Factory ----
 			"afConcurrent 1.0.22 - 1.0",	// use the SkySpark versions
 			"afPlastic    1.1.4  - 1.1",	// use the SkySpark versions
 		]

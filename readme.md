@@ -11,7 +11,7 @@
 
 Like `EJS` for Javascript, `ERB` for Ruby and `JSP` for Java, `efan` lets you embed snippets of Fantom code inside textual templates.
 
-`efan` aims to hit the middle ground between programmatically rendering markup with [web::WebOutStream](http://fantom.org/doc/web/WebOutStream.html) and rendering logicless templates such as [Mustache](https://bitbucket.org/xored/mustache/).
+`efan` aims to hit the middle ground between programmatically rendering markup with [web::WebOutStream](http://fantom.org/doc/web/WebOutStream.html) and rendering logicless templates such as [Mustache](http://eggbox.fantomfactory.org/pods/mustache).
 
 > **ALIEN-AID:** Create powerful re-usable components with [efanXtra](http://eggbox.fantomfactory.org/pods/afEfanXtra) and [IoC](http://eggbox.fantomfactory.org/pods/afIoc) !!!
 
@@ -144,7 +144,7 @@ ctx := ["name":"Emma"]  // ctx is a map
 
 template := "Hello <%= ctx["name"] %>!"
 
-Efan().renderFromStr(template, ctx)
+Efan().render(template, ctx)
 ```
 
 Using objs:
@@ -160,7 +160,7 @@ class Entity {
 template := "Hello <%= ctx.name %>!"
 ctx      := Entity("Emma")  // ctx is an Entity
 
-Efan().renderFromStr(template, ctx)
+Efan().render(template, ctx)
 ```
 
 ### Warning!
@@ -191,7 +191,7 @@ mixin XmlViewHelper {
 Set view helpers when calling efan:
 
 ```
-Efan().renderFromStr(template, ctx, [XmlViewHelper#])
+Efan().render(template, ctx, [XmlViewHelper#])
 ```
 
 Template usage would then be:
@@ -232,11 +232,11 @@ Efan works by converting the efan template string in to Fantom source code. It t
 
 Because types can not be *unloaded*, if you were compile 1000s of efan templates, it could be considered a memory leak.
 
-Each invocation of `Efan.compileXXX()` creates a new Fantom type, so use it judiciously. Caching the returned [EfanTemplateMeta](http://eggbox.fantomfactory.org/pods/afEfan/api/EfanTemplateMeta) classes is highly recommended. Example:
+Each invocation of `Efan.compileXXX()` creates a new Fantom type, so use it judiciously. Caching the returned [EfanMeta](http://eggbox.fantomfactory.org/pods/afEfan/api/EfanMeta) classes is highly recommended. Example:
 
 ```
 efanStr  := "<% ctx.times |i| { %>Ho! <% } %>"
-template := Efan().compileFromStr(efanStr, Int#)  // <-- cache this!
+template := Efan().compile(efanStr, Int#)  // <-- cache this!
 
 ho       := template.render(1)
 hoho     := template.render(2)
