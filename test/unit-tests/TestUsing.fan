@@ -15,7 +15,7 @@ internal class TestUsing : EfanTest {
 			type := compiler.compile(``, c, null)
 			fail
 		} catch (EfanParserErr err) {
-			verifyEq(err.msg, ErrMsgs.unknownInstruction("hello!"))
+			verifyEq(err.msg, "Unknown processing instruction: hello!")
 			verifyEq(err.errLineNo, 2)
 		}
 	}

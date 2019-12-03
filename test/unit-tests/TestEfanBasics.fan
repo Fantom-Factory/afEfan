@@ -22,13 +22,13 @@ internal class TestEfanBasics : EfanTest {
 	}
 
 	Void testEfanCanNotEndMidBlock() {
-		verifyEfanErrMsg(ErrMsgs.parserBlockNotClosed(BlockType.fanCode)) {
+		verifyEfanErrMsg("Fan Code block not closed.") {
 			text := efan.render("Hel<% lo!", null)
 		}
-		verifyEfanErrMsg(ErrMsgs.parserBlockNotClosed(BlockType.eval)) {
+		verifyEfanErrMsg("Eval block not closed.") {
 			text := efan.render("Hel<%= lo!", null)
 		}
-		verifyEfanErrMsg(ErrMsgs.parserBlockNotClosed(BlockType.comment)) {
+		verifyEfanErrMsg("Comment block not closed.") {
 			text := efan.render("Hel<%# lo!", null)
 		}		
 	}

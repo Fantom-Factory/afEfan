@@ -120,7 +120,7 @@ const class EfanParser {
 		}
 		
 		if (data.inBlock) {
-			errMsg	:= ErrMsgs.parserBlockNotClosed(data.blockType)
+			errMsg	:= "${data.blockType.name.toDisplayName} block not closed."
 			srcCode	:= SrcCodeSnippet(srcLocation, efanCode)
 			throw EfanParserErr(srcCode, efanCode.splitLines.size, errMsg, srcCodePadding)
 		}

@@ -12,7 +12,7 @@ const class EfanCompiler {
 	private const EfanParser 		efanParser 
 	
 	** The name of created render methods.
-	const Str	renderMethodName	:= "_efanRender"
+	const Str	renderMethodName	:= "_efan_render"
 
 	** The name given to the 'ctx' variable in the render method.
 	const Str	ctxName				:= "ctx"
@@ -20,16 +20,22 @@ const class EfanCompiler {
 	** Generates the type name given to compiled efan template instances.
 	const |Type[]->Str| templateTypeNameFn	:= |Type[] viewHelpers->Str| { (viewHelpers.first?.name ?: "") + "EfanTemplate" }
 	
+	** Callbacks are called for each compiled model.
+	const |Type, PlasticClassModel|[]	compilerCallbacks
+
+	
 	** Standard it-block ctor for setting fields.
 	new make(|This|? in := null) {
-		this.plasticCompiler = PlasticCompiler { it.podBaseName = "afEfanTemplate" }
-		this.efanParser 	 = EfanParser()
+		this.plasticCompiler 	= PlasticCompiler { it.podBaseName = "afEfanTemplate" }
+		this.efanParser 	 	= EfanParser()
+		this.compilerCallbacks	= Obj#.emptyList
 		in?.call(this)
 	}
 	
-	private new ctorForIoc(EfanParser efanParser, PlasticCompiler plasticCompiler, |This| in) {
-		this.efanParser		 = efanParser
-		this.plasticCompiler = plasticCompiler
+	private new ctorForIoc(|Type, PlasticClassModel|[] compilerCallbacks, EfanParser efanParser, PlasticCompiler plasticCompiler, |This| in) {
+		this.compilerCallbacks	= compilerCallbacks
+		this.efanParser		 	= efanParser
+		this.plasticCompiler 	= plasticCompiler
 		in(this)
 	}
 
@@ -42,7 +48,7 @@ const class EfanCompiler {
 	EfanMeta compile(Uri templateLoc, Str templateSrc, Type? ctxType := null, Type[] viewHelpers := Type#.emptyList) {
 		viewHelpers.each {
 			if (!it.isPublic)
-				throw EfanErr(ErrMsgs.viewHelperMixinIsNotPublic(it))
+				throw EfanErr("View Helper mixin ${it.qname} should be public.")
 		}
 	
 		// the important efan parsing
@@ -68,17 +74,16 @@ const class EfanCompiler {
 		model.addField(LocalRef#,	fieldName + "_ref").withInitValue("${LocalRef#.qname}(\"${fieldName}\") |->StrBuf| { StrBuf() }")
 		model.addField(Obj?#,		fieldName, """((StrBuf) ${fieldName}_ref.val).toStr""", """((StrBuf) ${fieldName}_ref.val).add(it)""")
 
-		
 		// check the ctx type here so it also works from renderEfan()  
 		ctxTypeSig	:= (ctxType == null) ? "Obj?" : ctxType.signature
 		renderCode	:= ""
 		if (ctxType != null && !ctxType.isNullable) {
 			renderCode	+= "if (_ctx == null)\n"
-			renderCode	+= "	throw ${EfanErr#.qname}(\"${ErrMsgs.compiler_ctxIsNull} ${ctxType.typeof.signature}\")\n"
+			renderCode	+= "	throw ${EfanErr#.qname}(\"ctx is null - but ctx type is not nullable: ${ctxType.typeof.signature}\")\n"
 		}
 		if (ctxType != null) {
 			renderCode	+= "if (_ctx != null && !_ctx.typeof.fits(${ctxType.qname}#))\n"
-			renderCode	+= "	throw ${EfanErr#.qname}(\"ctx \${_ctx.typeof.signature} ${ErrMsgs.compiler_ctxNoFit(ctxType)}\")\n"
+			renderCode	+= "	throw ${EfanErr#.qname}(\"ctx \${_ctx.typeof.signature} does not fit ctx type " + ctxType.signature.replace("sys::", "") + "\")\n"
 		}		
 		renderCode	+= "${ctxTypeSig} ${ctxName} := _ctx\n"
 		renderCode	+= "\n"
@@ -89,6 +94,9 @@ const class EfanCompiler {
 
 		model.addMethod(Str#, renderMethodName, "Obj? _ctx", renderCode)
 
+		// give callbacks a chance to add to our model - added for efanXtra and Pillow
+		compilerCallbacks.each { it.call(viewHelpers.first ?: Obj#, model) }
+		
 		efanType := compileModel(model, templateSrc, templateLoc)
 		
 		return EfanMeta {
@@ -102,6 +110,7 @@ const class EfanCompiler {
 			it.renderMethod		= efanType.method(renderMethodName, true)
 		}
 	}
+
 
 	** Compiles the given Plastic model, converting any compilation errors to 'EfanCompilationErrs' 
 	** that shows where in the efan template the error occurred.

@@ -73,7 +73,7 @@ internal class EfanModel : Pusher {
 		if (instruction.lower.startsWith("using ")) {
 			usings.add(instruction["using ".size..-1] + "\t// (efan) --> ${lineNo}")
 		} else {
-			throw EfanParserErr(snippet, lineNo, ErrMsgs.unknownInstruction(instruction), linesOfPadding)
+			throw EfanParserErr(snippet, lineNo, "Unknown processing instruction: ${instruction}", linesOfPadding)
 		}
 	}
 	
