@@ -71,31 +71,42 @@ const class EfanCompiler {
 
 		// we need the special syntax of "_efan_output = XXXX" so we don't have to close any brackets with eval expressions
 		fieldName := efanParser.fieldName
-		model.addField(LocalRef#,	fieldName + "_ref").withInitValue("${LocalRef#.qname}(\"${fieldName}\") |->StrBuf| { StrBuf() }")
+		localName := fieldName + "_ref"
+		model.addField(LocalRef#,	localName).withInitValue("${LocalRef#.qname}(\"${fieldName}\") |->StrBuf| { StrBuf() }")
 		model.addField(Obj?#,		fieldName, """((StrBuf) ${fieldName}_ref.val).toStr""", """((StrBuf) ${fieldName}_ref.val).add(it)""")
 
-		// check the ctx type here so it also works from renderEfan()  
-		ctxTypeSig	:= (ctxType == null) ? "Obj?" : ctxType.signature
-		renderCode	:= ""
-		if (ctxType != null && !ctxType.isNullable) {
-			renderCode	+= "if (_ctx == null)\n"
-			renderCode	+= "	throw ${EfanErr#.qname}(\"ctx is null - but ctx type is not nullable: ${ctxType.typeof.signature}\")\n"
-		}
-		if (ctxType != null) {
-			renderCode	+= "if (_ctx != null && !_ctx.typeof.fits(${ctxType.qname}#))\n"
-			renderCode	+= "	throw ${EfanErr#.qname}(\"ctx \${_ctx.typeof.signature} does not fit ctx type " + ctxType.signature.replace("sys::", "") + "\")\n"
-		}		
-		renderCode	+= "${ctxTypeSig} ${ctxName} := _ctx\n"
-		renderCode	+= "\n"
-		renderCode	+= parseResult.fantomCode
-		renderCode	+= "\t\t${fieldName} := this.${fieldName}\n"
-		renderCode	+= "\t\t${fieldName}_ref.cleanUp\n"
-		renderCode	+= "\t\treturn ${fieldName}\n"
-
-		model.addMethod(Str#, renderMethodName, "Obj? _ctx", renderCode)
-
+		
 		// give callbacks a chance to add to our model - added for efanXtra and Pillow
 		compilerCallbacks.each { it.call(viewHelpers.first ?: Obj#, model) }
+
+		
+		// check the ctx type here so it also works from renderEfan()  
+		renderCode	:= ""
+		if (ctxType != null) {
+			if (!ctxType.isNullable) {
+				renderCode	+= "if (_ctx == null)\n"
+				renderCode	+= "	throw ${EfanErr#.qname}(\"ctx is null - but ctx type is not nullable: ${ctxType.typeof.signature}\")\n"
+			}
+			renderCode	+= "if (_ctx != null && !_ctx.typeof.fits(${ctxType.qname}#))\n"
+			renderCode	+= "	throw ${EfanErr#.qname}(\"ctx \${_ctx.typeof.signature} does not fit ctx type " + ctxType.signature.replace("sys::", "") + "\")\n"
+			renderCode	+= "${ctxType.signature} ${ctxName} := _ctx\n"
+			renderCode	+= "\n"
+		} else
+			// some code does want a null ctx to exist!
+			renderCode	+= "Obj? ${ctxName} := _ctx\n"
+
+		renderCode	+= parseResult.fantomCode
+
+		// check that efanXtra hasn't deleted the localRef!
+		hasLocalRef := model.fields.any { it.name == localName && it.type == LocalRef# }
+		if (hasLocalRef) {
+			renderCode	+= "${fieldName} := this.${fieldName}\n"
+			renderCode	+= "${localName}.cleanUp\n"
+			renderCode	+= "return ${fieldName}"
+		} else
+			renderCode	+= "return this.${fieldName}"
+
+		model.addMethod(Str#, renderMethodName, "Obj? _ctx", renderCode)
 		
 		efanType := compileModel(model, templateSrc, templateLoc)
 		

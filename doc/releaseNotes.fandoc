@@ -5,6 +5,7 @@ v2.0.4
 ======
  - New: 'EfanCompiler' now takes callbacks for efan generation (for efanXtra v2.0).
  - Chg: Optimised Fantom code generation (removed all string interpolation).
+ - Chg: Updates for 'afEfanXtra' v2.0!
  - Chg: Removed outdated 'ErrMsgs' class.
 
 v2.0.2

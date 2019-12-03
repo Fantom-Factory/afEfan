@@ -5,7 +5,7 @@ internal class EfanModel : Pusher {
 	StrBuf 	code
 	Str[]	usings	:= [,]
 	
-	private Int				indentSize	:= 1
+	private Int				indentSize	:= 0
 	private SrcCodeSnippet	snippet
 	private Int				linesOfPadding
 	private Str				bufFieldName
