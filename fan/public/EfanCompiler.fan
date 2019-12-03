@@ -65,7 +65,7 @@ const class EfanCompiler {
 
 		// we need the special syntax of "_efan_output = XXXX" so we don't have to close any brackets with eval expressions
 		fieldName := efanParser.fieldName
-		model.addField(LocalRef#,	fieldName + "_ref").withInitValue("${LocalRef#.qname}(\"${fieldName}\") |->Obj| { StrBuf() }")
+		model.addField(LocalRef#,	fieldName + "_ref").withInitValue("${LocalRef#.qname}(\"${fieldName}\") |->StrBuf| { StrBuf() }")
 		model.addField(Obj?#,		fieldName, """((StrBuf) ${fieldName}_ref.val).toStr""", """((StrBuf) ${fieldName}_ref.val).add(it)""")
 
 		

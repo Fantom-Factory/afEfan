@@ -44,10 +44,10 @@ internal class EfanModel : Pusher {
 		if (eval.isEmpty) return
 		
 		if (eval.contains("\n")) {
-			indent.append("${bufFieldName} = ")	// no need to end this line
+			indent.append(bufFieldName).append(" = ")	// no need to end this line
 			appendMulti(eval, lineNo)
 		} else {
-			indent.append("${bufFieldName} = ${eval}").appendLineNo(lineNo).endLine
+			indent.append(bufFieldName).append(" = ").append(eval).appendLineNo(lineNo).endLine
 		}
 		
 		if (eval.endsWith("{"))
@@ -60,9 +60,9 @@ internal class EfanModel : Pusher {
 
 		// add the '#' so it can not be confused with "// (efan) --> XXX"
 		if (comment.contains("\n")) {
-			appendMulti(comment, lineNo) { "// # " + it }
+			appendMulti(comment, lineNo, "// # ")
 		} else {
-			indent.append("// # ${comment}").appendLineNo(lineNo).endLine
+			indent.append("// # ").append(comment).appendLineNo(lineNo).endLine
 		}
 	}
 
@@ -79,7 +79,7 @@ internal class EfanModel : Pusher {
 	
 	override Void onText(Int lineNo, Str text) {
 		if (text.isEmpty) return
-		indent.append("${bufFieldName} = ${text.toCode}").appendLineNo(lineNo).endLine
+		indent.append(bufFieldName).append(" = ").append(text.toCode).appendLineNo(lineNo).endLine
 	}
 
 	override Void onExit(Int lineNo, BlockType blockType) { }
@@ -91,11 +91,14 @@ internal class EfanModel : Pusher {
 	// ---- Private Methods ----
 	
 	private This indent() {
-		append("".padl(indentSize, '\t'))
+		for (i := 0; i < indentSize; ++i) {
+			code.addChar('\t')
+		}
+		return this
 	}
 	
 	private This appendLineNo(Int lineNo) {
-		append("\t// (efan) --> ${lineNo}")
+		append("\t// (efan) --> ").append(lineNo.toStr)
 		return this
 	}
 
@@ -109,14 +112,16 @@ internal class EfanModel : Pusher {
 		return this
 	}
 
-	private This appendMulti(Str code, Int lineNo, |Str, Int -> Str|? c := null) {
+	private This appendMulti(Str code, Int lineNo, Str linePrefix := "") {
 		indentSize++
 		lineNo--
-		code.split('\n').each |line| {
+		lines := code.split('\n')
+		for (i := 0; i < lines.size; ++i) {
+			line := lines[i]
 			lineNo++
-			if (line.isEmpty) return
-			str := c?.call(line, lineNo) ?: line
-			indent.append(str).appendLineNo(lineNo).endLine
+			if (line.size > 0) {
+				indent.append(linePrefix).append(line).appendLineNo(lineNo).endLine
+			}
 		}
 		indentSize--
 		return this

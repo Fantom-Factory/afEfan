@@ -1,9 +1,13 @@
 v2.0.0
 ******
 
+v2.0.4
+======
+ - Chg: Optimised Fantom code generation (removed all string interpolation).
+
 v2.0.2
 ======
- - Chg: Removed hard coded string references to 'afConcurrent::LocalRef'.
+ - Chg: Removed hard coded string references to 'afConcurrent::LocalRef' (for compatibility with 'afUberPod').
 
 v2.0.0
 ======

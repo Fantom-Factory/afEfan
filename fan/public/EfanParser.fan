@@ -46,9 +46,9 @@ const class EfanParser {
 	}
 	
 	internal Void doParse(Uri srcLocation, Pusher pusher, Str efanCode) {
-		efanIn	:= efanCode.toBuf
+		efanIn	:= efanCode.in
 		data	:= ParserData(pusher, efanCode, removeWhitespace)
-		while (efanIn.more) {
+		while (efanIn.peekChar != null) {
 			// escape chars can be in both text and blocks
 			if (peekEq(efanIn, tokenEscapeStart)) {
 				data.addChar('<').addChar('%')
@@ -130,18 +130,60 @@ const class EfanParser {
 	}
 
 	** If tag is next, consume it and return true
-	private Bool peekEq(Buf buf, Str tag) {
-		if (buf.remaining < tag.size)
-			return false
-
-		peek := buf.readChars(tag.size)
-		if (peek == tag) {
-			return true
-		} else {
-			// BugFix: buf.seek doesn't take into account char encoding
-			peek.eachr { buf.unreadChar(it) }
+	private Bool peekEq(InStream in, Str tag) {
+		p1 := in.readChar
+		if (p1 == null) {
 			return false
 		}
+		if (p1 != tag[0]) {
+			in.unreadChar(p1)
+			return false
+		}
+		if (tag.size == 1)
+			return true
+
+		p2 := in.readChar
+		if (p2 == null) {
+			in.unreadChar(p1)
+			return false
+		}
+		if (p2 != tag[1]) {
+			in.unreadChar(p2)
+			in.unreadChar(p1)
+			return false
+		}
+		if (tag.size == 2)
+			return true
+		
+		p3 := in.readChar
+		if (p3 == null) {
+			in.unreadChar(p2)
+			in.unreadChar(p1)
+			return false
+		}
+		if (p3 != tag[2]) {
+			in.unreadChar(p3)
+			in.unreadChar(p2)
+			in.unreadChar(p1)
+			return false
+		}
+		if (tag.size == 3)
+			return true
+		
+		throw UnsupportedErr("efan tags must be < 3 chars: $tag")
+
+		// use the above hardcoded logic for speed
+//		if (buf.avail < tag.size)
+//			return false
+//
+//		peek := buf.readChars(tag.size)
+//		if (peek == tag) {
+//			return true
+//		} else {
+//			// BugFix: buf.seek doesn't take into account char encoding
+//			peek.eachr { buf.unreadChar(it) }
+//			return false
+//		}
 	}
 }
 
@@ -208,29 +250,46 @@ internal class ParserData {
 		lineNo++
 	}
 	Void push() {
+		push := null as Push
 		switch (blockType) {
-			case BlockType.text:
-			    pushes.add(Push() { it.method = Pusher#onText; 		it.lineNo = this.lineNo })
-			case BlockType.comment:
-			    pushes.add(Push() { it.method = Pusher#onComment; 	it.lineNo = this.lineNoToSend })
-			case BlockType.fanCode:
-			    pushes.add(Push() { it.method = Pusher#onFanCode; 	it.lineNo = this.lineNoToSend })
-			case BlockType.instruction:
-			    pushes.add(Push() { it.method = Pusher#onInstruction;it.lineNo = this.lineNoToSend })
-			case BlockType.eval:
-			    pushes.add(Push() { it.method = Pusher#onEval; 		it.lineNo = this.lineNoToSend })
+			case BlockType.text			: push = Push(lineNo,		Pusher#onText)
+			case BlockType.comment		: push = Push(lineNoToSend, Pusher#onComment)
+			case BlockType.fanCode		: push = Push(lineNoToSend, Pusher#onFanCode)
+			case BlockType.instruction	: push = Push(lineNoToSend, Pusher#onInstruction)
+			case BlockType.eval			: push = Push(lineNoToSend, Pusher#onEval)
+			default						: throw Err("Unknown BlockType: $blockType")
 		}
-		pushes.peek.blockType = blockType
-		pushes.peek.line = buf.toStr
+		push.blockType	= blockType
+		push.line		= buf.toStr
+		pushes.add(push)
 		
 		lineNoToSend = lineNo
 		buf.clear
 	}
 	Void flush() {
+
 		// do dat intelligent whitespace removal - only clear lines WITH non-text blocks!
-		if (removeWs && pushes.all { it.isEmpty || it.canClear } && pushes.any { it.canClear })
-			pushes = pushes.exclude { it.isEmpty }
-		pushes.each { it.push(pusher) }
+		if (removeWs) {
+			allEmptyOrClear := true
+			anyCanClear	 	:= false
+			i				:= 0
+			while (i < pushes.size && allEmptyOrClear == true) {
+				push := pushes[i++]
+				if (!push.isEmpty && !push.canClear)
+					allEmptyOrClear = false
+				if (push.canClear)
+					anyCanClear	= true
+			}
+			if (allEmptyOrClear && anyCanClear)
+				pushes = pushes.exclude(Push#isEmpty.func)
+		}
+		// the un-optimised code for above
+//		if (removeWs && pushes.all { it.isEmpty || it.canClear } && pushes.any { it.canClear })
+//			pushes = pushes.exclude { it.isEmpty }
+		
+		for (i := 0; i < pushes.size; ++i) {
+			pushes[i].push(pusher)
+		}
 		pushes.clear
 	}
 }
@@ -241,15 +300,18 @@ internal class Push {
 	Int			lineNo
 	BlockType?	blockType
 	Str?		line
-	new make(|This|in) { in(this) }
+	new make(Int lineNo, Method method) {
+		this.lineNo	= lineNo
+		this.method	= method
+	}
 	Bool isEmpty() {
-		blockType == BlockType.text && line.trim.isEmpty
+		blockType == BlockType.text && line.all(Int#isSpace.func)
 	}
 	Bool canClear() {
 		 clearables.contains(blockType)
 	}
 	Void push(Pusher pusher) {
-		method.callOn(pusher, [lineNo, line])
+		method.call(pusher, lineNo, line)
 	}
 }
 
@@ -258,10 +320,10 @@ internal enum class BlockType {
 }
 
 internal mixin Pusher {
-	abstract Void onFanCode(Int lineNo, Str fanCode)
-	abstract Void onComment(Int lineNo, Str comment)
-	abstract Void onText(Int lineNo, Str text)
-	abstract Void onEval(Int lineNo, Str fanCode)
-	abstract Void onInstruction(Int lineNo, Str instruction)
-	abstract Void onExit(Int lineNo, BlockType blockType)
+	abstract Void onFanCode		(Int lineNo, Str fanCode)
+	abstract Void onComment		(Int lineNo, Str comment)
+	abstract Void onText		(Int lineNo, Str text)
+	abstract Void onEval		(Int lineNo, Str fanCode)
+	abstract Void onInstruction	(Int lineNo, Str instruction)
+	abstract Void onExit		(Int lineNo, BlockType blockType)
 }
