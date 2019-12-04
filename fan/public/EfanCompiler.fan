@@ -79,6 +79,8 @@ const class EfanCompiler {
 		// give callbacks a chance to add to our model - added for efanXtra and Pillow
 		compilerCallbacks.each { it.call(viewHelpers.first ?: Obj#, model) }
 
+		beforeRender := model.methods.find { it.name == "efan_beforeRender" }
+		afterRender  := model.methods.find { it.name == "efan_afterRender"  }
 		
 		// check the ctx type here so it also works from renderEfan()  
 		renderCode	:= ""
@@ -92,10 +94,26 @@ const class EfanCompiler {
 			renderCode	+= "${ctxType.signature} ${ctxName} := _ctx\n"
 			renderCode	+= "\n"
 		} else
-			// some code does want a null ctx to exist!
+			// some code (in my tests at least!) do want a null ctx to exist!
 			renderCode	+= "Obj? ${ctxName} := _ctx\n"
 
+		// render some render hooks
+		if (beforeRender != null)
+			if (beforeRender.signature.isEmpty)
+				renderCode	+= beforeRender.name + "()\n"
+			else
+				// assume any paramters are for the ctx - not that I need this myself in any library
+				renderCode	+= beforeRender.name + "(_ctx)\n"
+		
 		renderCode	+= parseResult.fantomCode
+
+		// render some render hooks - this one is used by efanXtra
+		if (afterRender != null)
+			if (afterRender.signature.isEmpty)
+				renderCode	+= afterRender.name + "()\n"
+			else
+				// assume any paramters are for the ctx - not that I need this myself in any library
+				renderCode	+= afterRender.name + "(_ctx)\n"
 
 		// check that efanXtra hasn't deleted the localRef!
 		hasLocalRef := model.fields.any { it.name == localName && it.type == LocalRef# }

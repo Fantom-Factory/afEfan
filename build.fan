@@ -26,12 +26,12 @@ class Build : BuildPod {
 
 		depends = [
 			// ---- Fantom Core ----
-			"sys          1.0.68 - 1.0",
-			"concurrent   1.0.68 - 1.0",
+			"sys          1.0.69 - 1.0",
+			"concurrent   1.0.69 - 1.0",
 			
 			// ---- Fantom Factory ----
-			"afConcurrent 1.0.22 - 1.0",	// use the SkySpark versions
-			"afPlastic    1.1.4  - 1.1",	// use the SkySpark versions
+			"afConcurrent 1.0.22 - 1.0",	// use the SkySpark version
+			"afPlastic    1.1.6  - 1.1",
 		]
 
 		srcDirs = [`fan/`, `fan/internal/`, `fan/public/`, `test/unit-tests/`]

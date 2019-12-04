@@ -4,6 +4,10 @@ internal class TestEfanBasics : EfanTest {
 	Void testOneLineText() {
 		text := efan.render("Hello!", null)
 		verifyEq(text, "Hello!")
+
+		// again!
+		text = efan.render("Hello!", null)
+		verifyEq(text, "Hello!")
 	}
 
 	Void testOneLineEmptyBlock() {
