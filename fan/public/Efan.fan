@@ -1,4 +1,3 @@
-using afPlastic
 
 ** Convenience methods for compiling and rendering efan templates.
 ** 
