@@ -94,7 +94,15 @@ const class EfanMeta {
 
 		templateLineNo	:= findTemplateLineNo(typeSrc, srcCodeLineNo) ?: throw cause
 		srcCodeSnippet	:= SrcCodeSnippet(templateLoc, templateSrc)
-		return EfanRuntimeErr(srcCodeSnippet, templateLineNo, cause.msg, srcCodePadding, cause)
+		efanErr			:= EfanRuntimeErr(srcCodeSnippet, templateLineNo, cause.msg, srcCodePadding, cause)
+		
+		// allow afxEfan to convert EfanErrs to AfxErrs
+		newErr			:= Env.cur.index("afEfan.errFn").eachWhile |qname| {
+			try	return Method.findMethod(qname, false)?.call(efanErr) as Err
+			catch { /* Meh */ return null }
+		} ?: efanErr
+		
+		return newErr
 	}
 
 	internal static Int? findTemplateLineNo(Str typeSrc, Int srcCodeLineNo) {

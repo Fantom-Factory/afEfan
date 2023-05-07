@@ -46,97 +46,106 @@ const class EfanCompiler {
 	** 
 	** Note that 'templateLoc' is only used for reporting Err msgs.
 	EfanMeta compile(Uri templateLoc, Str templateSrc, Type? ctxType := null, Type[] viewHelpers := Type#.emptyList) {
-		viewHelpers.each {
-			if (!it.isPublic)
-				throw EfanErr("View Helper mixin ${it.qname} should be public.")
-		}
-	
-		// the important efan parsing
-		parseResult	:= efanParser.parse(templateLoc, templateSrc)
-
-
-		isConst	:= viewHelpers.first?.isConst ?: true	// const by default
-		model := PlasticClassModel(templateTypeNameFn(viewHelpers), isConst)
-		
-		
-		parseResult.usings.each { model.usingStr(it) }
-		model.usingType(EfanMeta#)
-
-		
-		viewHelpers.each { model.extend(it) }
-		viewHelpers.first?.methods?.findAll { it.isCtor }?.each {
-			model.overrideCtor(it, "")
-		}
-		
-
-		// we need the special syntax of "_efan_output = XXXX" so we don't have to close any brackets with eval expressions
-		fieldName := efanParser.fieldName
-		localName := fieldName + "_ref"
-		model.addField(LocalRef#,	localName).withInitValue("${LocalRef#.qname}(\"${fieldName}\") |->StrBuf| { StrBuf() }")
-		model.addField(Obj?#,		fieldName, """((StrBuf) ${fieldName}_ref.val).toStr""", """((StrBuf) ${fieldName}_ref.val).add(it)""")
-
-		
-		// give callbacks a chance to add to our model - added for efanXtra and Pillow
-		compilerCallbacks.each { it.call(viewHelpers.first ?: Obj#, model) }
-
-		beforeRender := model.methods.find { it.name == "efan_beforeRender" }
-		afterRender  := model.methods.find { it.name == "efan_afterRender"  }
-		
-		// check the ctx type here so it also works from renderEfan()  
-		renderCode	:= ""
-		if (ctxType != null) {
-			if (!ctxType.isNullable) {
-				renderCode	+= "if (_ctx == null)\n"
-				renderCode	+= "	throw ${EfanErr#.qname}(\"ctx is null - but ctx type is not nullable: ${ctxType.typeof.signature}\")\n"
+		try {
+			viewHelpers.each {
+				if (!it.isPublic)
+					throw EfanErr("View Helper mixin ${it.qname} must be public")
 			}
-			renderCode	+= "if (_ctx != null && !_ctx.typeof.fits(${ctxType.qname}#))\n"
-			renderCode	+= "	throw ${EfanErr#.qname}(\"ctx \${_ctx.typeof.signature} does not fit ctx type " + ctxType.signature.replace("sys::", "") + "\")\n"
-			renderCode	+= "${ctxType.signature} ${ctxName} := _ctx\n"
-			renderCode	+= "\n"
-		} else
-			// some code (in my tests at least!) do want a null ctx to exist!
-			renderCode	+= "Obj? ${ctxName} := _ctx\n"
-
-		// render some render hooks
-		if (beforeRender != null)
-			if (beforeRender.signature.isEmpty)
-				renderCode	+= beforeRender.name + "()\n"
-			else
-				// assume any paramters are for the ctx - not that I need this myself in any library
-				renderCode	+= beforeRender.name + "(_ctx)\n"
 		
-		renderCode	+= parseResult.fantomCode
+			// the important efan parsing
+			parseResult	:= efanParser.parse(templateLoc, templateSrc)
 
-		// render some render hooks - this one is used by efanXtra
-		if (afterRender != null)
-			if (afterRender.signature.isEmpty)
-				renderCode	+= afterRender.name + "()\n"
-			else
-				// assume any paramters are for the ctx - not that I need this myself in any library
-				renderCode	+= afterRender.name + "(_ctx)\n"
 
-		// check that efanXtra hasn't deleted the localRef!
-		hasLocalRef := model.fields.any { it.name == localName && it.type == LocalRef# }
-		if (hasLocalRef) {
-			renderCode	+= "${fieldName} := this.${fieldName}\n"
-			renderCode	+= "${localName}.cleanUp\n"
-			renderCode	+= "return ${fieldName}"
-		} else
-			renderCode	+= "return this.${fieldName}"
+			isConst	:= viewHelpers.first?.isConst ?: true	// const by default
+			model := PlasticClassModel(templateTypeNameFn(viewHelpers), isConst)
+			
+			
+			parseResult.usings.each { model.usingStr(it) }
+			model.usingType(EfanMeta#)
 
-		model.addMethod(Str#, renderMethodName, "Obj? _ctx", renderCode)
-		
-		efanType := compileModel(model, templateSrc, templateLoc)
-		
-		return EfanMeta {
-			it.type 			= efanType
-			it.typeSrc			= model.toFantomCode
-			it.templateLoc		= templateLoc
-			it.templateSrc		= templateSrc
-			it.srcCodePadding	= plasticCompiler.srcCodePadding
-			it.ctxType			= ctxType
-			it.ctxName			= this.ctxName
-			it.renderMethod		= efanType.method(renderMethodName, true)
+			
+			viewHelpers.each { model.extend(it) }
+			viewHelpers.first?.methods?.findAll { it.isCtor }?.each {
+				model.overrideCtor(it, "")
+			}
+			
+
+			// we need the special syntax of "_efan_output = XXXX" so we don't have to close any brackets with eval expressions
+			fieldName := efanParser.fieldName
+			localName := fieldName + "_ref"
+			model.addField(LocalRef#,	localName).withInitValue("${LocalRef#.qname}(\"${fieldName}\") |->StrBuf| { StrBuf() }")
+			model.addField(Obj?#,		fieldName, """((StrBuf) ${fieldName}_ref.val).toStr""", """((StrBuf) ${fieldName}_ref.val).add(it)""")
+
+			
+			// give callbacks a chance to add to our model - added for efanXtra and Pillow
+			compilerCallbacks.each { it.call(viewHelpers.first ?: Obj#, model) }
+
+			beforeRender := model.methods.find { it.name == "efan_beforeRender" }
+			afterRender  := model.methods.find { it.name == "efan_afterRender"  }
+			
+			// check the ctx type here so it also works from renderEfan()  
+			renderCode	:= ""
+			if (ctxType != null) {
+				if (!ctxType.isNullable) {
+					renderCode	+= "if (_ctx == null)\n"
+					renderCode	+= "	throw ${EfanErr#.qname}(\"ctx is null - but ctx type is not nullable: ${ctxType.typeof.signature}\")\n"
+				}
+				renderCode	+= "if (_ctx != null && !_ctx.typeof.fits(${ctxType.qname}#))\n"
+				renderCode	+= "	throw ${EfanErr#.qname}(\"ctx \${_ctx.typeof.signature} does not fit ctx type " + ctxType.signature.replace("sys::", "") + "\")\n"
+				renderCode	+= "${ctxType.signature} ${ctxName} := _ctx\n"
+				renderCode	+= "\n"
+			} else
+				// some code (in my tests at least!) do want a null ctx to exist!
+				renderCode	+= "Obj? ${ctxName} := _ctx\n"
+
+			// render some render hooks
+			if (beforeRender != null)
+				if (beforeRender.signature.isEmpty)
+					renderCode	+= beforeRender.name + "()\n"
+				else
+					// assume any paramters are for the ctx - not that I need this myself in any library
+					renderCode	+= beforeRender.name + "(_ctx)\n"
+			
+			renderCode	+= parseResult.fantomCode
+
+			// render some render hooks - this one is used by efanXtra
+			if (afterRender != null)
+				if (afterRender.signature.isEmpty)
+					renderCode	+= afterRender.name + "()\n"
+				else
+					// assume any paramters are for the ctx - not that I need this myself in any library
+					renderCode	+= afterRender.name + "(_ctx)\n"
+
+			// check that efanXtra hasn't deleted the localRef!
+			hasLocalRef := model.fields.any { it.name == localName && it.type == LocalRef# }
+			if (hasLocalRef) {
+				renderCode	+= "${fieldName} := this.${fieldName}\n"
+				renderCode	+= "${localName}.cleanUp\n"
+				renderCode	+= "return ${fieldName}"
+			} else
+				renderCode	+= "return this.${fieldName}"
+
+			model.addMethod(Str#, renderMethodName, "Obj? _ctx", renderCode)
+			
+			efanType := compileModel(model, templateSrc, templateLoc)
+			
+			return EfanMeta {
+				it.type 			= efanType
+				it.typeSrc			= model.toFantomCode
+				it.templateLoc		= templateLoc
+				it.templateSrc		= templateSrc
+				it.srcCodePadding	= plasticCompiler.srcCodePadding
+				it.ctxType			= ctxType
+				it.ctxName			= this.ctxName
+				it.renderMethod		= efanType.method(renderMethodName, true)
+			}
+		} catch (Err err) {
+			// allow afxEfan to convert EfanErrs to AfxErrs
+			newErr := Env.cur.index("afEfan.errFn").eachWhile |qname| {
+				try	return Method.findMethod(qname, false)?.call(err) as Err
+				catch { /* Meh */ return null }
+			} ?: err
+			throw newErr
 		}
 	}
 
