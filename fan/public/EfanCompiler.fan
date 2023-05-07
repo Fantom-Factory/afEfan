@@ -2,7 +2,6 @@ using afPlastic::PlasticCompilationErr
 using afPlastic::PlasticClassModel
 using afPlastic::PlasticCompiler
 using afPlastic::SrcCodeSnippet
-using afConcurrent::LocalRef
 
 ** Compiles an efan template into a method on a Fantom type.
 ** 
@@ -72,9 +71,8 @@ const class EfanCompiler {
 
 			// we need the special syntax of "_efan_output = XXXX" so we don't have to close any brackets with eval expressions
 			fieldName := efanParser.fieldName
-			localName := fieldName + "_ref"
-			model.addField(LocalRef#,	localName).withInitValue("${LocalRef#.qname}(\"${fieldName}\") |->StrBuf| { StrBuf() }")
-			model.addField(Obj?#,		fieldName, """((StrBuf) ${fieldName}_ref.val).toStr""", """((StrBuf) ${fieldName}_ref.val).add(it)""")
+			model.addMethod(StrBuf#, "${fieldName}Ref", "", """concurrent::Actor.locals[${fieldName.toCode}]""")
+			model.addField(Obj?#,		fieldName, """${fieldName}Ref.toStr""", """${fieldName}Ref.add(it)""")
 
 			
 			// give callbacks a chance to add to our model - added for efanXtra and Pillow
@@ -103,7 +101,7 @@ const class EfanCompiler {
 				if (beforeRender.signature.isEmpty)
 					renderCode	+= beforeRender.name + "()\n"
 				else
-					// assume any paramters are for the ctx - not that I need this myself in any library
+					// assume any parameters are for the ctx - not that I need this myself in any library
 					renderCode	+= beforeRender.name + "(_ctx)\n"
 			
 			renderCode	+= parseResult.fantomCode
@@ -113,17 +111,10 @@ const class EfanCompiler {
 				if (afterRender.signature.isEmpty)
 					renderCode	+= afterRender.name + "()\n"
 				else
-					// assume any paramters are for the ctx - not that I need this myself in any library
+					// assume any parameters are for the ctx - not that I need this myself in any library
 					renderCode	+= afterRender.name + "(_ctx)\n"
 
-			// check that efanXtra hasn't deleted the localRef!
-			hasLocalRef := model.fields.any { it.name == localName && it.type == LocalRef# }
-			if (hasLocalRef) {
-				renderCode	+= "${fieldName} := this.${fieldName}\n"
-				renderCode	+= "${localName}.cleanUp\n"
-				renderCode	+= "return ${fieldName}"
-			} else
-				renderCode	+= "return this.${fieldName}"
+			renderCode	+= "return this.${fieldName}"
 
 			model.addMethod(Str#, renderMethodName, "Obj? _ctx", renderCode)
 			
@@ -138,6 +129,8 @@ const class EfanCompiler {
 				it.ctxType			= ctxType
 				it.ctxName			= this.ctxName
 				it.renderMethod		= efanType.method(renderMethodName, true)
+				// there's no reason to keep this the same - but may as well for consistency
+				it.strBufKey		= fieldName
 			}
 		} catch (Err err) {
 			// allow afxEfan to convert EfanErrs to AfxErrs
@@ -164,4 +157,3 @@ const class EfanCompiler {
 		}
 	}
 }
-

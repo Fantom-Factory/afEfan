@@ -1,5 +1,6 @@
 using afPlastic::SrcCodeSnippet
 using concurrent::AtomicRef
+using concurrent::Actor
 
 ** Meta data about an efan template. 
 ** 
@@ -26,6 +27,11 @@ const class EfanMeta {
 	
 	** The rendering method on 'type'.
 	const Method renderMethod
+	
+	** The key in 'Actor.locals' that stores the 'StrBuf' that efan renders to.
+	** See EFan
+	internal
+	const Str strBufKey
 	
 	// plastic will always need the concurrent pod (to store JVM unique pod name),
 	// so we're not adding any extra dependencies here
@@ -59,9 +65,19 @@ const class EfanMeta {
 	Str renderFrom(Obj instance, Obj? ctx) {
 		if (instance.typeof.fits(type).not)
 			throw ArgErr("Given instance does not fit template type: ${instance.typeof.qname} => ${type.qname}")
+
+		// cater for nested renders (see TestLayout)
+		old := Actor.locals[strBufKey]
+		Actor.locals[strBufKey] = StrBuf()
 		try	return renderMethod.call(instance, ctx)
 		catch (Err err)
 			throw efanRuntimeErr(err)
+		finally {
+			if (old == null)
+				Actor.locals.remove(strBufKey)
+			else
+				Actor.locals[strBufKey] = old
+		}
 	}
 	
 	** Returns an instance of 'type' via 'type.make()'. 

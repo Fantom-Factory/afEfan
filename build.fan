@@ -30,13 +30,12 @@ class Build : BuildPod {
 			"concurrent   1.0.69 - 1.0",
 
 			// ---- Fantom Factory ----
-			"afConcurrent 1.0.22 - 1.0",	// use the SkySpark version
 			"afPlastic    1.1.6  - 1.1",
 		]
 
 		srcDirs = [`fan/`, `fan/internal/`, `fan/public/`, `test/unit-tests/`]
 		resDirs = [`doc/`, `svg/`]
 
-		meta["afBuild.uberPod"] = "afConcurrent/LocalRef afConcurrent/ConcurrentBase64 afPlastic"
+		meta["afBuild.uberPod"] = "afPlastic"
 	}
 }
