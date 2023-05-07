@@ -1,18 +1,18 @@
 v2.0.0
 ******
 
-v2.0.4
+v2.0.4 [#v2.0.4]
 ======
  - New: 'EfanCompiler' now takes callbacks for efan generation (for efanXtra v2.0).
  - Chg: Optimised Fantom code generation (removed all string interpolation).
  - Chg: Updates for 'afEfanXtra' v2.0!
  - Chg: Removed outdated 'ErrMsgs' class.
 
-v2.0.2
+v2.0.2 [#v2.0.2]
 ======
  - Chg: Removed hard coded string references to 'afConcurrent::LocalRef' (for compatibility with 'afUberPod').
 
-v2.0.0
+v2.0.0 [#v2.0.0]
 ======
  - New: 'afEfan' now available as a SkySpark extension.
  - Chg: Re-engineered, simplified, and exposed the internal workings of efan. The parser may be used for your own code generation.
@@ -21,25 +21,26 @@ v2.0.0
  - Chg: Generated pod and type names are more customised.
 
 
-v1.x.x
+
+v1.x.x [#v1.x.x]
 ******
 
-v1.5.2
+v1.5.2 [#v1.5.2]
 ======
  - Bug: Rendering nested component bodies could corrupt the generated output.
 
-v1.5.0
+v1.5.0 [#v1.5.0]
 ======
  - New: Added 'Efan.renderingStack()' and associated 'RenderingElements' to inspect what's currently being rendered.
  - Chg: Removed the 'EfanTemplate' mixin - rendering is done via 'EfanTemplateMeta' instead. (Breaking change.)
  - Chg: 'ViewHelpers' may be 'const' or 'non-const', 'classes' or 'mixins'.
  - Chg: Updated to work with [Plastic v1.1]`pod:afPlastic`.
 
-v1.4.2
+v1.4.2 [#v1.4.2]
 ======
  - Chg: 'EfanEngine' generates less brittle rendering code.
 
-v1.4.0
+v1.4.0 [#v1.4.0]
 ======
  - New: Intelligent whitespace removal.
  - Chg: Overhauled and simplified the public API, mainly the advanced classes. (Breaking change.)
@@ -47,27 +48,27 @@ v1.4.0
  - Chg: Renamed 'EfanRenderer' --> 'EfanTemplate'. (Breaking change.)
  - Chg: Renamed 'EfanMetaData' --> 'EfanTemplateMeta'. (Breaking change.)
 
-v1.3.8
+v1.3.8 [#v1.3.8]
 ======
  - Chg: Updated licence to *The MIT Licence*.
 
-v1.3.6
+v1.3.6 [#v1.3.6]
 ======
  - New: 'using' statements can be added with '<%? using ... %>' notation
  - New: efan tags can be escaped with '<%% ... %%>' notation.
  - Bug: Rendering 'null' values with debug logging turned on could cause NPEs.
 
-v1.3.4
+v1.3.4 [#v1.3.4]
 ======
  - Chg: Added 'withXtraMsg()' to EfanErrs so Err msgs can be appended to.
  - Chg: Internal API changes for 'afEfanXtra'.
 
-v1.3.2
+v1.3.2 [#v1.3.2]
 ======
  - Chg: Moved 'EfanRenderer.id' -> 'EfanMetaData.templateId'
  - Bug: Non ASCII templates could not be compiled.
 
-v1.3.0
+v1.3.0 [#v1.3.0]
 ======
  - Chg: Rejigged the public efan API.
  - Chg: Removed 'EfanRenderer.renderEfan(...)'. All template rendering is done via 'EfanRenderer.render(...)'.
@@ -75,7 +76,7 @@ v1.3.0
  - Chg: Massivly simplified nested component rendering by introducing a threaded 'EfanCtxStack'.
  - Chg: Added 'EfanRenderer.id' to make debugging efanXtra a bit more humane!
 
-v1.2.0
+v1.2.0 [#v1.2.0]
 ======
  - New: Runtime Errs thrown while rendering report efan template code snippets and line numbers.
  - New: 'EfanRenderer' now has an 'efanMetaData' field with more contextual information.
@@ -86,7 +87,7 @@ v1.2.0
  - Chg: Exposed (made public) the 'EfanErr' hierarchy.
  - Chg: Added optional 'makeFunc' to 'EfanCompiler.compileWithModel()'.
 
-v1.1.0
+v1.1.0 [#v1.1.0]
 ======
  - New: Added 'EfanRenderCtx' to ease efan extensions.
  - Chg: Updated to use [Plastic]`pod:afPlastic`.
@@ -94,7 +95,7 @@ v1.1.0
  - Chg: 'EfanRenderer' is now a mixin and is implemented by the rendering type.
  - Chg: 'renderEfan()' and 'renderBody()' are now methods on 'EfanRenderer'.
 
-v1.0.0
+v1.0.0 [#v1.0.0]
 ======
  - New: Efan templates may now be nested and can optionally render their body!
  - Chg: 'EfanCompiler' wraps the generated renderer in a sane 'const' 'EfanRenderer' wrapper.
@@ -103,13 +104,13 @@ v1.0.0
  - Chg: Removed dependency on [IoC]`pod:afIoc`, all 'Plastic' code has been copied in to efan.
  - Chg: Updated docs.
 
-v0.0.4
+v0.0.4 [#v0.0.4]
 ======
  - New: Hooked error reporting into afBedSheet.
  - New: 'EfanErr' now gives code snippets and line numbers of parsing and compilation errors.
  - Chg: Re-factored fantom code generation.
 
-v0.0.2
+v0.0.2 [#v0.0.2]
 ======
  - New: Preview release.
 
