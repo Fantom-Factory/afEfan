@@ -5,6 +5,7 @@ v2.0.6 [#v2.0.6]
 ======
  - Chg: Removed the dependency on 'afConcurrent' - which (neatly) accommodates FASS macros!
  - Chg: Added system hook that lets Efan Errs be converted to custom Errs (added for AFX).
+ - Chg: Added IDs to fandoc headings.
 
 v2.0.4 [#v2.0.4]
 ======

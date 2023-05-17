@@ -1,11 +1,11 @@
-# efan v2.0.4
+# efan v2.0.6
 ---
 
 [![Written in: Fantom](http://img.shields.io/badge/written%20in-Fantom-lightgray.svg)](https://fantom-lang.org/)
-[![pod: v2.0.4](http://img.shields.io/badge/pod-v2.0.4-yellow.svg)](http://eggbox.fantomfactory.org/pods/afEfan)
+[![pod: v2.0.6](http://img.shields.io/badge/pod-v2.0.6-yellow.svg)](http://eggbox.fantomfactory.org/pods/afEfan)
 [![Licence: ISC](http://img.shields.io/badge/licence-ISC-blue.svg)](https://choosealicense.com/licenses/isc/)
 
-## Overview
+## <a name="overview"></a>Overview
 
 `efan` is a library for rendering Embedded Fantom (efan) templates.
 
@@ -36,7 +36,7 @@ To use in a [Fantom](https://fantom-lang.org/) project, add a dependency to `bui
 
 Full API & fandocs are available on the [Eggbox](http://eggbox.fantomfactory.org/pods/afEfan/) - the Fantom Pod Repository.
 
-## Quick Start
+## <a name="quickStart"></a>Quick Start
 
 1. Create a text file called `Example.fan`    using afEfan
     
@@ -61,35 +61,35 @@ Full API & fandocs are available on the [Eggbox](http://eggbox.fantomfactory.org
 
 
 
-## Tags
+## <a name="tags"></a>Tags
 
 Efan supports the following tags:
 
-### Eval Tags
+### <a name="evalTags"></a>Eval Tags
 
 Any tag with the prefix `<%=` will evaluate the fantom expression and write it out as a Str.
 
     Hello, <%= "Emma".upper %>!
 
-### Comment Tags
+### <a name="commentTags"></a>Comment Tags
 
 Any tag with the prefix `<%#` is a comment and will be left out of the resulting template.
 
     <%# This is just a comment %>
 
-### Code Tags
+### <a name="codeTags"></a>Code Tags
 
 Any tag with the prefix `<%` will be converted into Fantom code.
 
     <% echo("Hello!") %>
 
-### Instruction Tags
+### <a name="instructionTags"></a>Instruction Tags
 
 The content of any tag with the prefix `<%?` is taken to be a Fantom `using` instruction.
 
     <%? using concurrent::Actor %>
 
-### Escaping Tags
+### <a name="escapingTags"></a>Escaping Tags
 
 All efan tags can be escaped by adding an extra `%` character to the start and end tags. Example:
 
@@ -99,7 +99,7 @@ prints:
 
     This is how you <%= escape %> efan tags.
 
-### Whitespace
+### <a name="whitespace"></a>Whitespace
 
 All whitespace in efan templates is preserved, except for when a line exists only to contain a code block (or similar). This has the effect of removing unwanted line breaks. For example:
 
@@ -128,7 +128,7 @@ and not:
 
 (Advanced users may turn this feature off in `EfanCompiler`.)
 
-## Template Context
+## <a name="templateContext"></a>Template Context
 
 Each template render method takes an argument called `ctx` which you can reference in your template. `ctx` is typed to whatever Obj you pass in, so you don't need to cast it. Examples:
 
@@ -156,7 +156,7 @@ Using objs:
     Efan().render(template, ctx)
     
 
-### Warning!
+### <a name="warning"></a>Warning!
 
 All classes not in `sys` (and that includes all classes in your application) need to be referenced by their fully qualified class name:
 
@@ -169,7 +169,7 @@ Or imported with `<%? using %>` statements:
 
 This is because compiled efan code resides in a newly constructed pod!
 
-## View Helpers
+## <a name="viewHelpers"></a>View Helpers
 
 Efan lets you provide view helpers for common tasks. View helpers are `classes` or `mixins` that your efan template will extend, giving your templates access to commonly used methods. Example, for escaping XML:
 
@@ -192,7 +192,7 @@ Template usage would then be:
     </p>
     
 
-## Err Reporting
+## <a name="errReporting"></a>Err Reporting
 
 Efan compilation and runtime Errs report snippets of code showing which line in the `efan` template the error occurred. Example:
 
@@ -215,7 +215,7 @@ Efan compilation and runtime Errs report snippets of code showing which line in 
 
 This really helps you see where typos occurred.
 
-## How efan Works
+## <a name="howEfanWorks"></a>How efan Works
 
 Efan works by converting the efan template string in to Fantom source code. It then compiles this source code into a new Fantom class.  This new Fantom class extends any given `ViewHelpers` and has a hidden `render()` method. That is how code in the template is able to access the `ViewHelpers`.
 
@@ -231,7 +231,7 @@ Each invocation of `Efan.compileXXX()` creates a new Fantom type, so use it judi
     hohoho   := template.render(3)
     
 
-## IoC
+## <a name="ioc"></a>IoC
 
 When efan is added as a dependency to an IoC enabled application, such as [BedSheet](http://eggbox.fantomfactory.org/pods/afBedSheet) or [Reflux](http://eggbox.fantomfactory.org/pods/afReflux), then the following services are automatically made available to IoC:
 
